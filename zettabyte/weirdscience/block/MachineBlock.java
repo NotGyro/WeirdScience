@@ -1,4 +1,4 @@
-package gyro.weirdscience.block;
+package zettabyte.weirdscience.block;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;

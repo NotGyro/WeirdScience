@@ -1,4 +1,4 @@
-package gyro.weirdscience;
+package zettabyte.weirdscience;
 
 //With which to build GUI-accessible inventories for tile entities declaratively.
 public class WSInventorySpec {

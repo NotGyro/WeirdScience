@@ -1,6 +1,6 @@
-package gyro.weirdscience.client.gui;
+package zettabyte.weirdscience.client.gui;
 
-import gyro.weirdscience.tileentity.*;
+import zettabyte.weirdscience.tileentity.*;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;

@@ -1,5 +1,5 @@
-package gyro.weirdscience.client;
-import gyro.weirdscience.CommonProxy;
+package zettabyte.weirdscience.client;
+import zettabyte.weirdscience.CommonProxy;
 import net.minecraftforge.client.MinecraftForgeClient;
 
 public class ClientProxy extends CommonProxy {

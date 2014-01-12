@@ -1,8 +1,9 @@
-package gyro.weirdscience;
+package zettabyte.weirdscience;
 
-import gyro.weirdscience.tileentity.TileEntityPhosphateEngine;
 
 import java.util.Random;
+
+import zettabyte.weirdscience.tileentity.TileEntityPhosphateEngine;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;

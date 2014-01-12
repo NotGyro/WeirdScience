@@ -1,4 +1,4 @@
-package gyro.weirdscience;
+package zettabyte.weirdscience;
 
 public class CommonProxy {
 

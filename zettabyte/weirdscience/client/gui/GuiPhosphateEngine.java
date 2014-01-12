@@ -1,6 +1,5 @@
-package gyro.weirdscience.client.gui;
+package zettabyte.weirdscience.client.gui;
 
-import gyro.weirdscience.tileentity.TileEntityPhosphateEngine;
 
 import net.minecraft.inventory.Container;
 import net.minecraft.util.ResourceLocation;
@@ -13,6 +12,8 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.StatCollector;
 
 import org.lwjgl.opengl.GL11;
+
+import zettabyte.weirdscience.tileentity.TileEntityPhosphateEngine;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;

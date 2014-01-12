@@ -1,6 +1,6 @@
-package gyro.weirdscience.client.gui;
+package zettabyte.weirdscience.client.gui;
 
-import gyro.weirdscience.tileentity.TileEntityPhosphateEngine;
+import zettabyte.weirdscience.tileentity.TileEntityPhosphateEngine;
 
 import cofh.gui.slot.SlotOutput;
 import cofh.gui.slot.SlotSpecificItem;

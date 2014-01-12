@@ -1,7 +1,10 @@
-package gyro.weirdscience;
+package zettabyte.weirdscience;
 
 
 import static java.lang.System.out;
+import zettabyte.weirdscience.block.*;
+import zettabyte.weirdscience.client.gui.WeirdScienceGUIHandler;
+import zettabyte.weirdscience.tileentity.TileEntityPhosphateEngine;
 //Basic Forge stuff.
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
@@ -27,9 +30,6 @@ import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraft.item.ItemPotion;
 //Import our own stuff.
-import gyro.weirdscience.block.*;
-import gyro.weirdscience.client.gui.WeirdScienceGUIHandler;
-import gyro.weirdscience.tileentity.TileEntityPhosphateEngine;
 
 @Mod(modid="WeirdScience", name="Weird Science", version="0.0.0")
 @NetworkMod(clientSideRequired=true)

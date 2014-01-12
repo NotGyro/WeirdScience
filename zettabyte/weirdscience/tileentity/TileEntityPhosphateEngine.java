@@ -1,4 +1,4 @@
-package gyro.weirdscience.tileentity;
+package zettabyte.weirdscience.tileentity;
 
 import java.util.Random;
 import static java.lang.System.out;
