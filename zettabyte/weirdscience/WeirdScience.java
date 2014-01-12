@@ -4,13 +4,13 @@ package zettabyte.weirdscience;
 import static java.lang.System.out;
 import zettabyte.weirdscience.block.*;
 import zettabyte.weirdscience.client.gui.WeirdScienceGUIHandler;
+import zettabyte.weirdscience.item.MelonPan;
 import zettabyte.weirdscience.tileentity.TileEntityPhosphateEngine;
 //Basic Forge stuff.
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
-
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -20,7 +20,6 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
-
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -44,6 +43,8 @@ public class WeirdScience {
     
     //TODO: Must find a better way to handle our own block registry.
     public static BlockPhosphateEngine phosphateEngine;
+    
+    public static Item melonPan;
     
     int idPhosphateEngine = 0;
     boolean enablePhosphateEngine = true;
@@ -93,6 +94,11 @@ public class WeirdScience {
     	}
     	NetworkRegistry.instance().registerGuiHandler(this, new WeirdScienceGUIHandler());
         proxy.registerRenderers();
+        
+        // Register the all-consuming Melonpan
+        melonPan = new MelonPan(4949);
+        LanguageRegistry.addName(melonPan, "Melonpan");
+        GameRegistry.addShapelessRecipe(new ItemStack(melonPan,MelonPan.craftCount), MelonPan.recipe);
     }
 
     @EventHandler
