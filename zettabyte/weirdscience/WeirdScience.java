@@ -36,7 +36,7 @@ import net.minecraft.item.ItemPotion;
 public class WeirdScience {
     @Instance(value = "WeirdScience")
     public static WeirdScience instance;
-    @SidedProxy(clientSide="gyro.weirdscience.client.ClientProxy", serverSide="gyro.weirdscience.CommonProxy")
+    @SidedProxy(clientSide="zettabyte.weirdscience.client.ClientProxy", serverSide="zettabyte.weirdscience.CommonProxy")
     public static CommonProxy proxy;
     
     
