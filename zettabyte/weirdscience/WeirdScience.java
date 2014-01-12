@@ -45,9 +45,13 @@ public class WeirdScience {
     public static BlockPhosphateEngine phosphateEngine;
     
     public static Item melonPan;
-    
+
     int idPhosphateEngine = 0;
     boolean enablePhosphateEngine = true;
+    
+
+    int idMelonPan = 0;
+    boolean enableMelonPan = true;
     
     @EventHandler // used in 1.6.2
     public void preInit(FMLPreInitializationEvent event) {
@@ -55,6 +59,7 @@ public class WeirdScience {
         config.load();
         //Enable/disable components of the mod.
         enablePhosphateEngine = config.get("Features", "Enable phosphate engine", true).getBoolean(true);
+        enableMelonPan = config.get("Features", "Enable melonpan", true, "If you disable Melonpan you're a horrible person.").getBoolean(true);
         //Manage misc. settings
         
         //Manage worldgen.
@@ -62,6 +67,7 @@ public class WeirdScience {
         //Retrieve block IDs
         //int TestID = config.get(Configuration.CATEGORY_BLOCK, "Single-block generator ID", 1014).getInt();
         idPhosphateEngine = config.getBlock("Phosphate engine ID", 3500, "In a later refactor, this will just be one sub-block of the machine block ID.").getInt();
+        idMelonPan = config.getItem("Melonpan item ID", 4949).getInt();
     
     	if(idPhosphateEngine != 0) {
 	    	phosphateEngine = (BlockPhosphateEngine)new BlockPhosphateEngine(idPhosphateEngine, Material.iron)
@@ -96,7 +102,7 @@ public class WeirdScience {
         proxy.registerRenderers();
         
         // Register the all-consuming Melonpan
-        melonPan = new MelonPan(4949);
+        melonPan = new MelonPan(idMelonPan);
         LanguageRegistry.addName(melonPan, "Melonpan");
         GameRegistry.addShapelessRecipe(new ItemStack(melonPan,MelonPan.craftCount), MelonPan.recipe);
     }
