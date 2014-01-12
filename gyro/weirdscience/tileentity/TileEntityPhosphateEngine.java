@@ -15,18 +15,19 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet132TileEntityData;
+import net.minecraft.tileentity.TileEntity;
 
 import net.minecraftforge.common.ForgeDirection;
 
-import cofh.api.energy.TileEnergyHandler;
-import cofh.api.tileentity.IEnergyInfo;
-import cofh.util.EnergyHelper;
+//import cofh.api.energy.TileEnergyHandler;
+//import cofh.api.tileentity.IEnergyInfo;
+//import cofh.api.energy.IEnergyHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 
-public class TileEntityPhosphateEngine extends TileEnergyHandler implements IEnergyInfo,
+public class TileEntityPhosphateEngine extends TileEntity implements //IEnergyHandler, IEnergyInfo,
 		ISidedInventory {
 	private static final int[] accessibleSlots = new int[] {0,1};
 
@@ -43,13 +44,16 @@ public class TileEntityPhosphateEngine extends TileEnergyHandler implements IEne
 	public TileEntityPhosphateEngine() {
 		this(20, 20, 80);
 	}
+
+	private int energy;
+	private int energyCap;
     
 	public TileEntityPhosphateEngine(int rfpd, int rfpt, int cap) {
 		super();
-		storage.modifyEnergyStored(0);
+		energy = 0;
 		this.rfPerDirt = rfpd;
 		this.rfPerTick = rfpt;
-		storage.setCapacity(cap);
+		energyCap = cap;
 	}
 
 	@Override
@@ -196,7 +200,7 @@ public class TileEntityPhosphateEngine extends TileEnergyHandler implements IEne
         	return false;
         }
 	}
-
+/*
 	@Override
 	public int getEnergyPerTick() {
 		// TODO Auto-generated method stub
@@ -232,7 +236,7 @@ public class TileEntityPhosphateEngine extends TileEnergyHandler implements IEne
 		storage.setMaxExtract(rfPerDirt);
 		storage.setMaxReceive(rfPerDirt);
 	}
-
+*/
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
 		int dirtQuantity = nbt.getInteger("dirtQuantity");
@@ -274,9 +278,11 @@ public class TileEntityPhosphateEngine extends TileEnergyHandler implements IEne
 	@Override
 	public void updateEntity() //The meat of our block.
     {
+		/*
 		boolean flagInvChanged = false;
 		boolean flagHasPower = this.getEnergyStored(ForgeDirection.UP) > 0;
 		//Make sure we have fuel, somewhere to put waste products, and energy storage capacity.
+		
 		if (this.engineItemStacks[0] != null) {
             if ((this.engineItemStacks[0].stackSize >= 1) && (this.storage.getEnergyStored() < this.storage.getMaxEnergyStored())) {
             	
@@ -331,27 +337,64 @@ public class TileEntityPhosphateEngine extends TileEnergyHandler implements IEne
 		if (flagHasPower) {
             //out.println("FlagHasPower Block.");
 			for (int direction = 0; direction < 6; ++direction) {
-				/*int toExtract = rfPerTick;
-				if(this.storage.getEnergyStored() == 0) {
-		            out.println("1");
-					break;
-				}
-				else if(this.storage.getEnergyStored() < toExtract) {
-		            out.println("2");
-					toExtract = this.storage.getEnergyStored();
-				}
-				int amount = EnergyHelper.chargeAdjacentEnergyHandler(this, direction, 50, false);
-	            out.println("Amount charge:");
-	            out.println(amount);
-	            if(amount > 0) {
-	            	this.storage.extractEnergy(toExtract, false);
-	            }*/
+				//int toExtract = rfPerTick;
+				//if(this.storage.getEnergyStored() == 0) {
+		        //    out.println("1");
+				//	break;
+				//}
+				//else if(this.storage.getEnergyStored() < toExtract) {
+		        //    out.println("2");
+				//	toExtract = this.storage.getEnergyStored();
+				//}
+				//int amount = EnergyHelper.chargeAdjacentEnergyHandler(this, direction, 50, false);
+	            //out.println("Amount charge:");
+	            //out.println(amount);
+	            //if(amount > 0) {
+	            //	this.storage.extractEnergy(toExtract, false);
+	            //}
 				
 			}
 		}
         if (flagInvChanged) {
             this.onInventoryChanged();
-        }
+        }*/
     }
+	@Override
+	public void onInventoryChanged() {
+		// TODO Auto-generated method stub
+		
+	}
+/*
+	@Override
+	public int receiveEnergy(ForgeDirection from, int maxReceive,
+			boolean simulate) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
+	@Override
+	public int extractEnergy(ForgeDirection from, int maxExtract,
+			boolean simulate) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public boolean canInterface(ForgeDirection from) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public int getEnergyStored(ForgeDirection from) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getMaxEnergyStored(ForgeDirection from) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+*/
 }
