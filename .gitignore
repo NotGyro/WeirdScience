@@ -1,6 +1,17 @@
+# From Github's Java gitignore #
+
 *.class
 
 # Package Files #
 *.jar
 *.war
 *.ear
+
+# Forge's Folders #
+assets/forge/**/*
+ixbm/**/* 
+net/**/* 
+paulscode/**/* 
+
+# CoFHLib. Add later? #
+cpw/**/*
