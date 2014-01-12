@@ -20,6 +20,8 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -27,8 +29,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.block.material.Material;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fluids.BlockFluidClassic;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraft.item.ItemPotion;
 //Import our own stuff.
+import net.minecraft.util.Icon;
 
 @Mod(modid="WeirdScience", name="Weird Science", version="0.0.0")
 @NetworkMod(clientSideRequired=true)
@@ -53,6 +59,9 @@ public class WeirdScience {
     int idMelonPan = 0;
     boolean enableMelonPan = true;
     
+    public int fluidBloodID;
+    public Fluid fluidBlood;
+    public BlockFluidClassic fluidBloodBlock;
     @EventHandler // used in 1.6.2
     public void preInit(FMLPreInitializationEvent event) {
     	Configuration config = new Configuration(event.getSuggestedConfigurationFile());
@@ -84,7 +93,38 @@ public class WeirdScience {
 	    	phosphateEngine.setEfficiency(peEnergyPerDirt);
 	    	phosphateEngine.setOutputRate(peEnergyPerTick);
     	}
+    	
+    	//TODO: Config for this. Dunno how it works with liquids.
+    	fluidBloodID = 1000;
+    	
+    	fluidBlood = new Fluid("Blood").setBlockID(fluidBloodID);
+        FluidRegistry.registerFluid(fluidBlood);
+        
+    	fluidBloodBlock = new BlockFluidClassic(fluidBloodID, fluidBlood, Material.water) {
+    		//Things I didn't know Java could do.
 
+            @SideOnly(Side.CLIENT)
+            protected Icon stillIcon;
+            @SideOnly(Side.CLIENT)
+            protected Icon flowingIcon;
+            
+            @SideOnly(Side.CLIENT)
+            @Override
+            public void registerIcons(IconRegister register)
+            {
+                stillIcon = register.registerIcon("weirdscience:bloodStill");
+                flowingIcon = register.registerIcon("weirdscience:bloodStill");
+                
+                fluidBlood.setIcons(stillIcon);
+            }
+
+            @Override
+            public Icon getIcon(int side, int meta) {
+                    return (side == 0 || side == 1)? stillIcon : flowingIcon;
+            }
+    	};
+
+    	fluidBloodBlock.setCreativeTab(tabWeirdScience);
         config.save();
     }
    
@@ -105,6 +145,10 @@ public class WeirdScience {
         melonPan = new MelonPan(idMelonPan);
         LanguageRegistry.addName(melonPan, "Melonpan");
         GameRegistry.addShapelessRecipe(new ItemStack(melonPan,MelonPan.craftCount), MelonPan.recipe);
+        
+        GameRegistry.registerBlock(fluidBloodBlock, "YourFluid");
+        LanguageRegistry.addName(fluidBloodBlock, "Blood");
+        fluidBlood.setUnlocalizedName("Blood");
     }
 
     @EventHandler
