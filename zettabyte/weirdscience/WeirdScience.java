@@ -146,7 +146,7 @@ public class WeirdScience {
         LanguageRegistry.addName(melonPan, "Melonpan");
         GameRegistry.addShapelessRecipe(new ItemStack(melonPan,MelonPan.craftCount), MelonPan.recipe);
         
-        GameRegistry.registerBlock(fluidBloodBlock, "YourFluid");
+        GameRegistry.registerBlock(fluidBloodBlock, "Blood");
         LanguageRegistry.addName(fluidBloodBlock, "Blood");
         fluidBlood.setUnlocalizedName("Blood");
     }
