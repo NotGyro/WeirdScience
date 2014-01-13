@@ -22,6 +22,7 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import mekanism.common.PacketHandler;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.block.Block;
@@ -38,7 +39,7 @@ import net.minecraft.item.ItemPotion;
 import net.minecraft.util.Icon;
 
 @Mod(modid="WeirdScience", name="Weird Science", version="0.0.0")
-@NetworkMod(clientSideRequired=true)
+@NetworkMod(channels = {"WS"}, clientSideRequired = true, serverSideRequired = false)
 public class WeirdScience {
     @Instance(value = "WeirdScience")
     public static WeirdScience instance;
@@ -63,6 +64,8 @@ public class WeirdScience {
     int idBloodDonation = 0;
     boolean enableBloodDonation = true;
     
+    int idBucket = 0;
+    
     public int fluidBloodID;
     public Fluid fluidBlood;
     public BlockFluidClassic fluidBloodBlock;
@@ -83,6 +86,7 @@ public class WeirdScience {
         idPhosphateEngine = config.getBlock("Phosphate engine ID", 3500, "In a later refactor, this will just be one sub-block of the machine block ID.").getInt();
         idMelonPan = config.getItem("Melonpan item ID", 4949).getInt();
         idBloodDonation = config.getBlock("Blood donation machine ID", 3501).getInt();
+        idBucket = config.getItem("Weird Science fluid bucket ID", 4950).getInt();
 
         //Initialize Phosphate Engine if it isn't hard-disabled.
     	if(idPhosphateEngine != 0) {
@@ -176,7 +180,6 @@ public class WeirdScience {
         GameRegistry.registerBlock(fluidBloodBlock, "Blood");
         LanguageRegistry.addName(fluidBloodBlock, "Blood");
         fluidBlood.setUnlocalizedName("Blood");
-        //LanguageRegistry.addName(fluid, "Blood");
     }
 
     @EventHandler

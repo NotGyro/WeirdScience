@@ -1,24 +1,34 @@
 package zettabyte.weirdscience.block;
 
+import java.util.ArrayList;
+
 import zettabyte.weirdscience.WeirdScience;
 import zettabyte.weirdscience.tileentity.TileEntityBloodDonation;
 import zettabyte.weirdscience.tileentity.TileEntityPhosphateEngine;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import mekanism.api.Object3D;
+import mekanism.common.PacketHandler;
+import mekanism.common.PacketHandler.Transmission;
+import mekanism.common.network.PacketTileEntity;
+import mekanism.common.util.ChargeUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.IFluidHandler;
 
 public class BlockBloodDonation extends BlockContainer {
 	
@@ -71,7 +81,7 @@ public class BlockBloodDonation extends BlockContainer {
 	@Override
 	public TileEntity createNewTileEntity(World world) {
 		TileEntityBloodDonation TE = new TileEntityBloodDonation();
-		TE.setFluid(bloodFluid);
+		TE.setBloodFluid(bloodFluid);
 		TE.setStorageCap(maxStorage);
 		return TE;
 	}
@@ -86,7 +96,7 @@ public class BlockBloodDonation extends BlockContainer {
 		
 		TileEntityBloodDonation donationEntity = (TileEntityBloodDonation)tileEntity;
 		if(donationEntity != null) {
-			donationEntity.fill(ForgeDirection.UP, new FluidStack(bloodFluid, mbPerDonation), true);
+			donationEntity.fill(new FluidStack(bloodFluid, mbPerDonation), true);
 		}
 		
 	    return true;
