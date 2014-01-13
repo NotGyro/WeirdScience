@@ -91,14 +91,15 @@ public class BlockBloodDonation extends BlockContainer {
 		if (tileEntity == null || player.isSneaking()) {
 			return false;
 		}
-	    
+	    float previousPlayerHealth = player.getHealth();
 		player.attackEntityFrom(DamageSource.magic, (float)dmgPerDonation);
-		
-		TileEntityBloodDonation donationEntity = (TileEntityBloodDonation)tileEntity;
-		if(donationEntity != null) {
-			donationEntity.fill(new FluidStack(bloodFluid, mbPerDonation), true);
+		if(player.getHealth() < previousPlayerHealth)
+		{
+			TileEntityBloodDonation donationEntity = (TileEntityBloodDonation)tileEntity;
+			if(donationEntity != null) {
+				donationEntity.fill(new FluidStack(bloodFluid, mbPerDonation), true);
+			}
 		}
-		
 	    return true;
 	}
 
