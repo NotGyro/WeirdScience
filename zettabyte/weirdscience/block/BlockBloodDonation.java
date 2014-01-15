@@ -40,9 +40,7 @@ public class BlockBloodDonation extends BlockContainer {
 	public BlockBloodDonation(int ID, Material Mat) {
 		super(ID, Mat);
         this.setCreativeTab(WeirdScience.tabWeirdScience);
-        
-		// TODO Auto-generated constructor stub
-	}
+    }
 
 	public void setFluid(Fluid newfluid) {
 		bloodFluid = newfluid;
@@ -93,8 +91,7 @@ public class BlockBloodDonation extends BlockContainer {
 		}
 	    float previousPlayerHealth = player.getHealth();
 		player.attackEntityFrom(DamageSource.magic, (float)dmgPerDonation);
-		if(player.getHealth() < previousPlayerHealth)
-		{
+		if(player.getHealth() < previousPlayerHealth) {
 			TileEntityBloodDonation donationEntity = (TileEntityBloodDonation)tileEntity;
 			if(donationEntity != null) {
 				donationEntity.fill(new FluidStack(bloodFluid, mbPerDonation), true);
