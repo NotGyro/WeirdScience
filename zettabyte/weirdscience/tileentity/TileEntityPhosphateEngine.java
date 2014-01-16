@@ -2,6 +2,8 @@ package zettabyte.weirdscience.tileentity;
 
 import java.util.Random;
 
+import zettabyte.weirdscience.fluid.BlockGasBase;
+
 import cofh.api.energy.IEnergyHandler;
 import cofh.api.tileentity.IEnergyInfo;
 
@@ -9,6 +11,7 @@ import cofh.api.tileentity.IEnergyInfo;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFurnace;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
@@ -62,15 +65,36 @@ public class TileEntityPhosphateEngine extends TileEntity implements IEnergyHand
 	protected FluidStack fluidTank;
     protected int wasteCapacity;
     protected int ticksPerExhaust; //How long until we try to spawn smog?
-    protected Fluid wasteFluid;
+    protected BlockGasBase waste = null;
     protected int wasteProductionSpeed;
     
+    public float explosionStrength = 4.0F;
+
 	public TileEntityPhosphateEngine(int rfpb, int rfpt, int cap) {
 		super();
 		energy = 0;
 		this.rfPerDirt = rfpb;
 		this.rfPerTick = rfpt;
 		energyCap = cap;
+	    dirtPerBurn = 32; //Amount of dirt to attempt to consume at once.
+	    ticksPerBurn = 20; //Time between ticks where we burn dirt. To reduce lag.
+	    wasteProductionSpeed = 8; 
+		ticksUntilBurn = ticksPerBurn;
+		wasteCapacity = wasteProductionSpeed * 64;
+	}
+
+	public void setWaste(BlockGasBase b) {
+		waste = b;
+	}
+	public void setWasteCapacity(int amt) {
+		wasteCapacity = amt;
+	}
+	public void setTicksPerExhaust(int amt) {
+		ticksPerExhaust = amt;
+	}
+	//Warning: This is a *per dirt* value.
+	public void setWasteProductionSpeed(int amt) {
+		wasteProductionSpeed = amt;
 	}
 
 	@Override
@@ -423,6 +447,7 @@ public class TileEntityPhosphateEngine extends TileEntity implements IEnergyHand
 		//Burn logic:
 		//Are we still waiting to burn fuel?
 		boolean flagHasPower = energy > 0;
+		int smogProduced = 0;
         if (this.ticksUntilBurn > 0) {
         	--this.ticksUntilBurn;
         }
@@ -442,11 +467,11 @@ public class TileEntityPhosphateEngine extends TileEntity implements IEnergyHand
 	            		if(itemID == 3) { //Is the item in slot 0 our fuel?
 	            			//Decide how much fuel to burn.
 	            			toBurn = Math.min(dirtPerBurn, this.engineItemStacks[0].stackSize); //Either eat dirtPerBurn fuel or the entire stack.
-	        				this.engineItemStacks[0].stackSize--;
+	        				this.engineItemStacks[0].stackSize -= toBurn;
 	        				if(engineItemStacks[1] == null) { //Make sure we have a sand stack to add to.
 	        					engineItemStacks[1] = new ItemStack(12, toBurn, 0);
 	        				}
-	        				else if((engineItemStacks[1].stackSize + toBurn) >= this.getInventoryStackLimit()) {
+	        				else if((engineItemStacks[1].stackSize + toBurn) > this.getInventoryStackLimit()) {
 	        					//Drop excess waste
 	                            if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) { //prevent ghost item stupidity
 		        					float xr = this.itemDropRand.nextFloat() * 0.8F + 0.1F;
@@ -466,15 +491,18 @@ public class TileEntityPhosphateEngine extends TileEntity implements IEnergyHand
 	        	            flagInvChanged = true;
 	
 	        	            energy += (rfPerDirt * toBurn);
+
+	        				smogProduced = wasteProductionSpeed * toBurn;
 	        	            
 	        				flagHasPower = true;
 	        			}
 	        		}
-	                if (this.engineItemStacks[0].stackSize == 0) {
+	                if (this.engineItemStacks[0].stackSize <= 0) {
 	                	this.engineItemStacks[0] = null;
 	                }
 	            }
-	        }
+	            ticksUntilBurn = ticksPerBurn; //Reset the timer, but only if we did anything.
+			}
 	        if (flagInvChanged) {
 	            this.onInventoryChanged();
 	        }
@@ -496,8 +524,37 @@ public class TileEntityPhosphateEngine extends TileEntity implements IEnergyHand
 			}
 		}
 		//Smog logic:
-		
-		//Attempt to dump tank into surrounding blocks.
+		if(waste != null) {
+			if(smogProduced > 0) {
+				if(fluidTank == null) {
+					fluidTank = new FluidStack(waste.getFluidType(),0);
+				}
+				if(fluidTank.amount < wasteCapacity) {
+					int amountToStore = Math.min((wasteCapacity - fluidTank.amount), smogProduced);
+					fluidTank.amount += amountToStore;
+					smogProduced -= amountToStore;
+				}
+				//Is there still smog left over? If so, we could not fit it into the tank. Exhaust into the adjacent air.
+				if(smogProduced > 0) {
+					for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+						smogProduced = waste.pushIntoBlock(worldObj, xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ, smogProduced);
+						if(smogProduced <= 0) {
+							break;
+						}
+					}
+				}
+				//Is there STILL smog left over? If so, explode violently.
+				if(smogProduced > 0) {
+			        if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) { //prevent general stupidity
+			        	worldObj.createExplosion(null, xCoord, yCoord, zCoord, explosionStrength, true);
+			        }
+				}
+			}
+			else {
+				//TODO: Empty the tank into the atmosphere.
+			}
+		}
+		//Attempt to dump tank into surrounding Forge fluid handlers.
 		if(fluidTank != null) {
 			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 				TileEntity tileEntity = worldObj.getBlockTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);

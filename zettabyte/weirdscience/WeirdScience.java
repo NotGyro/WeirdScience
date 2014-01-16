@@ -177,6 +177,10 @@ public class WeirdScience {
 	    	};
 	    	gasSmogBlock.setTextureName("weirdscience:retardcube");
 	    	gasSmogBlock.setCreativeTab(tabWeirdScience);
+	    	
+	    	if(idPhosphateEngine != 0) {
+	    		phosphateEngine.setWaste(gasSmogBlock);
+	    	}
     	}
         config.save();
     }

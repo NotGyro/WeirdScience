@@ -28,7 +28,7 @@ public class BlockGasBase extends Block implements IFluidBlock {
 	
 	protected boolean entitiesInteract;
 
-	protected int dissipationChance = 12;
+	protected int dissipationChance = 4;
 	
 	protected Fluid ourFluid;
 	
@@ -66,6 +66,10 @@ public class BlockGasBase extends Block implements IFluidBlock {
 		return mbPerConcentration;
 	}
 	
+	public Fluid getFluidType() { 
+		return ourFluid;
+	}
+	
 	//Sets the metadata to be equal to the appropriate value for an amount of
 	//milibuckets chosen.
 	public boolean setMetadataByMB(World world, int x, int y, int z, int amount) {
@@ -89,6 +93,10 @@ public class BlockGasBase extends Block implements IFluidBlock {
 			if(block == 0 || blocksList[blockID].isAirBlock(world, x , y, z)) {
 				//Is this air?
 				world.setBlock(x, y, z, this.blockID, getMetadataFromMB(amount), 3); //Set the block to this one.
+				this.onBlockAdded(world, x, y, z);
+				if(amount > getMaxMB()) {
+					return amount - getMaxMB();
+				}
 				return 0;
 			}
 			else if(block == this.blockID) {

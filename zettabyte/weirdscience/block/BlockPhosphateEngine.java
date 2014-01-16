@@ -4,6 +4,7 @@ package zettabyte.weirdscience.block;
 import java.util.Random;
 
 import zettabyte.weirdscience.WeirdScience;
+import zettabyte.weirdscience.fluid.BlockGasBase;
 import zettabyte.weirdscience.tileentity.TileEntityPhosphateEngine;
 
 import net.minecraft.block.BlockContainer;
@@ -32,6 +33,11 @@ public class BlockPhosphateEngine extends BlockContainer {
     int teCapacity = 0;
     int tePerTick = 0;
     int tePerDirt = 0;
+    
+    protected int wasteCapacity;
+    protected int ticksPerExhaust; //How long until we try to spawn smog?
+    protected BlockGasBase waste = null;
+    protected int wasteProductionSpeed;
 
 	public void setCapacity(int setTo) {
 		teCapacity = setTo;
@@ -43,9 +49,24 @@ public class BlockPhosphateEngine extends BlockContainer {
 		tePerDirt = setTo;
 	}
 
+	public void setWaste(BlockGasBase b) {
+		waste = b;
+	}
+	public void setWasteCapacity(int amt) {
+		wasteCapacity = amt;
+	}
+	public void setTicksPerExhaust(int amt) {
+		ticksPerExhaust = amt;
+	}
+	//Warning: This is a *per dirt* value.
+	public void setWasteProductionSpeed(int amt) {
+		wasteProductionSpeed = amt;
+	}
+
 	@Override
 	public TileEntity createNewTileEntity(World world) {
 		TileEntityPhosphateEngine TE = new TileEntityPhosphateEngine(tePerDirt, tePerTick, teCapacity);
+		TE.setWaste(waste);
 		return TE;
 	}
     /**
