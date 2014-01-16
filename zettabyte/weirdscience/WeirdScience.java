@@ -4,6 +4,7 @@ package zettabyte.weirdscience;
 import static java.lang.System.out;
 import zettabyte.weirdscience.block.*;
 import zettabyte.weirdscience.client.gui.WeirdScienceGUIHandler;
+import zettabyte.weirdscience.fluid.BlockGasBase;
 import zettabyte.weirdscience.item.MelonPan;
 import zettabyte.weirdscience.tileentity.TileEntityBloodDonation;
 import zettabyte.weirdscience.tileentity.TileEntityPhosphateEngine;
@@ -69,6 +70,11 @@ public class WeirdScience {
     public int fluidBloodID;
     public Fluid fluidBlood;
     public BlockFluidClassic fluidBloodBlock;
+    
+    public int idGasSmog;
+    public Fluid fluidSmog;
+    public BlockGasBase gasSmogBlock;
+    
     @EventHandler // used in 1.6.2
     public void preInit(FMLPreInitializationEvent event) {
     	Configuration config = new Configuration(event.getSuggestedConfigurationFile());
@@ -87,6 +93,7 @@ public class WeirdScience {
         idMelonPan = config.getItem("Melonpan item ID", 4949).getInt();
         idBloodDonation = config.getBlock("Blood donation machine ID", 3501).getInt();
         idBucket = config.getItem("Weird Science fluid bucket ID", 4950).getInt();
+        idGasSmog = config.getBlock("Smog block ID", 3600).getInt();
 
         //Initialize Phosphate Engine if it isn't hard-disabled.
     	if(idPhosphateEngine != 0) {
@@ -97,7 +104,7 @@ public class WeirdScience {
 	    	phosphateEngine.setCreativeTab(tabWeirdScience);
 
 	    	int peEnergyPerTick = config.get("Phosphate Engine", "Max RF output per tick", 50).getInt();
-	    	int peEnergyPerDirt = config.get("Phosphate Engine", "RF generated per dirt burned", 20).getInt();
+	    	int peEnergyPerDirt = config.get("Phosphate Engine", "RF generated per dirt burned", 1).getInt();
 	    	int maxStorage = config.get("Phosphate Engine", "Max internal storage of Phosphate Engine", 80).getInt();
 
 	    	phosphateEngine.setCapacity(maxStorage);
@@ -148,7 +155,29 @@ public class WeirdScience {
 	    	bloodDonation.setStorageCap(maxStorage);
 	    	bloodDonation.setFluid(fluidBlood);
     	}
-    	
+
+    	fluidSmog = new Fluid("Smog").setBlockID(idGasSmog);
+        FluidRegistry.registerFluid(fluidSmog);
+
+        //TODO get good at understanding how "icon" differs from "texture" in this engine.
+    	if(idGasSmog != 0) {
+	    	gasSmogBlock = (BlockGasBase) new BlockGasBase(idGasSmog, fluidSmog, Material.snow){
+	    		//Things I didn't know Java could do.
+	            @SideOnly(Side.CLIENT)
+	            @Override
+	            public void registerIcons(IconRegister register) {
+	            	this.blockIcon = register.registerIcon("weirdscience:retardcube");
+	                
+	                fluidSmog.setIcons(this.blockIcon);
+	            }
+	            @Override
+	            public Icon getIcon(int side, int meta) {
+	                    return this.blockIcon;
+	            }
+	    	};
+	    	gasSmogBlock.setTextureName("weirdscience:retardcube");
+	    	gasSmogBlock.setCreativeTab(tabWeirdScience);
+    	}
         config.save();
     }
    
@@ -162,10 +191,20 @@ public class WeirdScience {
 	        GameRegistry.registerBlock(phosphateEngine, "phosphateEngine");
 	        GameRegistry.registerTileEntity(TileEntityPhosphateEngine.class, "PhosphateEngine");
     	}
-	    MinecraftForge.setBlockHarvestLevel(bloodDonation, "pickaxe", 0);
-        LanguageRegistry.addName(bloodDonation, "Blood Donation Station");
-	    GameRegistry.registerBlock(bloodDonation, "bloodDonationStation");
-	    GameRegistry.registerTileEntity(TileEntityBloodDonation.class, "BloodDonation");
+
+    	if(idBloodDonation != 0) {
+		    MinecraftForge.setBlockHarvestLevel(bloodDonation, "pickaxe", 0);
+	        LanguageRegistry.addName(bloodDonation, "Blood Donation Station");
+		    GameRegistry.registerBlock(bloodDonation, "bloodDonationStation");
+		    GameRegistry.registerTileEntity(TileEntityBloodDonation.class, "BloodDonation");
+    	}
+    	if(idGasSmog != 0) {
+            gasSmogBlock.setUnlocalizedName("gasSmog");
+            fluidSmog.setUnlocalizedName("gasSmog");
+            GameRegistry.registerBlock(fluidBloodBlock, "Smog");
+	        LanguageRegistry.addName(gasSmogBlock, "Smog");
+		    GameRegistry.registerBlock(gasSmogBlock, "gasSmog");
+    	}
 	        
     	NetworkRegistry.instance().registerGuiHandler(this, new WeirdScienceGUIHandler());
         proxy.registerRenderers();

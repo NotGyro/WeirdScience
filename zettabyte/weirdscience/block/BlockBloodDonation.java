@@ -56,7 +56,7 @@ public class BlockBloodDonation extends BlockContainer {
 	}
 
     @SideOnly(Side.CLIENT)
-    private Icon iconTop;
+    protected Icon iconTop;
 
     @SideOnly(Side.CLIENT)
     public Icon getIcon(int side, int par2)

@@ -201,8 +201,6 @@ public class TileEntityBloodDonation extends TileEntity implements IFluidHandler
 	@Override
 	public void updateEntity()
 	{		
-		super.updateEntity();
-		
 		if(fluidTank != null) {
 			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 				TileEntity tileEntity = worldObj.getBlockTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
