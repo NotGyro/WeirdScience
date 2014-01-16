@@ -36,7 +36,7 @@ public class BlockPhosphateEngine extends BlockContainer {
     
     protected int wasteCapacity;
     protected int ticksPerExhaust; //How long until we try to spawn smog?
-    protected BlockGasBase waste = null;
+    public static BlockGasBase waste = null;
     protected int wasteProductionSpeed;
 
 	public void setCapacity(int setTo) {
@@ -49,7 +49,7 @@ public class BlockPhosphateEngine extends BlockContainer {
 		tePerDirt = setTo;
 	}
 
-	public void setWaste(BlockGasBase b) {
+	public static void setWaste(BlockGasBase b) {
 		waste = b;
 	}
 	public void setWasteCapacity(int amt) {

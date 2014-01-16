@@ -49,7 +49,7 @@ public class BlockGasBase extends Block implements IFluidBlock {
 		return (world.getBlockMetadata(x, y, z) + 1) * mbPerConcentration;
 	}
 	public int getMetadataFromMB(int amount) {
-		if(amount > getMaxMB()) {
+		if(amount < getMaxMB()) {
 			return (int)Math.floor((float)amount / (float)mbPerConcentration) - 1;
 			//Return the closest metadata value for a given fluid amount.
 		}
@@ -88,12 +88,13 @@ public class BlockGasBase extends Block implements IFluidBlock {
 	 * Returns the amount left over.
 	 */
 	public int pushIntoBlock(World world, int x, int y, int z, int amount) {
+		//TODO: Glitch is probably here. Do a bunch of System.out.println stuff.
 		if(getMetadataFromMB(amount) >= 0) {
 			int block = world.getBlockId(x, y, z);
 			if(block == 0 || blocksList[blockID].isAirBlock(world, x , y, z)) {
 				//Is this air?
 				world.setBlock(x, y, z, this.blockID, getMetadataFromMB(amount), 3); //Set the block to this one.
-				this.onBlockAdded(world, x, y, z);
+				//this.onBlockAdded(world, x, y, z);
 				if(amount > getMaxMB()) {
 					return amount - getMaxMB();
 				}
@@ -169,12 +170,16 @@ public class BlockGasBase extends Block implements IFluidBlock {
     //Block placement stuff.
     
     //Added to the world by any means
+    @Override
     public void onBlockAdded(World world, int x, int y, int z) {
+    	super.onBlockAdded(world, x, y, z);
 		world.scheduleBlockUpdateWithPriority(x, y, z, this.blockID, tickRate(world), 0);
     }
     //Placed via itemblock (for creative mode & testing).
+    @Override
     public int onBlockPlaced(World world, int x, int y, int z, int par5, float par6, float par7, float par8, int meta) {
-		world.setBlockMetadataWithNotify(x, y, z, 15, 1&2);
+    	super.onBlockPlaced(world, x, y, z, par5, par6, par7, par8, meta);
+		world.setBlockMetadataWithNotify(x, y, z, 15, 3);
 		return 15;
     }
     //Tick stuff.

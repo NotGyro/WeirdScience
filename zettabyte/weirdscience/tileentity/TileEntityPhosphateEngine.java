@@ -65,7 +65,7 @@ public class TileEntityPhosphateEngine extends TileEntity implements IEnergyHand
 	protected FluidStack fluidTank;
     protected int wasteCapacity;
     protected int ticksPerExhaust; //How long until we try to spawn smog?
-    protected BlockGasBase waste = null;
+    public static BlockGasBase waste = null;
     protected int wasteProductionSpeed;
     
     public float explosionStrength = 4.0F;
@@ -81,9 +81,10 @@ public class TileEntityPhosphateEngine extends TileEntity implements IEnergyHand
 	    wasteProductionSpeed = 8; 
 		ticksUntilBurn = ticksPerBurn;
 		wasteCapacity = wasteProductionSpeed * 64;
+		//waste = setWaste;
 	}
 
-	public void setWaste(BlockGasBase b) {
+	public static void setWaste(BlockGasBase b) {
 		waste = b;
 	}
 	public void setWasteCapacity(int amt) {

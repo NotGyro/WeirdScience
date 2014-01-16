@@ -177,10 +177,7 @@ public class WeirdScience {
 	    	};
 	    	gasSmogBlock.setTextureName("weirdscience:retardcube");
 	    	gasSmogBlock.setCreativeTab(tabWeirdScience);
-	    	
-	    	if(idPhosphateEngine != 0) {
-	    		phosphateEngine.setWaste(gasSmogBlock);
-	    	}
+	    
     	}
         config.save();
     }
@@ -219,6 +216,9 @@ public class WeirdScience {
         if(enableMelonPan) {
         	GameRegistry.addShapelessRecipe(new ItemStack(melonPan,MelonPan.craftCount), MelonPan.recipe);
         }
+    	if((idPhosphateEngine != 0) && (idGasSmog != 0)) {
+    		phosphateEngine.setWaste(gasSmogBlock);
+    	}
         
         GameRegistry.registerBlock(fluidBloodBlock, "Blood");
         LanguageRegistry.addName(fluidBloodBlock, "Blood");
