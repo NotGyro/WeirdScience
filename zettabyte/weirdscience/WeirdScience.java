@@ -5,6 +5,8 @@ import static java.lang.System.out;
 import zettabyte.weirdscience.block.*;
 import zettabyte.weirdscience.client.gui.WeirdScienceGUIHandler;
 import zettabyte.weirdscience.fluid.BlockGasBase;
+import zettabyte.weirdscience.fluid.BlockGasExplosive;
+import zettabyte.weirdscience.fluid.FluidSmog;
 import zettabyte.weirdscience.item.MelonPan;
 import zettabyte.weirdscience.tileentity.TileEntityBloodDonation;
 import zettabyte.weirdscience.tileentity.TileEntityPhosphateEngine;
@@ -72,8 +74,8 @@ public class WeirdScience {
     public BlockFluidClassic fluidBloodBlock;
     
     public int idGasSmog;
-    public Fluid fluidSmog;
-    public BlockGasBase gasSmogBlock;
+    public FluidSmog fluidSmog;
+    public BlockGasExplosive gasSmogBlock;
     
     @EventHandler // used in 1.6.2
     public void preInit(FMLPreInitializationEvent event) {
@@ -156,12 +158,12 @@ public class WeirdScience {
 	    	bloodDonation.setFluid(fluidBlood);
     	}
 
-    	fluidSmog = new Fluid("Smog").setBlockID(idGasSmog);
+    	fluidSmog = (FluidSmog) new FluidSmog("Smog").setBlockID(idGasSmog);
         FluidRegistry.registerFluid(fluidSmog);
 
         //TODO get good at understanding how "icon" differs from "texture" in this engine.
     	if(idGasSmog != 0) {
-	    	gasSmogBlock = (BlockGasBase) new BlockGasBase(idGasSmog, fluidSmog, Material.snow){
+	    	gasSmogBlock = (BlockGasExplosive) new BlockGasExplosive(idGasSmog, fluidSmog, Material.glass){
 	    		//Things I didn't know Java could do.
 	            @SideOnly(Side.CLIENT)
 	            @Override
@@ -175,6 +177,7 @@ public class WeirdScience {
 	                    return this.blockIcon;
 	            }
 	    	};
+	    	gasSmogBlock.setEntitiesInteract(true);
 	    	gasSmogBlock.setTextureName("weirdscience:retardcube");
 	    	gasSmogBlock.setCreativeTab(tabWeirdScience);
 	    

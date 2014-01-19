@@ -4,12 +4,17 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.Vector;
 
+import zettabyte.weirdscience.chemistry.BioactiveFluid;
+
 import cofh.api.energy.IEnergyHandler;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.DamageSource;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
@@ -18,16 +23,53 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidBlock;
 
-public class BlockGasBase extends Block implements IFluidBlock {
+public class BlockGasBase extends Block implements IFiniteFluidBlock {
 
 	protected int mbPerConcentration = 64; //1024 MB in a fully concentrated block (64 * 16).
 	protected int dissipationConcentration = 1; //If a block's concentration is lower than or equal to this, dissipate.
 	protected int floorMB; 
+	
+	protected boolean isReactive = false;
 
 	//protected int flowRate = 4;
 	
-	protected boolean entitiesInteract;
+	protected boolean entitiesInteract = false;
 
+	public int getMbPerConcentration() {
+		return mbPerConcentration;
+	}
+
+	public void setMbPerConcentration(int mbPerConcentration) {
+		this.mbPerConcentration = mbPerConcentration;
+	}
+
+	public int getDissipationConcentration() {
+		return dissipationConcentration;
+	}
+
+	public void setDissipationConcentration(int dissipationConcentration) {
+		this.dissipationConcentration = dissipationConcentration;
+	}
+
+	public int getFloorMB() {
+		return floorMB;
+	}
+
+	public void setFloorMB(int floorMB) {
+		this.floorMB = floorMB;
+	}
+
+	public int getDissipationChance() {
+		return dissipationChance;
+	}
+
+	public void setDissipationChance(int dissipationChance) {
+		this.dissipationChance = dissipationChance;
+	}
+
+	public void setEntitiesInteract(boolean entitiesInteract) {
+		this.entitiesInteract = entitiesInteract;
+	}
 	protected int dissipationChance = 4;
 	
 	protected Fluid ourFluid;
@@ -36,6 +78,67 @@ public class BlockGasBase extends Block implements IFluidBlock {
 		super(id, material);
 		ourFluid = fluid;
 	}
+	public void tryReaction(World world, int x, int y, int z, int xO, int yO, int zO) { }
+	public void updateReaction(World world, int x, int y, int z) {
+		if(isReactive) {
+			int adjBlockID;
+			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+				adjBlockID = world.getBlockId(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
+				if(adjBlockID != 0) {
+					tryReaction(world, x, y, z, x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
+				}
+			}
+		}
+	}
+	@Override
+    public void onNeighborBlockChange(World world, int x, int y, int z, int id) {
+    	super.onNeighborBlockChange(world, x, y, z, id);
+    	updateReaction(world, x, y, z);
+    }
+    /**
+     * Triggered whenever an entity collides with this block (enters into the block). Args: world, x, y, z, entity
+     */
+	@Override
+    public void onEntityCollidedWithBlock(World world, int x, int y, int z, Entity entity)
+    {
+        if(entitiesInteract & (ourFluid instanceof BioactiveFluid)) {
+        	BioactiveFluid bioFluid = (BioactiveFluid)ourFluid;
+        	if(entity instanceof EntityLivingBase) {
+        		bioFluid.breatheAffectCreature((EntityLivingBase)entity);
+        	}
+        }
+    }
+	
+	@Override
+	public int getLightOpacity(World world, int x, int y, int z) {
+		return 0;
+	}
+	
+	@Override
+	public int getRenderBlockPass()
+    {
+        return 1;
+    }
+
+    /**
+     * Is this block (a) opaque and (b) a full 1m cube?  This determines whether or not to render the shared face of two
+     * adjacent blocks and also whether the player can attach torches, redstone wire, etc to this block.
+     */
+	@Override
+    public boolean isOpaqueCube()
+    {
+        return false;
+    }
+
+    /**
+     * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)
+     */
+	@Override
+    public boolean renderAsNormalBlock()
+    {
+        return false;
+    }
+	
 	@Override
 	public FluidStack drain(World world, int x, int y, int z, boolean doDrain) {
 		FluidStack outputVal = new FluidStack(this.getFluid(), getBlockInMB(world, x, y, z));
@@ -45,9 +148,11 @@ public class BlockGasBase extends Block implements IFluidBlock {
 		return outputVal;
 	}
 
+	@Override
 	public int getBlockInMB(World world, int x, int y, int z) {
 		return (world.getBlockMetadata(x, y, z) + 1) * mbPerConcentration;
 	}
+	
 	public int getMetadataFromMB(int amount) {
 		if(amount < getMaxMB()) {
 			return (int)Math.floor((float)amount / (float)mbPerConcentration) - 1;
@@ -58,6 +163,8 @@ public class BlockGasBase extends Block implements IFluidBlock {
 			return 15;
 		}
 	}
+
+	@Override
 	public int getMaxMB() {
 		//15 metadata values with a range of 1, 16 concentration values. 0 concentration is air.
 		return 16 * mbPerConcentration;
@@ -88,7 +195,6 @@ public class BlockGasBase extends Block implements IFluidBlock {
 	 * Returns the amount left over.
 	 */
 	public int pushIntoBlock(World world, int x, int y, int z, int amount) {
-		//TODO: Glitch is probably here. Do a bunch of System.out.println stuff.
 		if(getMetadataFromMB(amount) >= 0) {
 			int block = world.getBlockId(x, y, z);
 			if(block == 0 || blocksList[blockID].isAirBlock(world, x , y, z)) {
@@ -129,18 +235,9 @@ public class BlockGasBase extends Block implements IFluidBlock {
 		return true;
 	}
 
-	//C&P'd with modification from a Forge class.
-    public int getQuantaValue(IBlockAccess world, int x, int y, int z) {
-		//We apparently need these strange sanity checks.
-        if (world.getBlockId(x, y, z) == 0) {
-            return 0;
-        }
-        if (world.getBlockId(x, y, z) != blockID) {
-            return -1;
-        }
-
-        int quantaRemaining = (world.getBlockMetadata(x, y, z) + 1); //Range is 1, 16.
-        return quantaRemaining;
+	@Override
+    public float getFilledPercentage(World world, int x, int y, int z) {
+    	return ((float)getBlockInMB(world, x, y, z) / (float)getMaxMB()) * 100.0F;
     }
 
     //Basic fluid hacks on minecraft functions follow
@@ -174,6 +271,7 @@ public class BlockGasBase extends Block implements IFluidBlock {
     public void onBlockAdded(World world, int x, int y, int z) {
     	super.onBlockAdded(world, x, y, z);
 		world.scheduleBlockUpdateWithPriority(x, y, z, this.blockID, tickRate(world), 0);
+		updateReaction(world, x, y, z);
     }
     //Placed via itemblock (for creative mode & testing).
     @Override
@@ -186,6 +284,7 @@ public class BlockGasBase extends Block implements IFluidBlock {
     /**
      * How many world ticks before ticking
      */
+    @Override
     public int tickRate(World par1World)
     {
         return 20;
@@ -270,8 +369,27 @@ public class BlockGasBase extends Block implements IFluidBlock {
 		else {
 			world.setBlockMetadataWithNotify(x, y, z, ourConcentration, 1&2);
 		}
+		updateReaction(world, x, y, z);
 
 		//Ensure that the next tick happens.
 		world.scheduleBlockUpdateWithPriority(x, y, z, this.blockID, tickRate(world), 0);
     }
+	@Override
+	public int getQuantaSize() {
+		return mbPerConcentration;
+	}
+	@Override
+	public boolean isTileEntity() {
+		return false;
+	}
+	@Override
+	public boolean isTileEntity(World world, int x, int y, int z) {
+		return isTileEntity();
+	}
+	@Override
+	public FluidStack partialDrain(World world, int x, int y, int z,
+			int amount, boolean doDrain) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
