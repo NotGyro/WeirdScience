@@ -1,33 +1,22 @@
 package zettabyte.weirdscience.tileentity;
 
-import java.util.ArrayList;
-
-import zettabyte.weirdscience.WeirdScience;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet132TileEntityData;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidEvent;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fluids.IFluidTank;
-import net.minecraftforge.fluids.TileFluidHandler;
 
 public class TileEntityBloodDonation extends TileEntity implements IFluidHandler, IFluidTank {
 	
     protected FluidStack fluidTank;
-    protected int capacity;
-    protected int outputSpeed;
+    protected static int capacity;
+    protected static int outputSpeed;
 	
     public TileEntityBloodDonation() {
 		super();
@@ -63,19 +52,14 @@ public class TileEntityBloodDonation extends TileEntity implements IFluidHandler
 	    return new Packet132TileEntityData(xCoord, yCoord, zCoord, 1, nbt);
 	}
 
-	private Fluid bloodFluid;
+	private static Fluid bloodFluid;
 	
-	public void setBloodFluid(Fluid newfluid) {
+	public static void setBloodFluid(Fluid newfluid) {
 		bloodFluid = newfluid;
 	}
 	
-	public void setStorageCap(int setMax) {
+	public static void setStorageCap(int setMax) {
 		capacity = setMax;
-		if(fluidTank != null) {
-			if(fluidTank.amount > capacity) {
-				fluidTank.amount = capacity;
-			}
-		}
 	}
 	
 	@Override
@@ -133,34 +117,43 @@ public class TileEntityBloodDonation extends TileEntity implements IFluidHandler
 
 	@Override
 	public int fill(FluidStack resource, boolean doFill) {
+		//Is our blood fluid set?
 		if (bloodFluid != null) {
+			//Is our resource set?
 			if (resource == null) {
 		        return 0;
 		    }
+			//Make sure our resource is blood.
 			if(bloodFluid.getID() == resource.getFluid().getID()) {
+				//Get simulation values.
 				if (!doFill) {
 		            if (fluidTank == null) {
 		                return Math.min(capacity, resource.amount);
 		            }
 		            return Math.min(capacity - fluidTank.amount, resource.amount);
 		        }
+				//Create the fluid tank if it's empty.
 				if (fluidTank == null) {
 					fluidTank = new FluidStack(resource, Math.min(capacity, resource.amount));
+					//Some network thing.
 		            FluidEvent.fireEvent(new FluidEvent.FluidFillingEvent(fluidTank, this.worldObj, this.xCoord, this.yCoord, this.zCoord, this));
 		            return fluidTank.amount;
 		        }
-				
-		        int filled = capacity - fluidTank.amount;
-		
-		        if (resource.amount < filled) {
+				int filled;
+		        if ((fluidTank.amount + resource.amount) < capacity) {
+		        	//Will we still be under capacity with this new influx of resources?
 		        	fluidTank.amount += resource.amount;
-		            filled = resource.amount;
+		        	filled = resource.amount;
 		        }
 		        else {
+		        	//Over capacity?
+		        	//Get the difference between current and capacity, that's what we're filling.
+		        	filled = capacity - fluidTank.amount;
 		        	fluidTank.amount = capacity;
 		        }
 		
 		        if (fluidTank != null) {
+		        	//Some network thing.
 		            FluidEvent.fireEvent(new FluidEvent.FluidFillingEvent(fluidTank, this.worldObj, this.xCoord, this.yCoord, this.zCoord, this));
 		        }
 		        return filled;
@@ -175,6 +168,8 @@ public class TileEntityBloodDonation extends TileEntity implements IFluidHandler
 		}
 	}
 
+	//If doDrain is false, the drain is only simulated
+	//to get the FluidStack that would be returned.
 	@Override
 	public FluidStack drain(int maxDrain, boolean doDrain) {
 		if (fluidTank == null) {
@@ -187,8 +182,7 @@ public class TileEntityBloodDonation extends TileEntity implements IFluidHandler
         }
 
         FluidStack stack = new FluidStack(fluidTank, drained);
-        if (doDrain)
-        {
+        if (doDrain) {
         	fluidTank.amount -= drained;
             if (fluidTank.amount <= 0) {
             	fluidTank = null;

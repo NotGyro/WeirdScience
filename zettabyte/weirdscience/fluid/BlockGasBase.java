@@ -4,24 +4,17 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.Vector;
 
-import zettabyte.weirdscience.chemistry.IBioactive;
-
-import cofh.api.energy.IEnergyHandler;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.DamageSource;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
-import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.IFluidBlock;
+import zettabyte.weirdscience.chemistry.IBioactive;
 
 public class BlockGasBase extends Block implements IFiniteFluidBlock {
 
@@ -320,7 +313,6 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 		if(ourConcentration > dissipationConcentration) {
 			//Do chemical reactions.
 			updateReaction(world, x, y, z);
-			//System.out.println("How often does this happen?");
 			int adjBlockID;
 			//Iterate through each direction.
 			ForgeDirection dirLeastConcentration = ForgeDirection.UP;

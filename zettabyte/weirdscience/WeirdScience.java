@@ -1,20 +1,30 @@
 package zettabyte.weirdscience;
 
 
-import static java.lang.System.out;
-import zettabyte.weirdscience.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBucket;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Icon;
+import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fluids.BlockFluidClassic;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidRegistry;
+import zettabyte.weirdscience.block.BlockBloodDonation;
+import zettabyte.weirdscience.block.BlockPhosphateEngine;
 import zettabyte.weirdscience.client.gui.WeirdScienceGUIHandler;
 import zettabyte.weirdscience.fluid.BlockFluidClassicWS;
-import zettabyte.weirdscience.fluid.BlockGasBase;
-import zettabyte.weirdscience.fluid.BlockGasExplosive;
 import zettabyte.weirdscience.fluid.BlockGasSmog;
 import zettabyte.weirdscience.fluid.FluidAcid;
 import zettabyte.weirdscience.fluid.FluidSmog;
 import zettabyte.weirdscience.item.MelonPan;
 import zettabyte.weirdscience.tileentity.TileEntityBloodDonation;
 import zettabyte.weirdscience.tileentity.TileEntityPhosphateEngine;
-//Basic Forge stuff.
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -24,24 +34,12 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.renderer.texture.IconRegister;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.block.material.Material;
-import net.minecraftforge.common.Configuration;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fluids.BlockFluidClassic;
-import net.minecraftforge.fluids.Fluid;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraft.item.ItemPotion;
+//Basic Forge stuff.
 //Import our own stuff.
-import net.minecraft.util.Icon;
 
 @Mod(modid="WeirdScience", name="Weird Science", version="0.0.0")
 @NetworkMod(channels = {"WS"}, clientSideRequired = true, serverSideRequired = false)
@@ -69,7 +67,8 @@ public class WeirdScience {
     int idBloodDonation = 0;
     boolean enableBloodDonation = true;
     
-    int idBucket = 0;
+    int idBloodBucket = 0;
+    int idAcidBucket = 0;
 
     public Fluid fluidBlood;
     public Fluid fluidAcid;
@@ -81,7 +80,13 @@ public class WeirdScience {
     public BlockGasSmog gasSmogBlock;
 	private int idFluidBlood;
 	private int idFluidAcid;
-    
+
+	public ItemBucket itemBloodBucket;
+	public ItemBucket itemAcidBucket;
+	
+	//Important things to note: Values read from config and passed around don't reach their destination serverside unless
+	//they are null. Weird.
+	
     @EventHandler // used in 1.6.2
     public void preInit(FMLPreInitializationEvent event) {
     	Configuration config = new Configuration(event.getSuggestedConfigurationFile());
@@ -99,10 +104,12 @@ public class WeirdScience {
         idPhosphateEngine = config.getBlock("Phosphate engine ID", 3500, "In a later refactor, this will just be one sub-block of the machine block ID.").getInt();
         idMelonPan = config.getItem("Melonpan item ID", 4949).getInt();
         idBloodDonation = config.getBlock("Blood donation machine ID", 3501).getInt();
-        idBucket = config.getItem("Weird Science fluid bucket ID", 4950).getInt();
+        //idBucket = config.getItem("Weird Science fluid bucket ID", 4950).getInt();
         idGasSmog = config.getBlock("Smog block ID", 3600).getInt();
         idFluidBlood = config.getBlock("Blood block ID", 3601).getInt();
         idFluidAcid = config.getBlock("Acid block ID", 3602).getInt();
+        idBloodBucket = config.getItem("Blood bucket ID", 4950).getInt();
+        idAcidBucket = config.getItem("Acid bucket ID", 4951).getInt();
 
         //Initialize Phosphate Engine if it isn't hard-disabled.
     	if(idPhosphateEngine != 0) {
@@ -149,6 +156,10 @@ public class WeirdScience {
             }
     	};
     	fluidBloodBlock.setCreativeTab(tabWeirdScience);
+    	itemBloodBucket = new ItemBucket(idBloodBucket, idFluidBlood);
+    	itemBloodBucket.setUnlocalizedName("bloodBucket");
+    	itemBloodBucket.setCreativeTab(tabWeirdScience);
+    	itemBloodBucket.setTextureName("weirdscience:bloodbucket");
     	
     	if(idBloodDonation != 0) {
     		bloodDonation = (BlockBloodDonation)new BlockBloodDonation(idBloodDonation, Material.rock)
@@ -190,6 +201,11 @@ public class WeirdScience {
 	    	fluidAcidBlock.setCreativeTab(tabWeirdScience);
     	}
 
+    	itemAcidBucket = new ItemBucket(idAcidBucket, idFluidAcid);
+    	itemAcidBucket.setUnlocalizedName("acidBucket");
+    	itemAcidBucket.setCreativeTab(tabWeirdScience);
+    	itemAcidBucket.setTextureName("weirdscience:acidbucket");
+    	
     	fluidSmog = (FluidSmog) new FluidSmog("Smog").setBlockID(idGasSmog);
         FluidRegistry.registerFluid(fluidSmog);
 
@@ -253,10 +269,19 @@ public class WeirdScience {
             GameRegistry.registerBlock(fluidAcidBlock, "Acid");
             LanguageRegistry.addName(fluidAcidBlock, "Acid");
             fluidAcid.setUnlocalizedName("Acid");
+            
+            
     	}
+
+    	
+    	MinecraftForge.EVENT_BUS.register(new BucketEventManager());
 	        
     	NetworkRegistry.instance().registerGuiHandler(this, new WeirdScienceGUIHandler());
         proxy.registerRenderers();
+        
+        FluidContainerRegistry.registerFluidContainer(fluidAcid, new ItemStack(itemAcidBucket), new ItemStack(Item.bucketEmpty));
+        GameRegistry.registerItem(itemAcidBucket, "acidBucket");
+        LanguageRegistry.addName(itemAcidBucket, "Acid bucket");
         
         // Register the all-consuming Melonpan
         melonPan = new MelonPan(idMelonPan);
@@ -264,10 +289,14 @@ public class WeirdScience {
         if(enableMelonPan) {
         	GameRegistry.addShapelessRecipe(new ItemStack(melonPan,MelonPan.craftCount), MelonPan.recipe);
         }
+        GameRegistry.registerItem(melonPan, "Melonpan");
     	if((idPhosphateEngine != 0) && (idGasSmog != 0)) {
     		phosphateEngine.setWaste(gasSmogBlock);
     	}
-
+        FluidContainerRegistry.registerFluidContainer(fluidBlood, new ItemStack(itemBloodBucket), new ItemStack(Item.bucketEmpty));
+        GameRegistry.registerItem(itemBloodBucket, "bloodBucket");
+        LanguageRegistry.addName(itemBloodBucket, "Blood Bucket");
+        
         GameRegistry.registerBlock(fluidBloodBlock, "Blood");
         LanguageRegistry.addName(fluidBloodBlock, "Blood");
         fluidBlood.setUnlocalizedName("Blood");
@@ -276,5 +305,4 @@ public class WeirdScience {
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
     }
-
 }
