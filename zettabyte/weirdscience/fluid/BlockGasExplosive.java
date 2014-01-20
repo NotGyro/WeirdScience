@@ -15,9 +15,26 @@ public class BlockGasExplosive extends BlockGasBase {
 	public BlockGasExplosive(int id, Fluid fluid, Material material) {
 		super(id, fluid, material);
 		isReactive = true;
-		entitiesInteract = true;
 	}
-    @Override
+    public float getExplosionStrength() {
+		return explosionStrength;
+	}
+	public void setExplosionStrength(float explosionStrength) {
+		this.explosionStrength = explosionStrength;
+	}
+	public boolean isExplosionsEnabled() {
+		return explosionsEnabled;
+	}
+	public void setExplosionsEnabled(boolean explosionsEnabled) {
+		this.explosionsEnabled = explosionsEnabled;
+	}
+	public int getExplosionThreshhold() {
+		return explosionThreshhold;
+	}
+	public void setExplosionThreshhold(int explosionThreshhold) {
+		this.explosionThreshhold = explosionThreshhold;
+	}
+	@Override
     public void onBlockDestroyedByExplosion(World world, int x, int y, int z, Explosion explosion) {
     	if(canExplode(world, x, y, z)) {
             world.createExplosion(null, x, y, z, explosionStrength, true);
@@ -25,7 +42,7 @@ public class BlockGasExplosive extends BlockGasBase {
     	}
     }
     public boolean canExplode(World world, int x, int y, int z) {
-    	if(explosionsEnabled & (world.getBlockMetadata(x, y, z) > explosionThreshhold)) {
+    	if(explosionsEnabled & (getConcentration(world, x, y, z) > explosionThreshhold)) {
     		return true;
     	}
     	else {

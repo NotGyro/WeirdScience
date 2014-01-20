@@ -1,44 +1,48 @@
 package zettabyte.weirdscience.fluid;
 
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.DamageSource;
 import net.minecraftforge.fluids.Fluid;
 import zettabyte.weirdscience.chemistry.IBioactive;
 
-public class FluidSmog extends Fluid implements IBioactive {
+public class FluidAcid extends Fluid implements IBioactive {
 
-	public FluidSmog(String fluidName) {
+	public int damage = 4;
+	public FluidAcid(String fluidName) {
 		super(fluidName);
 	}
 
 	@Override
 	public boolean contactAffectCreature(EntityLivingBase affected) {
-		return false;
+		affected.attackEntityFrom(DamageSource.magic, (float)damage);
+		return true;
 	}
 
 	@Override
 	public boolean drinkAffectCreature(EntityLivingBase affected) {
-		return breatheAffectCreature(affected);
+		//Don't drink acid.
+		affected.attackEntityFrom(DamageSource.magic, (float)damage*2);
+		return true;
 	}
 
 	@Override
 	public boolean bloodstreamAffectCreature(EntityLivingBase affected) {
-		return breatheAffectCreature(affected);
+		//Holy shit what are you doing?
+		affected.attackEntityFrom(DamageSource.magic, (float)damage*4);
+		return true;
 	}
 
 	@Override
 	public boolean breatheAffectCreature(EntityLivingBase affected) {
-		if(affected != null) {
-			affected.addPotionEffect(new PotionEffect(Potion.poison.id, 250, 1));
-			affected.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 250, 1));
-		}
-		return false;
+		//Doesn't seem possible, but eh.
+		//If there are going to be Space Station 13 style shenanigans wherein we put acid in somebody's
+		//oxygen tank, we should start laying the foundations for that now.
+		return bloodstreamAffectCreature(affected);
 	}
 
 	@Override
 	public boolean canContactAffectCreature() {
-		return false;
+		return true;
 	}
 
 	@Override

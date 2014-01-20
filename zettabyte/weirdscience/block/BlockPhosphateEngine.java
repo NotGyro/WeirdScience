@@ -3,10 +3,14 @@ package zettabyte.weirdscience.block;
 
 import java.util.Random;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 import zettabyte.weirdscience.WeirdScience;
 import zettabyte.weirdscience.fluid.BlockGasBase;
 import zettabyte.weirdscience.tileentity.TileEntityPhosphateEngine;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
@@ -17,7 +21,10 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.util.Icon;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeDirection;
 
 public class BlockPhosphateEngine extends BlockContainer {
 
@@ -33,6 +40,25 @@ public class BlockPhosphateEngine extends BlockContainer {
     int teCapacity = 0;
     int tePerTick = 0;
     int tePerDirt = 0;
+    @SideOnly(Side.CLIENT)
+    public Icon sidesIcon;
+    @SideOnly(Side.CLIENT)
+    public Icon topandbottomIcon;
+    @Override
+    @SideOnly(Side.CLIENT)
+    public Icon getBlockTexture(IBlockAccess world, int x, int y, int z, int side) {
+        return this.getIcon(side, 0);
+    }
+    @Override
+    @SideOnly(Side.CLIENT)
+    public Icon getIcon(int side, int metadata) {
+    	if((side == 1) || (side == 0)) {
+    		return topandbottomIcon;
+    	}
+    	else {
+    		return sidesIcon;
+    	}
+    }
     
     protected int wasteCapacity;
     protected int ticksPerExhaust; //How long until we try to spawn smog?

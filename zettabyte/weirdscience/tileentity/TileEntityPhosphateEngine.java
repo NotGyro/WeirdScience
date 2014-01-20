@@ -538,9 +538,12 @@ public class TileEntityPhosphateEngine extends TileEntity implements IEnergyHand
 				//Is there still smog left over? If so, we could not fit it into the tank. Exhaust into the adjacent air.
 				if(smogProduced > 0) {
 					for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-						smogProduced = waste.pushIntoBlock(worldObj, xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ, smogProduced);
-						if(smogProduced <= 0) {
-							break;
+						if(dir != ForgeDirection.UP)
+						{
+							smogProduced = waste.pushIntoBlock(worldObj, xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ, smogProduced);
+							if(smogProduced <= 0) {
+								break;
+							}
 						}
 					}
 				}
