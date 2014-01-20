@@ -3,11 +3,6 @@ package zettabyte.weirdscience.tileentity;
 import java.util.ArrayList;
 
 import zettabyte.weirdscience.WeirdScience;
-import mekanism.api.Object3D;
-import mekanism.common.PacketHandler;
-import mekanism.common.PacketHandler.Transmission;
-import mekanism.common.network.PacketTileEntity;
-import mekanism.common.util.ChargeUtils;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -206,8 +201,6 @@ public class TileEntityBloodDonation extends TileEntity implements IFluidHandler
 	@Override
 	public void updateEntity()
 	{		
-		super.updateEntity();
-		
 		if(fluidTank != null) {
 			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 				TileEntity tileEntity = worldObj.getBlockTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);

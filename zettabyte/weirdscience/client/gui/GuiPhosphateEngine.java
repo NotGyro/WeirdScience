@@ -20,7 +20,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class GuiPhosphateEngine extends GuiBase {
-    private static final ResourceLocation engineGuiTextures = new ResourceLocation("weirdscience:textures/gui/genericcontainer.png");
+    private static final ResourceLocation engineGuiTextures = new ResourceLocation("weirdscience:textures/gui/genericmachinegui.png");
 	public GuiPhosphateEngine (InventoryPlayer inventoryPlayer, TileEntityPhosphateEngine tileEntity) {
 		//Instantiate the container.
 		super(new ContainerPhosphateEngine(inventoryPlayer, tileEntity));
@@ -30,7 +30,7 @@ public class GuiPhosphateEngine extends GuiBase {
 	protected void drawGuiContainerForegroundLayer(int param1, int param2) {
 		//draw text and stuff here
 		//the parameters for drawString are: string, x, y, color
-		fontRenderer.drawString("Tiny", 8, 6, 4210752);
+		fontRenderer.drawString("Phosphate Engine", 8, 6, 4210752);
 		//draws "Inventory" or your regional equivalent
 		fontRenderer.drawString(StatCollector.translateToLocal("container.inventory"), 8, ySize - 96 + 2, 4210752);
 	}
