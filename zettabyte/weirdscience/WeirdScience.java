@@ -1,5 +1,6 @@
 package zettabyte.weirdscience;
 
+import java.util.ArrayList;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -17,11 +18,13 @@ import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 import zettabyte.weirdscience.block.BlockBloodDonation;
 import zettabyte.weirdscience.block.BlockPhosphateEngine;
+import zettabyte.weirdscience.block.CongealedBloodBlock;
 import zettabyte.weirdscience.client.gui.WeirdScienceGUIHandler;
 import zettabyte.weirdscience.fluid.BlockFluidClassicWS;
 import zettabyte.weirdscience.fluid.BlockGasSmog;
 import zettabyte.weirdscience.fluid.FluidAcid;
 import zettabyte.weirdscience.fluid.FluidSmog;
+import zettabyte.weirdscience.item.Coagulant;
 import zettabyte.weirdscience.item.MelonPan;
 import zettabyte.weirdscience.tileentity.TileEntityBloodDonation;
 import zettabyte.weirdscience.tileentity.TileEntityPhosphateEngine;
@@ -41,9 +44,10 @@ import cpw.mods.fml.relauncher.SideOnly;
 //Basic Forge stuff.
 //Import our own stuff.
 
-@Mod(modid="WeirdScience", name="Weird Science", version="0.0.0")
+@Mod(modid = WeirdScience.modid, name = "Weird Science", version = "0.0.0")
 @NetworkMod(channels = {"WS"}, clientSideRequired = true, serverSideRequired = false)
 public class WeirdScience {
+	public static final String modid = "weirdscience";
     @Instance(value = "WeirdScience")
     public static WeirdScience instance;
     @SidedProxy(clientSide="zettabyte.weirdscience.client.ClientProxy", serverSide="zettabyte.weirdscience.CommonProxy")
@@ -56,28 +60,38 @@ public class WeirdScience {
     public static BlockPhosphateEngine phosphateEngine;
     public static BlockBloodDonation bloodDonation;
     
+    public static Block congealedBloodBlock;
     public static Item melonPan;
+    public static Item coagulant;
 
+    public static ArrayList<String> sounds = CongealedBloodBlock.sounds;
+    
     int idPhosphateEngine = 0;
     boolean enablePhosphateEngine = true;
+    int idBloodDonation = 0;
+    boolean enableBloodDonation = true;
 
     int idMelonPan = 0;
     boolean enableMelonPan = true;
+    int idCoagulant = 0;
+    boolean enableCoagulant = true;
     
-    int idBloodDonation = 0;
-    boolean enableBloodDonation = true;
+    int idCongealedBloodBlock = 0;
+    boolean enableCongealedBloodBlock = true;
+    
+
     
     int idBloodBucket = 0;
     int idAcidBucket = 0;
 
-    public Fluid fluidBlood;
-    public Fluid fluidAcid;
-    public BlockFluidClassic fluidBloodBlock;
-    public BlockFluidClassicWS fluidAcidBlock;
+    public static Fluid fluidBlood;
+    public static Fluid fluidAcid;
+    public static BlockFluidClassic fluidBloodBlock;
+    public static BlockFluidClassicWS fluidAcidBlock;
     
     public int idGasSmog;
-    public FluidSmog fluidSmog;
-    public BlockGasSmog gasSmogBlock;
+    public static FluidSmog fluidSmog;
+    public static BlockGasSmog gasSmogBlock;
 	private int idFluidBlood;
 	private int idFluidAcid;
 
@@ -94,22 +108,32 @@ public class WeirdScience {
         //Enable/disable components of the mod.
         enablePhosphateEngine = config.get("Features", "Enable phosphate engine", true).getBoolean(true);
         enableBloodDonation = config.get("Features", "Enable blood donation machine", true).getBoolean(true);
+        
         enableMelonPan = config.get("Features", "Enable melonpan", true, "If you disable Melonpan you're a horrible person.").getBoolean(true);
+        enableCoagulant = config.get("Features", "Enable coagulant", true, "If you disable Coagulant you're going to bleed to death.").getBoolean(true);
+        
+        enableCongealedBloodBlock = config.get("Features", "Enable congealed blood block", true, "Enable congealed blood blocks (aesthetic)").getBoolean(true);
         //Manage misc. settings
         
         //Manage worldgen.
         
         //Retrieve block IDs
         //int TestID = config.get(Configuration.CATEGORY_BLOCK, "Single-block generator ID", 1014).getInt();
-        idPhosphateEngine = config.getBlock("Phosphate engine ID", 3500, "In a later refactor, this will just be one sub-block of the machine block ID.").getInt();
         idMelonPan = config.getItem("Melonpan item ID", 4949).getInt();
-        idBloodDonation = config.getBlock("Blood donation machine ID", 3501).getInt();
         //idBucket = config.getItem("Weird Science fluid bucket ID", 4950).getInt();
+        idCoagulant = config.getItem("Coagulant item ID", 4951).getInt();
+        
+        
+        idBloodDonation = config.getBlock("Blood donation machine ID", 3501).getInt();
+        idPhosphateEngine = config.getBlock("Phosphate engine ID", 3500, "In a later refactor, this will just be one sub-block of the machine block ID.").getInt();
+        
         idGasSmog = config.getBlock("Smog block ID", 3600).getInt();
         idFluidBlood = config.getBlock("Blood block ID", 3601).getInt();
         idFluidAcid = config.getBlock("Acid block ID", 3602).getInt();
         idBloodBucket = config.getItem("Blood bucket ID", 4950).getInt();
         idAcidBucket = config.getItem("Acid bucket ID", 4951).getInt();
+        
+        idCongealedBloodBlock = config.getBlock("Congealed blood block ID", 3700).getInt();
 
         //Initialize Phosphate Engine if it isn't hard-disabled.
     	if(idPhosphateEngine != 0) {
@@ -237,6 +261,10 @@ public class WeirdScience {
 	    
     	}
     	
+    	if (idCongealedBloodBlock != 0) {
+    		congealedBloodBlock = new CongealedBloodBlock(idCongealedBloodBlock, Material.ground);
+    	}
+    	
         config.save();
     }
    
@@ -272,24 +300,39 @@ public class WeirdScience {
             
             
     	}
+    	if (idCongealedBloodBlock != 0) {
+    		MinecraftForge.setBlockHarvestLevel(congealedBloodBlock, "pickaxe", 0);
+        	LanguageRegistry.addName(congealedBloodBlock, "Congealed Blood Block");
+        	GameRegistry.registerBlock(congealedBloodBlock, "congealedBloodBlock");
+    	}
 
-    	
     	MinecraftForge.EVENT_BUS.register(new BucketEventManager());
-	        
+    	   
     	NetworkRegistry.instance().registerGuiHandler(this, new WeirdScienceGUIHandler());
         proxy.registerRenderers();
+        proxy.registerSound();
+        
+        
+        
         
         FluidContainerRegistry.registerFluidContainer(fluidAcid, new ItemStack(itemAcidBucket), new ItemStack(Item.bucketEmpty));
         GameRegistry.registerItem(itemAcidBucket, "acidBucket");
         LanguageRegistry.addName(itemAcidBucket, "Acid bucket");
         
         // Register the all-consuming Melonpan
-        melonPan = new MelonPan(idMelonPan);
-        LanguageRegistry.addName(melonPan, "Melonpan");
         if(enableMelonPan) {
+        	melonPan = new MelonPan(idMelonPan);
+        	LanguageRegistry.addName(melonPan, "Melonpan");
         	GameRegistry.addShapelessRecipe(new ItemStack(melonPan,MelonPan.craftCount), MelonPan.recipe);
+        	GameRegistry.registerItem(melonPan, "Melonpan");
         }
-        GameRegistry.registerItem(melonPan, "Melonpan");
+        if(enableCoagulant) {
+        	coagulant = new Coagulant(idCoagulant);
+            LanguageRegistry.addName(coagulant, "Coagulant");
+        	GameRegistry.addShapelessRecipe(new ItemStack(coagulant,Coagulant.craftCount), Coagulant.recipe);
+            GameRegistry.registerItem(coagulant, "Coagulant");
+        }
+
     	if((idPhosphateEngine != 0) && (idGasSmog != 0)) {
     		phosphateEngine.setWaste(gasSmogBlock);
     	}
