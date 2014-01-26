@@ -1,0 +1,39 @@
+<html xmlns:tomboy="http://beatniksoftware.com/tomboy" xmlns:link="http://beatniksoftware.com/tomboy/link" xmlns:size="http://beatniksoftware.com/tomboy/size"><head><META http-equiv="Content-Type" content="text/html; charset=utf-8"><title>Weird Science ideas</title><style type="text/css">
+        
+	body {  }
+	h1 { font-size: xx-large;
+     	     font-weight: bold;
+     	     border-bottom: 1px solid black; }
+	div.note {
+		   position: relative;
+		   display: block;
+		   padding: 5pt;
+		   margin: 5pt; 
+		   white-space: -moz-pre-wrap; /* Mozilla */
+ 	      	   white-space: -pre-wrap;     /* Opera 4 - 6 */
+ 	      	   white-space: -o-pre-wrap;   /* Opera 7 */
+ 	      	   white-space: pre-wrap;      /* CSS3 */
+ 	      	   word-wrap: break-word;      /* IE 5.5+ */ }
+	</style></head><body><div class="note" id="Weird Science ideas"><a name="weird science ideas"></a>
+GUI system: tile entity w/ inventory HAS A slot spec
+<ul><li dir="ltr">Slot spec: Each slot has properties whitelist, isWhitelist, Blacklist, isBlacklist, InputRestricted (refers to machine interface, players can still remove), InputOutput, OutputOnly, OutputRestricted (much like InputRestricted, players can still put items in there but not automation and not shift-click). Each slot describes capacity, etc.
+</li><li dir="ltr">Tile Entities can have similar FluidTankSpec and BatterySpec</li></ul>
+Zetta TileEntity GUI:
+<ul><li dir="ltr">Has a GUIslot, which can be linked to a slot in the slot spec
+<ul><li dir="ltr">Renders self, for fuck's sake. None of this gruntwork putting slots on pictures.
+</li></ul></li><li dir="ltr">Similarly, GUITank and GUIBattery.
+<ul><li dir="ltr">Tank and battery add linkage functionality, extending a base "GUIBar" class.
+</li></ul></li><li dir="ltr">Available widgets: 
+<ul><li dir="ltr">Button (link to a callback)
+</li><li dir="ltr">ToggleButton (link to a bool)
+</li><li dir="ltr">Special widget: Player's inventory.
+</li><li dir="ltr">Image
+</li><li dir="ltr">Bar
+</li><li dir="ltr">Slot
+</li><li dir="ltr">Text boxes
+<ul><li dir="ltr">Number-enterable (at some point)
+<ul><li dir="ltr">Sliders?
+</li></ul></li><li dir="ltr">Text-enterable
+</li></ul></li></ul></li><li dir="ltr">Should have a base ZettaGUI class for general purpose, extended by ZettaTileGUI for tile entities.
+</li><li dir="ltr">Visitor pattern on widgets? You could link a Button to a bool or a callback, or a ToggleButton to two functions, same widget class, different behavior.
+<ul><li dir="ltr">Too elaborate. Just subclassing would be much better in this case for the same purpose.</li></ul></li></ul></div></body></html>
