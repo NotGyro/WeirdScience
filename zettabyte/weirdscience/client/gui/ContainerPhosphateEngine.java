@@ -2,8 +2,8 @@ package zettabyte.weirdscience.client.gui;
 
 import zettabyte.weirdscience.tileentity.TileEntityPhosphateEngine;
 
-import cofh.gui.slot.SlotOutput;
-import cofh.gui.slot.SlotSpecificItem;
+import zettabyte.weirdscience.cofh.gui.slot.SlotOutput;
+import zettabyte.weirdscience.cofh.gui.slot.SlotSpecificItem;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;

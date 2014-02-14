@@ -3,9 +3,9 @@ package zettabyte.weirdscience.client.gui;
 
 import net.minecraft.inventory.Container;
 import net.minecraft.util.ResourceLocation;
-import cofh.gui.GuiBase;
-import cofh.gui.slot.SlotOutput;
-import cofh.gui.slot.SlotSpecificItem;
+import zettabyte.weirdscience.cofh.gui.GuiBase;
+import zettabyte.weirdscience.cofh.gui.slot.SlotOutput;
+import zettabyte.weirdscience.cofh.gui.slot.SlotSpecificItem;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
