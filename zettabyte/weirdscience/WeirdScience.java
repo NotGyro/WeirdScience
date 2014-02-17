@@ -7,6 +7,8 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemBlockWithMetadata;
 import net.minecraft.item.ItemBucket;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
@@ -89,11 +91,15 @@ public class WeirdScience {
     public static BlockFluidClassic fluidBloodBlock;
     public static BlockFluidClassicWS fluidAcidBlock;
     
-    public int idGasSmog;
-    public static FluidSmog fluidSmog;
-    public static BlockGasSmog gasSmogBlock;
+
+    public static FluidSmog fluidSmog;;
 	private int idFluidBlood;
 	private int idFluidAcid;
+	
+	public static int gasSmogDetail = 16;
+    public static BlockGasSmog[] gasSmogBlocks = new BlockGasSmog[gasSmogDetail];
+	
+	private ArrayList<Integer> smogIDs = new ArrayList<Integer>();
 
 	public ItemBucket itemBloodBucket;
 	public ItemBucket itemAcidBucket;
@@ -127,11 +133,18 @@ public class WeirdScience {
         idBloodDonation = config.getBlock("Blood donation machine ID", 3501).getInt();
         idPhosphateEngine = config.getBlock("Phosphate engine ID", 3500, "In a later refactor, this will just be one sub-block of the machine block ID.").getInt();
         
-        idGasSmog = config.getBlock("Smog block ID", 3600).getInt();
-        idFluidBlood = config.getBlock("Blood block ID", 3601).getInt();
-        idFluidAcid = config.getBlock("Acid block ID", 3602).getInt();
+        idFluidBlood = config.getBlock("Blood block ID", 3599).getInt();
+        idFluidAcid = config.getBlock("Acid block ID", 3598).getInt();
         idBloodBucket = config.getItem("Blood bucket ID", 4950).getInt();
         idAcidBucket = config.getItem("Acid bucket ID", 4951).getInt();
+
+        int smogBaseID = 3654;
+        for(int i = 0; i < gasSmogDetail; i++) {
+        	int tempID = config.getBlock("Smog block #".concat(String.valueOf(i)), 
+        			smogBaseID + i).getInt();
+        	
+        	smogIDs.add(tempID);
+        }
         
         idCongealedBloodBlock = config.getBlock("Congealed blood block ID", 3700).getInt();
 
@@ -230,36 +243,42 @@ public class WeirdScience {
     	itemAcidBucket.setCreativeTab(tabWeirdScience);
     	itemAcidBucket.setTextureName("weirdscience:acidbucket");
     	
-    	fluidSmog = (FluidSmog) new FluidSmog("Smog").setBlockID(idGasSmog);
+    	fluidSmog = (FluidSmog) new FluidSmog("Smog").setBlockID(smogIDs.get(smogIDs.size()-1));
         FluidRegistry.registerFluid(fluidSmog);
 
         //TODO get good at understanding how "icon" differs from "texture" in this engine.
-    	if(idGasSmog != 0) {
-	    	gasSmogBlock = (BlockGasSmog) new BlockGasSmog(idGasSmog, fluidSmog, Material.air){
-	    		//Things I didn't know Java could do.
-	            @SideOnly(Side.CLIENT)
-	            @Override
-	            public void registerIcons(IconRegister register) {
-	            	this.blockIcon = register.registerIcon("weirdscience:smog");
-	                
-	                fluidSmog.setIcons(this.blockIcon);
-	            }
-	            @Override
-	            public Icon getIcon(int side, int meta) {
-	                    return this.blockIcon;
-	            }
-	    	};
-	    	gasSmogBlock.setEntitiesInteract(true);
-	    	gasSmogBlock.setTextureName("weirdscience:smog");
-	    	gasSmogBlock.setCreativeTab(tabWeirdScience);
-	    	//TODO: Add actual acid.
-	    	gasSmogBlock.setBlockAcid(fluidAcidBlock);
-	    	
-	    	gasSmogBlock.setExplosionThreshhold(8);
-	    	
-	    	gasSmogBlock.setHardness(0.5f);
-	    
-    	}
+        for(int i = 0; i < gasSmogDetail; i++) {
+	    	if(smogIDs.get(i) != 0) {
+		    	gasSmogBlocks[i] = (BlockGasSmog) new BlockGasSmog(smogIDs.get(i), fluidSmog, Material.air){
+		    		//Things I didn't know Java could do.
+		            @SideOnly(Side.CLIENT)
+		            @Override
+		            public void registerIcons(IconRegister register) {
+		            	this.blockIcon = register.registerIcon("weirdscience:smog");
+		                
+		                fluidSmog.setIcons(this.blockIcon);
+		            }
+		            @Override
+		            public Icon getIcon(int side, int meta) {
+		                    return this.blockIcon;
+		            }
+		    	};
+		        for(int i2 = 0; i2 < this.smogIDs.size(); i2++) {
+		        	//Add every other ID to this one.
+	            	gasSmogBlocks[i].addExtenderID(smogIDs.get(i2));
+		        }
+		    	gasSmogBlocks[i].setEntitiesInteract(true);
+		    	gasSmogBlocks[i].setTextureName("weirdscience:smog");
+		    	//gasSmogBlock.setCreativeTab(tabWeirdScience);
+		    	//TODO: Add actual acid.
+		    	gasSmogBlocks[i].setBlockAcid(fluidAcidBlock);
+		    	
+		    	gasSmogBlocks[i].setExplosionThreshhold(8);
+		    	
+		    	gasSmogBlocks[i].setHardness(0.5f);
+	    	}
+        }
+        gasSmogBlocks[this.gasSmogDetail-1].setCreativeTab(tabWeirdScience);
     	
     	if (idCongealedBloodBlock != 0) {
     		congealedBloodBlock = new CongealedBloodBlock(idCongealedBloodBlock, Material.ground);
@@ -285,13 +304,13 @@ public class WeirdScience {
 		    GameRegistry.registerBlock(bloodDonation, "bloodDonationStation");
 		    GameRegistry.registerTileEntity(TileEntityBloodDonation.class, "BloodDonation");
     	}
-    	if(idGasSmog != 0) {
-            gasSmogBlock.setUnlocalizedName("gasSmog");
-            fluidSmog.setUnlocalizedName("gasSmog");
-	        LanguageRegistry.addName(gasSmogBlock, "Smog");
-		    GameRegistry.registerBlock(gasSmogBlock, "gasSmog");
-    	}
-
+        for(int i = 0; i < this.gasSmogBlocks.length; i++) {
+        	gasSmogBlocks[i].setUnlocalizedName("gasSmog");
+        	fluidSmog.setUnlocalizedName("gasSmog");
+        	LanguageRegistry.addName(gasSmogBlocks[i], "Smog");
+        	GameRegistry.registerBlock(gasSmogBlocks[i], "gasSmog".concat(String.valueOf(i)));
+        }
+	    
     	if(idFluidAcid != 0) {
     		fluidAcidBlock.setUnlocalizedName("fluidSmog");
             GameRegistry.registerBlock(fluidAcidBlock, "Acid");
@@ -333,8 +352,8 @@ public class WeirdScience {
             GameRegistry.registerItem(coagulant, "Coagulant");
         }
 
-    	if((idPhosphateEngine != 0) && (idGasSmog != 0)) {
-    		phosphateEngine.setWaste(gasSmogBlock);
+    	if((idPhosphateEngine != 0)) {
+    		phosphateEngine.setWaste(gasSmogBlocks[0]);
     	}
         FluidContainerRegistry.registerFluidContainer(fluidBlood, new ItemStack(itemBloodBucket), new ItemStack(Item.bucketEmpty));
         GameRegistry.registerItem(itemBloodBucket, "bloodBucket");

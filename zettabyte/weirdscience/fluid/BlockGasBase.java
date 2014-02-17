@@ -1,5 +1,6 @@
 package zettabyte.weirdscience.fluid;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.Vector;
@@ -26,8 +27,25 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 
 	//protected int flowRate = 4;
 	
+	protected ArrayList<Integer> blockIDs;
+	
 	protected boolean entitiesInteract = false;
-
+	
+	public BlockGasBase(int id, Fluid fluid, Material material) {
+		super(id, material);
+		ourFluid = fluid;
+		blockIDs = new ArrayList<Integer>();
+	}
+	
+	public void addExtenderID(int id) {
+		blockIDs.add(id);
+		//Block.blocksList[id] = this;
+	}
+	
+	public boolean isAssociatedBlockID(int id) {
+		return blockIDs.contains((Integer)id);
+	}
+	
 	public int getMbPerConcentration() {
 		return mbPerConcentration;
 	}
@@ -45,7 +63,7 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 	}
 
 	public int getFloorMB() {
-		return floorMB;
+		return getMBPerConcentration();
 	}
 
 	public void setFloorMB(int floorMB) {
@@ -67,10 +85,6 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 	
 	protected Fluid ourFluid;
 	
-	public BlockGasBase(int id, Fluid fluid, Material material) {
-		super(id, material);
-		ourFluid = fluid;
-	}
 	public void tryReaction(World world, int x, int y, int z, int xO, int yO, int zO) { }
 	public void updateReaction(World world, int x, int y, int z) {
 		if(isReactive) {
@@ -83,6 +97,7 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 			}
 		}
 	}
+	
 	@Override
     public void onNeighborBlockChange(World world, int x, int y, int z, int id) {
     	super.onNeighborBlockChange(world, x, y, z, id);
@@ -93,7 +108,7 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
     @Override
     public boolean shouldSideBeRendered(IBlockAccess world, int x, int y, int z, int side)
     {
-        if (world.getBlockId(x, y, z) != blockID) {
+        if (!isAssociatedBlockID(world.getBlockId(x, y, z))) {
             return !world.isBlockOpaqueCube(x, y, z);
         }
         return false;
@@ -152,15 +167,57 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 		return outputVal;
 	}
 	
+	public void setMBMax(int newMax) {
+		mbPerConcentration = newMax / getMaxConcentration();
+	}
+	
+	public int getMaxConcentration() {
+		return getConcentrationPerBracket() * this.blockIDs.size();
+	}
+	
 	/*
 	 * Abstracting the gas concentration away from metadata.
 	 */
 
-	public int getConcentration(World world, int x, int y, int z) {
+	protected int getConcentrationBase(World world, int x, int y, int z) {
 		return world.getBlockMetadata(x, y, z) + 1;
-	}
-	public void setConcentration(World world, int x, int y, int z, int concentration) {
+	} /*
+	protected void setBaseConcentration(World world, int x, int y, int z, int concentration) {
 		world.setBlockMetadataWithNotify(x, y, z, concentration - 1, 1|2);
+	}*/
+	
+	protected int getConcentrationMultiplier(World world, int x, int y, int z) {
+		return blockIDs.indexOf((Integer)world.getBlockId(x, y, z));
+	}
+	public int getConcentration(World world, int x, int y, int z) {
+		return (getConcentrationMultiplier(world, x, y, z) * 16) + getConcentrationBase(world, x, y, z);
+	}
+	protected int getConcentrationPerBracket() {
+		return 16;
+	}
+	protected int getIDByConcentration(int concen) {
+		return blockIDs.get((concen-1)/getConcentrationPerBracket());
+	}
+	public void setConcentration(World world, int x, int y, int z, int concen) {
+		if (concen <= 0) {
+			world.setBlock(x, y, z, 0, 0, 1|2);
+		}
+		else if (concen <= dissipationConcentration) {
+			world.setBlock(x, y, z, 0, 0, 1|2);			
+		}
+		else {
+			//I honestly don't expect to be able to comment this in a way that makes sense.
+			//It's a pretty horrible hack.
+			//Basically the extended IDs are ever higher brackets of concentration.
+			if(concen <= getMaxConcentration()) {
+				world.setBlock(x, y, z, getIDByConcentration(concen),
+						(concen%getConcentrationPerBracket())-1, 1|2);
+			}
+			else {
+				world.setBlock(x, y, z, getIDByConcentration(getMaxConcentration()),
+						15, 1|2);
+			}
+		}
 	}
 	@Override
 	public int getBlockInMB(World world, int x, int y, int z) {
@@ -174,20 +231,17 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 		}
 		else {
 			//Are we over the max? Set it to max.
-			return 16;
+			return getMaxConcentration();
 		}
 	}
 
 	@Override
 	public int getMaxMB() {
 		//15 metadata values with a range of 1, 16 concentration values. 0 concentration is air.
-		return 16 * mbPerConcentration;
+		return getMaxConcentration() * mbPerConcentration;
 	}
 	public int getMBPerConcentration() {
 		return mbPerConcentration;
-	}
-	public int getMaxConcentration() {
-		return 16;
 	}
 	
 	public Fluid getFluidType() { 
@@ -196,7 +250,7 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 	
 	//Sets the metadata to be equal to the appropriate value for an amount of
 	//milibuckets chosen.
-	public boolean setMetadataByMB(World world, int x, int y, int z, int amount) {
+	/*public boolean setMetadataByMB(World world, int x, int y, int z, int amount) {
 		if(getConcentrationFromMB(amount) >= 1) {
 			setConcentration(world, x, y, z, getConcentrationFromMB(amount));
 			return true;
@@ -205,7 +259,7 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 			world.setBlockToAir(x, y, z);
 			return false;
 		}
-	}
+	}*/
 	/*
 	 * Attempts to push an amount of this gas into the block specified.
 	 * Block specified doesn't need to be this gas.
@@ -214,23 +268,23 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 	public int pushIntoBlock(World world, int x, int y, int z, int amount) {
 		if(getConcentrationFromMB(amount) >= 1) {
 			int block = world.getBlockId(x, y, z);
-			if(block == 0 || blocksList[blockID].isAirBlock(world, x , y, z)) {
+			if(block == 0 || blocksList[block].isAirBlock(world, x , y, z)) {
 				//Is this air?
-				world.setBlock(x, y, z, this.blockID, getConcentrationFromMB(amount) - 1, 3); //Set the block to this one.
-				//this.onBlockAdded(world, x, y, z);
+				setConcentration(world, x, y, z, getConcentrationFromMB(amount));
+				
 				if(amount > getMaxMB()) {
 					return amount - getMaxMB();
 				}
 				return 0;
 			}
-			else if(block == this.blockID) {
+			else if(isAssociatedBlockID(block)) {
 				int blockGas = getBlockInMB(world, x, y, z);
 				if((blockGas + amount) > getMaxMB()) {
-					world.setBlockMetadataWithNotify(x, y, z, 15, 3); //set to max
+					setConcentrationByMB(world, x, y, z, getMaxConcentration()); //Set it to max.
 					return (blockGas + amount) - getMaxMB(); //Return leftovers.
 				}
 				else {
-					setMetadataByMB(world, x, y, z, blockGas + amount); //Add amount to block.
+					setConcentrationByMB(world, x, y, z, blockGas + amount); //Add amount to block.
 					return 0;
 				}
 			}
@@ -244,6 +298,10 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 			//Just fizzle it.
 			return 0;
 		}
+	}
+
+	private void setConcentrationByMB(World world, int x, int y, int z, int mbuckets) {
+		setConcentration(world, x, y, z, mbuckets/mbPerConcentration);		
 	}
 
 	@Override
@@ -291,12 +349,11 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 		updateReaction(world, x, y, z);
     }
     //Placed via itemblock (for creative mode & testing).
-    @Override
+    /*@Override
     public int onBlockPlaced(World world, int x, int y, int z, int par5, float par6, float par7, float par8, int meta) {
     	super.onBlockPlaced(world, x, y, z, par5, par6, par7, par8, meta);
-    	setConcentration(world, x, y, z, getMaxConcentration());
-		return 15;
-    }
+    	return 15;
+    }*/
     //Tick stuff.
     /**
      * How many world ticks before ticking
@@ -310,7 +367,8 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 	@Override
     public void updateTick(World world, int x, int y, int z, Random rand) {
 		int ourConcentration = getConcentration(world, x, y, z);
-		if(ourConcentration > dissipationConcentration) {
+		System.out.println(ourConcentration);
+		if(ourConcentration >= dissipationConcentration) {
 			//Do chemical reactions.
 			updateReaction(world, x, y, z);
 			int adjBlockID;
@@ -321,7 +379,7 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 			Vector<ForgeDirection> dirList = new Vector<ForgeDirection>(Arrays.asList(ForgeDirection.VALID_DIRECTIONS));
 			
 			//Set the flow rate to half of this block's concentration level, rounded up.
-			int flowRate = (int) Math.ceil(((float)ourConcentration)/4);
+			int flowRate = (int) Math.ceil(((float)ourConcentration)/2.0f);
 			//Shuffle the list of directions so as to avoid stupidity.
 			int toRand = 0;
 			for(int count = 0; count < 6; count ++){ 
@@ -339,7 +397,7 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 					valLeastConcentration = -1;
 					canGoAnywhereFlag = true;
 				}
-				else if(adjBlockID == this.blockID) {
+				else if(isAssociatedBlockID(adjBlockID)) {
 					//The adjacent block is more of this gas. Attempt to equalize them.
 					int adjBlockConcentration = getConcentration(world, x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
 					if((adjBlockConcentration < valLeastConcentration) && (adjBlockConcentration < ourConcentration) ) {
@@ -354,11 +412,11 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 				// || blocksList[adjBlockID].isAirBlock(world, x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ)
 				if(adjBlockID == 0) {
 					int toDrain = Math.min(ourConcentration, flowRate);
-					world.setBlock(x + dirLeastConcentration.offsetX, y + dirLeastConcentration.offsetY, z + dirLeastConcentration.offsetZ, 
-							this.blockID, toDrain, 3); //Set the adjacent block 
+					setConcentration(world, x + dirLeastConcentration.offsetX, y + dirLeastConcentration.offsetY, z + dirLeastConcentration.offsetZ,
+							toDrain); //Set the adjacent block 
 					ourConcentration -= toDrain;
 				}
-				else if(adjBlockID == this.blockID) {
+				else if(isAssociatedBlockID(adjBlockID)) {
 					//The adjacent block is more of this gas. Attempt to equalize them.
 					int adjBlockConcentration = getConcentration(world, x + dirLeastConcentration.offsetX, y + dirLeastConcentration.offsetY, z + dirLeastConcentration.offsetZ);
 					if(adjBlockConcentration < ourConcentration) {
@@ -373,22 +431,15 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 			//Negative concentration is not allowed at all.
 			world.setBlockToAir(x, y, z);
 		}
-		if(ourConcentration <= dissipationConcentration) {
+		else if(ourConcentration <= dissipationConcentration) {
 			//We have dissipated this block by extracting too much from it.
-			//world.setBlock(x, y, z, 0, 0, 1&2); //Set to air
-			if(rand.nextInt(dissipationChance) == 0) {
-				world.setBlockToAir(x, y, z);
-			}
-			else {
-				setConcentration(world, x, y, z, ourConcentration);
-			}
+			world.setBlock(x, y, z, 0, 0, 1|2); //Set to air
 		}
 		else {
 			setConcentration(world, x, y, z, ourConcentration);
+			//Ensure that the next tick happens.
 		}
-
-		//Ensure that the next tick happens.
-		world.scheduleBlockUpdateWithPriority(x, y, z, this.blockID, tickRate(world), 0);
+		world.scheduleBlockUpdateWithPriority(x, y, z, getIDByConcentration(ourConcentration), tickRate(world), 0);
     }
 	@Override
 	public int getQuantaSize() {
