@@ -1,14 +1,14 @@
 package zettabyte.weirdscience;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemBlockWithMetadata;
 import net.minecraft.item.ItemBucket;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
@@ -30,6 +30,7 @@ import zettabyte.weirdscience.item.Coagulant;
 import zettabyte.weirdscience.item.MelonPan;
 import zettabyte.weirdscience.tileentity.TileEntityBloodDonation;
 import zettabyte.weirdscience.tileentity.TileEntityPhosphateEngine;
+import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -43,8 +44,6 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-//Basic Forge stuff.
-//Import our own stuff.
 
 @Mod(modid = WeirdScience.modid, name = "Weird Science", version = "0.0.0")
 @NetworkMod(channels = {"WS"}, clientSideRequired = true, serverSideRequired = false)
@@ -55,6 +54,8 @@ public class WeirdScience {
     @SidedProxy(clientSide="zettabyte.weirdscience.client.ClientProxy", serverSide="zettabyte.weirdscience.CommonProxy")
     public static CommonProxy proxy;
     
+    //The logger for the mod. Should this not be static? Since it's Minecraft, it's unlikely that there will be threading issues.
+    public static final Logger logger = Logger.getLogger("WeirdScience");
     
     public static CreativeTabs tabWeirdScience = new CreativeTabWeirdScience(CreativeTabs.getNextID(), "tabWeirdScience");
     
@@ -96,7 +97,9 @@ public class WeirdScience {
 	private int idFluidBlood;
 	private int idFluidAcid;
 	
-	public static int gasSmogDetail = 16;
+	//The number of block IDs allocated to smog.
+	public static final int gasSmogDetail = 16;
+	
     public static BlockGasSmog[] gasSmogBlocks = new BlockGasSmog[gasSmogDetail];
 	
 	private ArrayList<Integer> smogIDs = new ArrayList<Integer>();
@@ -107,8 +110,14 @@ public class WeirdScience {
 	//Important things to note: Values read from config and passed around don't reach their destination serverside unless
 	//they are null. Weird.
 	
+	public WeirdScience() {
+        logger.setParent(FMLLog.getLogger());
+		logger.setLevel(Level.ALL);
+	}
+	
     @EventHandler // used in 1.6.2
     public void preInit(FMLPreInitializationEvent event) {
+    	logger.info("Testing.");
     	Configuration config = new Configuration(event.getSuggestedConfigurationFile());
         config.load();
         //Enable/disable components of the mod.
@@ -138,7 +147,7 @@ public class WeirdScience {
         idBloodBucket = config.getItem("Blood bucket ID", 4950).getInt();
         idAcidBucket = config.getItem("Acid bucket ID", 4951).getInt();
 
-        int smogBaseID = 3654;
+        final int smogBaseID = 3654;
         for(int i = 0; i < gasSmogDetail; i++) {
         	int tempID = config.getBlock("Smog block #".concat(String.valueOf(i)), 
         			smogBaseID + i).getInt();
@@ -272,8 +281,10 @@ public class WeirdScience {
 		    	//gasSmogBlock.setCreativeTab(tabWeirdScience);
 		    	//TODO: Add actual acid.
 		    	gasSmogBlocks[i].setBlockAcid(fluidAcidBlock);
+
 		    	
-		    	gasSmogBlocks[i].setExplosionThreshhold(8);
+		    	gasSmogBlocks[i].setMBMax(1024);
+		    	gasSmogBlocks[i].setExplosionThreshhold(200);
 		    	
 		    	gasSmogBlocks[i].setHardness(0.5f);
 	    	}

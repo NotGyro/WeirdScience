@@ -2,16 +2,7 @@ package zettabyte.weirdscience.tileentity;
 
 import java.util.Random;
 
-import zettabyte.weirdscience.fluid.BlockGasBase;
-
-import cofh.api.energy.IEnergyHandler;
-import cofh.api.tileentity.IEnergyInfo;
-
-//import static java.lang.System.out;
-
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockFurnace;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
@@ -23,7 +14,6 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet132TileEntityData;
 import net.minecraft.tileentity.TileEntity;
-
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidEvent;
@@ -31,11 +21,12 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fluids.IFluidTank;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
+import zettabyte.weirdscience.fluid.BlockGasBase;
+import cofh.api.energy.IEnergyHandler;
+import cofh.api.tileentity.IEnergyInfo;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
+//import static java.lang.System.out;
 
 public class TileEntityPhosphateEngine extends TileEntity implements IEnergyHandler, IEnergyInfo,
 		ISidedInventory, IFluidHandler, IFluidTank {
@@ -78,7 +69,7 @@ public class TileEntityPhosphateEngine extends TileEntity implements IEnergyHand
 		energyCap = cap;
 	    dirtPerBurn = 32; //Amount of dirt to attempt to consume at once.
 	    ticksPerBurn = 20; //Time between ticks where we burn dirt. To reduce lag.
-	    wasteProductionSpeed = 8; 
+	    wasteProductionSpeed = 80; 
 		ticksUntilBurn = ticksPerBurn;
 		wasteCapacity = wasteProductionSpeed * 64;
 		//waste = setWaste;

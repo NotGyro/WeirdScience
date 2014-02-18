@@ -10,7 +10,7 @@ public class BlockGasExplosive extends BlockGasBase {
 
 	public float explosionStrength = 4.0f;
 	public boolean explosionsEnabled = true;
-	public int explosionThreshhold = 0;
+	public int explosionThreshholdConcentration = 0;
 	
 	public BlockGasExplosive(int id, Fluid fluid, Material material) {
 		super(id, fluid, material);
@@ -28,11 +28,13 @@ public class BlockGasExplosive extends BlockGasBase {
 	public void setExplosionsEnabled(boolean explosionsEnabled) {
 		this.explosionsEnabled = explosionsEnabled;
 	}
+	//In millibuckets
 	public int getExplosionThreshhold() {
-		return explosionThreshhold;
+		return this.getMbPerConcentration() * explosionThreshholdConcentration;
 	}
+	//In millibuckets
 	public void setExplosionThreshhold(int explosionThreshhold) {
-		this.explosionThreshhold = explosionThreshhold;
+		this.explosionThreshholdConcentration = this.getConcentrationFromMB(explosionThreshhold);
 	}
 	@Override
     public void onBlockDestroyedByExplosion(World world, int x, int y, int z, Explosion explosion) {
@@ -42,7 +44,7 @@ public class BlockGasExplosive extends BlockGasBase {
     	}
     }
     public boolean canExplode(World world, int x, int y, int z) {
-    	if(explosionsEnabled & (getConcentration(world, x, y, z) > explosionThreshhold)) {
+    	if(explosionsEnabled & (getConcentration(world, x, y, z) > explosionThreshholdConcentration)) {
     		return true;
     	}
     	else {

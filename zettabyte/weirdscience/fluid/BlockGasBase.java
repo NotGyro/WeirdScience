@@ -15,11 +15,12 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
+import zettabyte.weirdscience.WeirdScience;
 import zettabyte.weirdscience.chemistry.IBioactive;
 
 public class BlockGasBase extends Block implements IFiniteFluidBlock {
 
-	protected int mbPerConcentration = 64; //1024 MB in a fully concentrated block (64 * 16).
+	protected int mbPerConcentration = 64;
 	protected int dissipationConcentration = 2; //If a block's concentration is lower than or equal to this, dissipate.
 	protected int floorMB; 
 	
@@ -31,6 +32,10 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 	
 	protected boolean entitiesInteract = false;
 	
+	protected int dissipationChance = 4;
+	
+	protected Fluid ourFluid;
+	
 	public BlockGasBase(int id, Fluid fluid, Material material) {
 		super(id, material);
 		ourFluid = fluid;
@@ -39,7 +44,7 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 	
 	public void addExtenderID(int id) {
 		blockIDs.add(id);
-		//Block.blocksList[id] = this;
+    	WeirdScience.logger.info(new String("Added ID " + id + " to gas: " + ourFluid.getUnlocalizedName()));
 	}
 	
 	public boolean isAssociatedBlockID(int id) {
@@ -81,9 +86,6 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 	public void setEntitiesInteract(boolean entitiesInteract) {
 		this.entitiesInteract = entitiesInteract;
 	}
-	protected int dissipationChance = 4;
-	
-	protected Fluid ourFluid;
 	
 	public void tryReaction(World world, int x, int y, int z, int xO, int yO, int zO) { }
 	public void updateReaction(World world, int x, int y, int z) {
@@ -201,9 +203,6 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 	public void setConcentration(World world, int x, int y, int z, int concen) {
 		if (concen <= 0) {
 			world.setBlock(x, y, z, 0, 0, 1|2);
-		}
-		else if (concen <= dissipationConcentration) {
-			world.setBlock(x, y, z, 0, 0, 1|2);			
 		}
 		else {
 			//I honestly don't expect to be able to comment this in a way that makes sense.
@@ -367,7 +366,6 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 	@Override
     public void updateTick(World world, int x, int y, int z, Random rand) {
 		int ourConcentration = getConcentration(world, x, y, z);
-		System.out.println(ourConcentration);
 		if(ourConcentration >= dissipationConcentration) {
 			//Do chemical reactions.
 			updateReaction(world, x, y, z);
@@ -432,15 +430,23 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 			world.setBlockToAir(x, y, z);
 		}
 		else if(ourConcentration <= dissipationConcentration) {
-			//We have dissipated this block by extracting too much from it.
-			world.setBlock(x, y, z, 0, 0, 1|2); //Set to air
+			//Too much has been extracted from this gas block, it will now eventually be dissipated.
+			//Roll for save vs. wind
+			if(rand.nextInt(dissipationChance) == 0) {
+				world.setBlockToAir(x, y, z);
+			}
+			else {
+				setConcentration(world, x, y, z, ourConcentration);
+			}
 		}
 		else {
 			setConcentration(world, x, y, z, ourConcentration);
-			//Ensure that the next tick happens.
 		}
+		//Ensure that the next tick happens.
 		world.scheduleBlockUpdateWithPriority(x, y, z, getIDByConcentration(ourConcentration), tickRate(world), 0);
     }
+	//And so ends the giant function.
+	
 	@Override
 	public int getQuantaSize() {
 		return mbPerConcentration;
