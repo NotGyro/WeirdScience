@@ -5,7 +5,7 @@ import java.util.Random;
 
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
-import zettabyte.weirdscience.cofh.api.world.IFeatureGenerator;
+import cofh.api.world.IFeatureGenerator;
 
 public abstract class FeatureBase implements IFeatureGenerator {
 

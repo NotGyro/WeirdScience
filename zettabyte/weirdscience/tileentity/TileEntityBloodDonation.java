@@ -1,5 +1,6 @@
 package zettabyte.weirdscience.tileentity;
 
+import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet132TileEntityData;
@@ -12,6 +13,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fluids.IFluidTank;
+import zettabyte.weirdscience.block.BlockMetaTank;
 import zettabyte.weirdscience.core.ContentRegistry;
 import zettabyte.weirdscience.core.interfaces.IConfiggable;
 import zettabyte.weirdscience.core.interfaces.IRegistrable;
@@ -237,5 +239,19 @@ public class TileEntityBloodDonation extends TileEntity implements IFluidHandler
 	@Override
 	public boolean isEnabled() {
 		return true;
+	}
+	
+
+	public void updateTank() { 
+		if(Block.blocksList[worldObj.getBlockId(xCoord, yCoord, zCoord)] instanceof BlockMetaTank) {
+			BlockMetaTank bmt = (BlockMetaTank)(Block.blocksList[worldObj.getBlockId(xCoord, yCoord, zCoord)]);
+			if(fluidTank == null) {
+				bmt.setMetaByFillPercent(worldObj, xCoord, yCoord, zCoord, 0);
+			} 
+			else {
+				bmt.setMetaByFillPercent(worldObj, xCoord, yCoord, zCoord,
+						(this.fluidTank.amount*100)/this.capacity);
+			}
+		}
 	}
 }

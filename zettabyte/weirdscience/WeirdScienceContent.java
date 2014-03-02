@@ -5,10 +5,12 @@ import net.minecraft.item.Item;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.fluids.Fluid;
 import zettabyte.weirdscience.block.BlockBloodDonation;
+import zettabyte.weirdscience.block.BlockBloodEngine;
 import zettabyte.weirdscience.block.BlockNitrateEngine;
 import zettabyte.weirdscience.block.CongealedBloodBlock;
 import zettabyte.weirdscience.core.ContentRegistry;
 import zettabyte.weirdscience.core.baseclasses.BlockFluidClassicWS;
+import zettabyte.weirdscience.core.baseclasses.ItemBase;
 import zettabyte.weirdscience.core.baseclasses.ItemBucketBase;
 import zettabyte.weirdscience.core.baseclasses.ItemFoodBase;
 import zettabyte.weirdscience.core.fluid.BlockGasBase;
@@ -25,12 +27,12 @@ public class WeirdScienceContent {
 		//Constants.
 		final int smogDetailDefault = 8;
 		//Init fluids.
-		FluidAcid fluidAcid = new FluidAcid("Acid");
-		FluidSmog fluidSmog = new FluidSmog("Smog");
-		Fluid fluidBlood = new Fluid("Blood");
-		fluidAcid.setUnlocalizedName("fluidAcid");
-		fluidSmog.setUnlocalizedName("fluidSmog");
-		fluidBlood.setUnlocalizedName("fluidBlood");
+		FluidAcid fluidAcid = new FluidAcid("acid");
+		FluidSmog fluidSmog = new FluidSmog("smog");
+		Fluid fluidBlood = new Fluid("blood");
+		//fluidAcid.setUnlocalizedName("fluidAcid");
+		//fluidSmog.setUnlocalizedName("fluidSmog");
+		//fluidBlood.setUnlocalizedName("fluidBlood");
 		
 		//Register fluids.
 		cr.RegisterFluid(fluidAcid);
@@ -94,18 +96,33 @@ public class WeirdScienceContent {
 		phosphateEngineBlock.setWaste(smogManager.blocks.get(0));
 		cr.RegisterBlock(phosphateEngineBlock);
 		
+		BlockBloodEngine bloodEngineBlock = new BlockBloodEngine(config, "Hemoionic Dynamo", Material.rock);
+		bloodEngineBlock.setTextureName("weirdscience:genericmachine");
+		bloodEngineBlock.addTopTextureName("weirdscience:genericmachine6_off");
+		bloodEngineBlock.addTopTextureName("weirdscience:genericmachine6_on");
+		bloodEngineBlock.addTankTextureName("weirdscience:genericmachine_tank_0");
+		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_1");
+		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_2");
+		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_3");
+		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_4");
+		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_5");
+		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_6");
+		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_7");
+		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_8");
+		cr.RegisterBlock(bloodEngineBlock);
+		
 		//Init and register items.
-		ItemFoodBase itemMelonPan = new ItemFoodBase(config, "Melonpan", 3, 0.6f);
+		ItemFoodBase itemMelonPan = new ItemFoodBase(config, "Melonpan", ItemBase.FindFreeItemID(), 3, 0.6f);
 		itemMelonPan.setTextureName("weirdscience:melonpan");
 		cr.RegisterItem(itemMelonPan);
 
-		ItemBucketBase bucketBlood = new ItemBucketBase(config, "Blood Bucket", bloodBlock);
+		ItemBucketBase bucketBlood = new ItemBucketBase(config, "Blood Bucket", ItemBase.FindFreeItemID(), bloodBlock);
 		bucketBlood.setTextureName("weirdscience:bloodbucket");
-		ItemBucketBase bucketAcid = new ItemBucketBase(config, "Acid Bucket", acidBlock);
-		bucketAcid.setTextureName("weirdscience:acidbucket");
-
-		cr.RegisterItem(bucketAcid);
 		cr.RegisterItem(bucketBlood);
+		
+		ItemBucketBase bucketAcid = new ItemBucketBase(config, "Acid Bucket", ItemBase.FindFreeItemID(), acidBlock);
+		bucketAcid.setTextureName("weirdscience:acidbucket");
+		cr.RegisterItem(bucketAcid);
 		//Register recipes.
 		cr.RegisterRecipe(new DisableableRecipe(itemMelonPan, new Object[]{Item.bread, Item.melon}, true, false));
 		

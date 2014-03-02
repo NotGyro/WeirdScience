@@ -3,6 +3,7 @@ package zettabyte.weirdscience.cofh.api.energy;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import cofh.api.energy.IEnergyContainerItem;
 
 /**
  * Reference implementation of {@link IEnergyContainerItem}. Use/extend this or

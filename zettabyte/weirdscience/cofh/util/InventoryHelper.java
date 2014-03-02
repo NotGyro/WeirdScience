@@ -5,7 +5,7 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.ForgeDirection;
-import zettabyte.weirdscience.cofh.api.transport.IItemConduit;
+import cofh.api.transport.IItemConduit;
 
 public class InventoryHelper {
 

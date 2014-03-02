@@ -21,7 +21,7 @@ public class ItemBase extends Item implements IWeirdScienceItem {
 		 */
 		super(config.getItem(name + " item ID", defaultID).getInt());
 		englishName = name;
-		setUnlocalizedName("item" + name.replace(" ", "")); //A default value. Absolutely acceptable to not keep it.
+		setUnlocalizedName(name.replace(" ", "")); //A default value. Absolutely acceptable to not keep it.
 	}
 
 	public ItemBase(Configuration config, String name) {
@@ -76,14 +76,16 @@ public class ItemBase extends Item implements IWeirdScienceItem {
 		return true;
 	}
 	
-	protected static int FindFreeItemID() {
-		for(int i = itemIDSearchLowerBound; i < 32000 /* max item ID */; ++i) {
+	public static int FindFreeItemID() {
+		int i = itemIDSearchLowerBound;
+		for(i = itemIDSearchLowerBound; i < 32000 /* max item ID */; ++i) {
 			if(itemsList[i] == null) {
 				return i;
 			}
 		}
+		i = itemIDSearchLowerBound;
 		//Should never be reached in practice.
-        throw new IllegalArgumentException("No free item IDs above " + itemIDSearchLowerBound + " available upon inspection in Weird Science's ItemBase.FindFreeItemID().");
+        throw new RuntimeException("No free item IDs above " + itemIDSearchLowerBound + " available upon inspection in Weird Science's ItemBase.FindFreeItemID().");
 	}
 
 }

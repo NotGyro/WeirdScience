@@ -237,6 +237,9 @@ public class TileEntityNitrateEngine extends TileEntity implements IEnergyHandle
             	fluidTank = fluid;
             }
         }
+
+        //Get energy
+        energy = nbt.getInteger("Energy");
     }
 
 	@Override
@@ -244,6 +247,8 @@ public class TileEntityNitrateEngine extends TileEntity implements IEnergyHandle
         super.writeToNBT(nbt);
         //Write time until next engine burn tick.
         nbt.setShort("BurnTime", (short)this.ticksUntilBurn);
+        //Write energy
+        nbt.setInteger("Energy", this.energy);
         //Write item stacks.
         NBTTagList nbttaglist = new NBTTagList();
         for (int i = 0; i < this.engineItemStacks.length; ++i) {

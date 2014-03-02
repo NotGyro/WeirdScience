@@ -5,8 +5,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.ForgeDirection;
-import zettabyte.weirdscience.cofh.api.energy.IEnergyContainerItem;
-import zettabyte.weirdscience.cofh.api.energy.IEnergyHandler;
+import cofh.api.energy.IEnergyContainerItem;
+import cofh.api.energy.IEnergyHandler;
 
 /**
  * This class contains helper functions related to Redstone Flux, the basis of

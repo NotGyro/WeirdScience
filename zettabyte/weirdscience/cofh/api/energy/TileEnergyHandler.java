@@ -3,6 +3,7 @@ package zettabyte.weirdscience.cofh.api.energy;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.ForgeDirection;
+import cofh.api.energy.IEnergyHandler;
 
 /**
  * Reference implementation of {@link IEnergyHandler}. Use/extend this or

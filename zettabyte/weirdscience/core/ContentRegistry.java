@@ -155,7 +155,9 @@ public class ContentRegistry {
 		 */
 		if(item instanceof ItemBucketBase) {
 			ItemBucketBase bucket = (ItemBucketBase)item;
-	        FluidContainerRegistry.registerFluidContainer(bucket.getFluid(), new ItemStack(item), new ItemStack(Item.bucketEmpty));
+			if(bucket.getFluid() != null) {
+				FluidContainerRegistry.registerFluidContainer(bucket.getFluid(), new ItemStack(item), new ItemStack(Item.bucketEmpty));
+	        }
 	        bucketMan.addRecipe(bucket.getContained(), new ItemStack(bucket, 1));
 		}
 		
@@ -200,10 +202,12 @@ public class ContentRegistry {
 		return true;
 	}
 	//Tell the deferred init users that we're all set.
-	protected void DeferredInit() {
+	public void DeferredInit() {
 		for(int i = 0; i < initToDo.size(); ++i) {
 			initToDo.get(i).DeferredInit(this);
 		}
+
+		initToDo = null;
 	}
 	
 	//Init the blocks that we've got to register after all of the config is done.
@@ -292,14 +296,11 @@ public class ContentRegistry {
 		
 		FinalizeTileEntities();
 		
-		DeferredInit();
-		
 		//This is where you can tell I'm used to C++.
 		itemsToRegister = null;
 		blocksToRegister = null;
 		fluidsToRegister = null;
 		tileentitiesToRegister = null;
-		initToDo = null;
 		recipesToRegister = null;
 	}
 }

@@ -78,5 +78,6 @@ public class WeirdScience {
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
+    	weirdRegistry.DeferredInit();
     }
 }

@@ -1,5 +1,7 @@
 package zettabyte.weirdscience.cofh.api.core;
 
+import cofh.api.core.ISimpleRegistry;
+
 /**
  * Access to the Cape and Skin Registries of CoFH Core.
  * 

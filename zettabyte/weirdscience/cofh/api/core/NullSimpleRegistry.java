@@ -1,5 +1,7 @@
 package zettabyte.weirdscience.cofh.api.core;
 
+import cofh.api.core.ISimpleRegistry;
+
 /**
  * Dummy class used to initialize Cape and Skin Registries to prevent accidental
  * NPEs.
