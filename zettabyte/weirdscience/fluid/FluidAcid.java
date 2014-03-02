@@ -4,8 +4,9 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.fluids.Fluid;
 import zettabyte.weirdscience.chemistry.IBioactive;
+import zettabyte.weirdscience.core.interfaces.IRegistrable;
 
-public class FluidAcid extends Fluid implements IBioactive {
+public class FluidAcid extends Fluid implements IBioactive, IRegistrable {
 
 	public int damage = 4;
 	public FluidAcid(String fluidName) {
@@ -60,4 +61,18 @@ public class FluidAcid extends Fluid implements IBioactive {
 		return true;
 	}
 
+	@Override
+	public String getEnglishName() {
+		return this.getLocalizedName();
+	}
+
+	@Override
+	public String getGameRegistryName() {
+		return this.getUnlocalizedName();
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return true;
+	}
 }

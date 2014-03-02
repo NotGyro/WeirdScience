@@ -1,23 +1,24 @@
 package zettabyte.weirdscience.fluid;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.world.World;
+import net.minecraftforge.common.Configuration;
 import net.minecraftforge.fluids.Fluid;
+import zettabyte.weirdscience.core.ContentRegistry;
+import zettabyte.weirdscience.core.interfaces.IConfiggable;
 
-public class BlockGasSmog extends BlockGasExplosive {
+public class BlockGasSmog extends BlockGasExplosive implements IConfiggable {
 
-	protected int acidThreshhold;
-	protected Block blockAcid;
-	public BlockGasSmog(int id, Fluid fluid, Material material) {
-		super(id, fluid, material);
-		acidThreshhold = 3;//(int)Math.ceil((float)this.getMaxConcentration()/4.0f);
-		entitiesInteract = true;
+	public BlockGasSmog(Configuration config, String name, Fluid fluid) {
+		super(config, name, fluid);
+		// TODO Auto-generated constructor stub
 	}
-	public Block getBlockAcid() {
+	protected int acidThreshhold;
+	protected static Block blockAcid;
+	public static Block getBlockAcid() {
 		return blockAcid;
 	}
-	public void setBlockAcid(Block acid) {
-		this.blockAcid = acid;
+	public static void setBlockAcid(Block acid) {
+		blockAcid = acid;
 	}
 	public int getAcidThreshhold() {
 		return acidThreshhold;
@@ -34,6 +35,14 @@ public class BlockGasSmog extends BlockGasExplosive {
 			world.setBlock(xO, yO, zO, blockAcid.blockID, 0, 1|2);
 			setConcentration(world, x, y, z, getConcentration(world, x, y, z) - acidThreshhold);
 		}
+	}
+
+	@Override
+	public void doConfig(Configuration config, ContentRegistry cr) {
+		int explThresh = config.get("Gas", "Smog explosion threshold", 200).getInt();
+		int acidThresh = config.get("Gas", "Smog water-to-acid threshold", 4).getInt();
+		setAcidThreshhold(acidThresh);
+		setExplosionThreshhold(explThresh);
 	}
 
 }

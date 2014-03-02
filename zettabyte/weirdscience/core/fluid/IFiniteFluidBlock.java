@@ -1,4 +1,4 @@
-package zettabyte.weirdscience.fluid;
+package zettabyte.weirdscience.core.fluid;
 
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;

@@ -3,34 +3,47 @@ package zettabyte.weirdscience.block;
 
 import java.util.Random;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
-import zettabyte.weirdscience.WeirdScience;
-import zettabyte.weirdscience.fluid.BlockGasBase;
-import zettabyte.weirdscience.tileentity.TileEntityPhosphateEngine;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.Icon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.Configuration;
+import zettabyte.weirdscience.WeirdScience;
+import zettabyte.weirdscience.core.baseclasses.BlockContainerBase;
+import zettabyte.weirdscience.core.fluid.BlockGasBase;
+import zettabyte.weirdscience.tileentity.TileEntityNitrateEngine;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
-public class BlockPhosphateEngine extends BlockContainer {
+public class BlockNitrateEngine extends BlockContainerBase {
 
-	public BlockPhosphateEngine(int id, Material material) {
-		super(id, material);
-		this.setCreativeTab(WeirdScience.tabWeirdScience);
+	public BlockNitrateEngine(Configuration config, String name,
+			int defaultID, Material material) {
+		super(config, name, defaultID, material);
+		// TODO Auto-generated constructor stub
+	}
+
+	public BlockNitrateEngine(Configuration config, String name, int defaultID) {
+		super(config, name, defaultID);
+		// TODO Auto-generated constructor stub
+	}
+
+	public BlockNitrateEngine(Configuration config, String name,
+			Material material) {
+		super(config, name, material);
+		// TODO Auto-generated constructor stub
+	}
+
+	public BlockNitrateEngine(Configuration config, String name) {
+		super(config, name);
+		// TODO Auto-generated constructor stub
 	}
 
     public boolean hasComparatorInputOverride() {
@@ -59,39 +72,21 @@ public class BlockPhosphateEngine extends BlockContainer {
     		return sidesIcon;
     	}
     }
+
+    @SideOnly(Side.CLIENT)
+    public void registerIcons(IconRegister iconRegister) {	
+    	sidesIcon = iconRegister.registerIcon("weirdscience:genericmachine1");
+    	topandbottomIcon = iconRegister.registerIcon("weirdscience:genericmachine");
+    }
     
-    protected int wasteCapacity;
-    protected int ticksPerExhaust; //How long until we try to spawn smog?
     public static BlockGasBase waste = null;
-    protected int wasteProductionSpeed;
 
-	public void setCapacity(int setTo) {
-		teCapacity = setTo;
-	}
-	public void setOutputRate(int setTo) {
-		tePerTick = setTo;
-	}
-	public void setEfficiency(int setTo) {
-		tePerDirt = setTo;
-	}
-
-	public static void setWaste(BlockGasBase b) {
-		waste = b;
-	}
-	public void setWasteCapacity(int amt) {
-		wasteCapacity = amt;
-	}
-	public void setTicksPerExhaust(int amt) {
-		ticksPerExhaust = amt;
-	}
-	//Warning: This is a *per dirt* value.
-	public void setWasteProductionSpeed(int amt) {
-		wasteProductionSpeed = amt;
-	}
-
+    public static void setWaste(BlockGasBase w) {
+    	waste = w;
+    }
 	@Override
 	public TileEntity createNewTileEntity(World world) {
-		TileEntityPhosphateEngine TE = new TileEntityPhosphateEngine(tePerDirt, tePerTick, teCapacity);
+		TileEntityNitrateEngine TE = new TileEntityNitrateEngine();
 		TE.setWaste(waste);
 		return TE;
 	}
@@ -104,7 +99,7 @@ public class BlockPhosphateEngine extends BlockContainer {
     }
     private final Random itemDropRand = new Random(); //Randomize item drop direction.
 	public void breakBlock(World world, int x, int y, int z, int par5, int par6) {
-		TileEntityPhosphateEngine tileentity = (TileEntityPhosphateEngine)world.getBlockTileEntity(x, y, z);
+		TileEntityNitrateEngine tileentity = (TileEntityNitrateEngine)world.getBlockTileEntity(x, y, z);
 
 		if (tileentity != null) {
 			for (int slotiter = 0; slotiter < tileentity.getSizeInventory(); ++slotiter) {

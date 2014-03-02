@@ -3,15 +3,16 @@ package zettabyte.weirdscience.block;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import zettabyte.weirdscience.WeirdScience;
 import net.minecraft.block.Block;
 import net.minecraft.block.StepSound;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraftforge.common.Configuration;
+import zettabyte.weirdscience.WeirdScience;
+import zettabyte.weirdscience.core.WeirdStepSound;
+import zettabyte.weirdscience.core.baseclasses.BlockBase;
+import zettabyte.weirdscience.core.interfaces.ISoundProvider;
 
-public class CongealedBloodBlock extends Block {
+public class CongealedBloodBlock extends BlockBase implements ISoundProvider {
 	private static String unlocalizedName = "congealedBloodBlock";
 	
 	private static final String stepSoundName = WeirdScience.modid + ":step." + unlocalizedName;
@@ -40,7 +41,7 @@ public class CongealedBloodBlock extends Block {
 		sounds.addAll(Arrays.asList(stepSounds));
 		sounds.addAll(Arrays.asList(placeSounds));
 	}
-	
+	/*
 	public CongealedBloodBlock(int blockID, Material blockMaterial) {
 		super(blockID, blockMaterial);
 		
@@ -50,11 +51,37 @@ public class CongealedBloodBlock extends Block {
 		setResistance(Block.dirt.blockResistance);
 		
 		setStepSound((StepSound) new WeirdStepSound(placeSoundName, placeSoundName, stepSoundName, 1.0f, 1.0f));
-	}
+	}*/
 	
+	public CongealedBloodBlock(Configuration config, String engName, Material blockMaterial) {
+		super(config, engName, blockMaterial);
+		//Done by the game registry.
+		//BlockBase returns true from isInCreativeTab by default.
+		//setCreativeTab(WeirdScience.tabWeirdScience);
+		setUnlocalizedName("congealedBloodBlock");
+		setHardness(Block.dirt.blockHardness);
+		setResistance(Block.dirt.blockResistance);
+		
+		setStepSound((StepSound) new WeirdStepSound(placeSoundName, placeSoundName, stepSoundName, 1.0f, 1.0f));
+	}
+	/*
 	@SideOnly(Side.CLIENT)
 	public void registerIcons(IconRegister reg) {
 		blockIcon = reg.registerIcon(WeirdScience.modid + ":" + getUnlocalizedName().substring(5));
+	}*/
+	@Override
+	public int getHarvestLevel(int subBlockMeta) {
+		return 0;
+	}
+
+	@Override
+	public String getHarvestType(int subBlockMeta) {
+		return "pickaxe";
+	}
+
+	@Override
+	public ArrayList<String> getSounds() {
+		return sounds;
 	}
 
 }

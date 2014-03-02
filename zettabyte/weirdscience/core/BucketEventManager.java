@@ -1,8 +1,9 @@
-package zettabyte.weirdscience;
+package zettabyte.weirdscience.core;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumMovingObjectType;
@@ -18,12 +19,12 @@ public class BucketEventManager {
 		fluidToBucket = new HashMap<Integer, ItemStack>();
 	};
 	
-	public boolean addRecipe(Integer id, ItemStack bucket) {
-		if((id == 0) || (fluidToBucket.containsKey(id))) {
+	public boolean addRecipe(Block sourceBlock, ItemStack bucket) {
+		if((sourceBlock.blockID == 0) || (fluidToBucket.containsKey(sourceBlock.blockID))) {
 			return false;
 		}
 		else {
-			fluidToBucket.put(id, bucket);
+			fluidToBucket.put(sourceBlock.blockID, bucket);
 			return true;
 		}
 	};

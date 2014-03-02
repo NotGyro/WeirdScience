@@ -1,24 +1,24 @@
-package zettabyte.weirdscience.fluid;
+package zettabyte.weirdscience.core.fluid;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.Vector;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
-import zettabyte.weirdscience.WeirdScience;
 import zettabyte.weirdscience.chemistry.IBioactive;
+import zettabyte.weirdscience.core.baseclasses.BlockBase;
 
-public class BlockGasBase extends Block implements IFiniteFluidBlock {
+public class BlockGasBase extends BlockBase implements IFiniteFluidBlock {
 
 	protected int mbPerConcentration = 64;
 	protected int dissipationConcentration = 2; //If a block's concentration is lower than or equal to this, dissipate.
@@ -28,23 +28,27 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 
 	//protected int flowRate = 4;
 	
-	protected ArrayList<Integer> blockIDs;
+	protected ArrayList<Integer> blockIDs; //Includes this and others.
 	
 	protected boolean entitiesInteract = false;
 	
 	protected int dissipationChance = 4;
 	
-	protected Fluid ourFluid;
+	protected int ourConcentration = 0; //The base concentration level of this particular BlockID.
+	// ^ As of yet unused. Higher concentration brackets were originally a hack.
+	// A later rewrite for optimization's sake will use this.
 	
-	public BlockGasBase(int id, Fluid fluid, Material material) {
-		super(id, material);
+	protected Fluid ourFluid;
+
+	public BlockGasBase(Configuration config, String name, Fluid fluid) {
+		super(config, name);
 		ourFluid = fluid;
 		blockIDs = new ArrayList<Integer>();
+		setMaterial(Material.air); //Cross your fingers...
 	}
 	
 	public void addExtenderID(int id) {
 		blockIDs.add(id);
-    	WeirdScience.logger.info(new String("Added ID " + id + " to gas: " + ourFluid.getUnlocalizedName()));
 	}
 	
 	public boolean isAssociatedBlockID(int id) {
@@ -242,9 +246,12 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 	public int getMBPerConcentration() {
 		return mbPerConcentration;
 	}
-	
+
 	public Fluid getFluidType() { 
 		return ourFluid;
+	}
+	public void setFluidType(Fluid fluid) { 
+		ourFluid = fluid;
 	}
 	
 	//Sets the metadata to be equal to the appropriate value for an amount of
@@ -464,5 +471,9 @@ public class BlockGasBase extends Block implements IFiniteFluidBlock {
 			int amount, boolean doDrain) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	@Override
+	public boolean InCreativeTab() { 
+		return false;
 	}
 }

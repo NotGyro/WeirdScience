@@ -11,8 +11,8 @@ public class WeirdScienceGUIHandler implements IGuiHandler {
 	@Override
     public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
             TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
-            if(tileEntity instanceof TileEntityPhosphateEngine){
-                    return new ContainerPhosphateEngine(player.inventory, (TileEntityPhosphateEngine) tileEntity);
+            if(tileEntity instanceof TileEntityNitrateEngine){
+                    return new ContainerNitrateEngine(player.inventory, (TileEntityNitrateEngine) tileEntity);
             }
             return null;
     }
@@ -20,8 +20,8 @@ public class WeirdScienceGUIHandler implements IGuiHandler {
     @Override
     public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
             TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
-            if(tileEntity instanceof TileEntityPhosphateEngine){
-                    return new GuiPhosphateEngine(player.inventory, (TileEntityPhosphateEngine) tileEntity);
+            if(tileEntity instanceof TileEntityNitrateEngine){
+                    return new GuiNitrateEngine(player.inventory, (TileEntityNitrateEngine) tileEntity);
             }
             return null;
 

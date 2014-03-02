@@ -1,10 +1,11 @@
 package zettabyte.weirdscience.fluid;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
+import net.minecraftforge.common.Configuration;
 import net.minecraftforge.fluids.Fluid;
+import zettabyte.weirdscience.core.fluid.BlockGasBase;
 
 public class BlockGasExplosive extends BlockGasBase {
 
@@ -12,8 +13,8 @@ public class BlockGasExplosive extends BlockGasBase {
 	public boolean explosionsEnabled = true;
 	public int explosionThreshholdConcentration = 0;
 	
-	public BlockGasExplosive(int id, Fluid fluid, Material material) {
-		super(id, fluid, material);
+	public BlockGasExplosive(Configuration config, String name, Fluid fluid) {
+		super(config, name, fluid);
 		isReactive = true;
 	}
     public float getExplosionStrength() {

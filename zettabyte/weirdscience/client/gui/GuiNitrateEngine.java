@@ -13,24 +13,24 @@ import net.minecraft.util.StatCollector;
 
 import org.lwjgl.opengl.GL11;
 
-import zettabyte.weirdscience.tileentity.TileEntityPhosphateEngine;
+import zettabyte.weirdscience.tileentity.TileEntityNitrateEngine;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GuiPhosphateEngine extends GuiBase {
+public class GuiNitrateEngine extends GuiBase {
     private static final ResourceLocation engineGuiTextures = new ResourceLocation("weirdscience:textures/gui/genericmachinegui.png");
-	public GuiPhosphateEngine (InventoryPlayer inventoryPlayer, TileEntityPhosphateEngine tileEntity) {
+	public GuiNitrateEngine (InventoryPlayer inventoryPlayer, TileEntityNitrateEngine tileEntity) {
 		//Instantiate the container.
-		super(new ContainerPhosphateEngine(inventoryPlayer, tileEntity));
+		super(new ContainerNitrateEngine(inventoryPlayer, tileEntity));
 	}
 
 	@Override
 	protected void drawGuiContainerForegroundLayer(int param1, int param2) {
 		//draw text and stuff here
 		//the parameters for drawString are: string, x, y, color
-		fontRenderer.drawString("Phosphate Engine", 8, 6, 4210752);
+		fontRenderer.drawString("Nitrate Engine", 8, 6, 4210752);
 		//draws "Inventory" or your regional equivalent
 		fontRenderer.drawString(StatCollector.translateToLocal("container.inventory"), 8, ySize - 96 + 2, 4210752);
 	}

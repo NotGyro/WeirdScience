@@ -4,6 +4,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet132TileEntityData;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidEvent;
@@ -11,12 +12,15 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fluids.IFluidTank;
+import zettabyte.weirdscience.core.ContentRegistry;
+import zettabyte.weirdscience.core.interfaces.IConfiggable;
+import zettabyte.weirdscience.core.interfaces.IRegistrable;
 
-public class TileEntityBloodDonation extends TileEntity implements IFluidHandler, IFluidTank {
+public class TileEntityBloodDonation extends TileEntity implements IFluidHandler, IFluidTank, IConfiggable, IRegistrable {
 	
     protected FluidStack fluidTank;
-    protected static int capacity;
-    protected static int outputSpeed;
+    protected static int capacity = 0;
+    protected static int outputSpeed = 0;
 	
     public TileEntityBloodDonation() {
 		super();
@@ -210,5 +214,28 @@ public class TileEntityBloodDonation extends TileEntity implements IFluidHandler
 				}
 			}
 		}
+	}
+
+	@Override
+	public void doConfig(Configuration config, ContentRegistry cr) {
+		capacity = config.get("Blood", "Blood Donation Station internal capacity", 1000).getInt();
+		outputSpeed = config.get("Blood", "Blood Donation Station output rate per tick", 500).getInt();
+	}
+
+	@Override
+	public String getEnglishName() {
+		// TODO Auto-generated method stub
+		return "Blood Donation Station";
+	}
+
+	@Override
+	public String getGameRegistryName() {
+		// TODO Auto-generated method stub
+		return "bloodDonation";
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return true;
 	}
 }

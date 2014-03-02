@@ -1,13 +1,14 @@
 package zettabyte.weirdscience.item;
 
-import zettabyte.weirdscience.CreativeTabWeirdScience;
-import zettabyte.weirdscience.WeirdScience;
-import net.minecraft.client.renderer.texture.IconRegister;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
 
 public class MelonPan extends ItemFood {
+
+	public MelonPan(int par1, int par2, boolean par3) {
+		super(par1, par2, par3);
+		// TODO Auto-generated constructor stub
+	} /*
+	@Override
 	private static final int hungerRestore = 3;
 	public static final int craftCount = 1;
 	public static Object[] recipe = {Item.bread, Item.melon};
@@ -20,9 +21,7 @@ public class MelonPan extends ItemFood {
 	}
 	
 	public void registerIcons(IconRegister reg) {
-		if (this.itemID == WeirdScience.melonPan.itemID) {
-			this.itemIcon = reg.registerIcon("weirdscience:melonpan");
-		}
+		this.itemIcon = reg.registerIcon("weirdscience:melonpan");
 	}
-
+*/
 }

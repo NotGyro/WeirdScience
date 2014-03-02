@@ -1,6 +1,5 @@
 package zettabyte.weirdscience.block;
 
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
@@ -9,31 +8,48 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
+import net.minecraftforge.common.Configuration;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
-import zettabyte.weirdscience.WeirdScience;
+import zettabyte.weirdscience.core.ContentRegistry;
+import zettabyte.weirdscience.core.baseclasses.BlockContainerBase;
+import zettabyte.weirdscience.core.interfaces.IConfiggable;
 import zettabyte.weirdscience.tileentity.TileEntityBloodDonation;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class BlockBloodDonation extends BlockContainer {
+public class BlockBloodDonation extends BlockContainerBase implements IConfiggable {
 	
+	public BlockBloodDonation(Configuration config, String name, int defaultID,
+			Material material) {
+		super(config, name, defaultID, material);
+		// Auto-generated constructor stub. Not a TODO. It's probably fine.
+	}
+	public BlockBloodDonation(Configuration config, String name, int defaultID) {
+		super(config, name, defaultID);
+		// Auto-generated constructor stub. Not a TODO. It's probably fine.
+	}
+	public BlockBloodDonation(Configuration config, String name,
+			Material material) {
+		super(config, name, material);
+		// Auto-generated constructor stub. Not a TODO. It's probably fine.
+	}
+	public BlockBloodDonation(Configuration config, String name) {
+		super(config, name);
+		// Auto-generated constructor stub. Not a TODO. It's probably fine.
+	}
+	public BlockBloodDonation(int id, Material material) {
+		super(id, material);
+		// Auto-generated constructor stub. Not a TODO. It's probably fine.
+	}
+
 	private static Fluid bloodFluid;
 	private static int mbPerDonation;
 	private static int dmgPerDonation;
-	private static int maxStorage;
-	
-	public BlockBloodDonation(int ID, Material Mat) {
-		super(ID, Mat);
-        this.setCreativeTab(WeirdScience.tabWeirdScience);
-    }
 
 	public static void setFluid(Fluid newfluid) {
 		bloodFluid = newfluid;
-	}
-	public static void setStorageCap(int setMax) {
-		maxStorage = setMax;
 	}
 	public static void setDamagePer(int setDmg) {
 		dmgPerDonation = setDmg;
@@ -67,7 +83,7 @@ public class BlockBloodDonation extends BlockContainer {
 	public TileEntity createNewTileEntity(World world) {
 		TileEntityBloodDonation TE = new TileEntityBloodDonation();
 		TE.setBloodFluid(bloodFluid);
-		TE.setStorageCap(maxStorage);
+		//TE.setStorageCap(maxStorage);
 		return TE;
 	}
 
@@ -126,5 +142,11 @@ public class BlockBloodDonation extends BlockContainer {
 			}
 		    return true;
 		}
+	}
+
+	@Override
+	public void doConfig(Configuration config, ContentRegistry cr) {
+		mbPerDonation = config.get("Blood", "Blood Donation Station milibuckets of blood per donation", 500).getInt();
+		dmgPerDonation = config.get("Blood", "Blood Donation Station damage per donation", 2).getInt();
 	}
 }

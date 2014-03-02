@@ -14,6 +14,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet132TileEntityData;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidEvent;
@@ -21,15 +22,18 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fluids.IFluidTank;
-import zettabyte.weirdscience.fluid.BlockGasBase;
+import zettabyte.weirdscience.core.ContentRegistry;
+import zettabyte.weirdscience.core.fluid.BlockGasBase;
+import zettabyte.weirdscience.core.interfaces.IConfiggable;
+import zettabyte.weirdscience.core.interfaces.IRegistrable;
 import cofh.api.energy.IEnergyHandler;
 import cofh.api.tileentity.IEnergyInfo;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
 //import static java.lang.System.out;
 
-public class TileEntityPhosphateEngine extends TileEntity implements IEnergyHandler, IEnergyInfo,
-		ISidedInventory, IFluidHandler, IFluidTank {
+public class TileEntityNitrateEngine extends TileEntity implements IEnergyHandler, IEnergyInfo,
+		ISidedInventory, IFluidHandler, IFluidTank, IConfiggable, IRegistrable {
 	private static final int[] accessibleSlots = new int[] {0,1};
 
     /**
@@ -39,41 +43,26 @@ public class TileEntityPhosphateEngine extends TileEntity implements IEnergyHand
 
     private final Random itemDropRand = new Random(); //Randomize item drop direction.
     
-    public int rfPerTick;
-    public int rfPerDirt;
-    public int dirtPerBurn; //Amount of dirt to attempt to consume at once.
-    public int ticksPerBurn; //Time between ticks where we burn dirt. To reduce lag.
+    public static int rfPerTick;
+    public static int rfPerDirt;
+    public static int dirtPerBurn; //Amount of dirt to attempt to consume at once.
+    public static int ticksPerBurn; //Time between ticks where we burn dirt. To reduce lag.
+	private static int energy;
+	private static int energyCap;
+    public static float explosionStrength = 4.0F;
+    protected static int wasteCapacity;
+    protected static int ticksPerExhaust; //How long until we try to spawn smog?
+    protected static int wasteProductionSpeed;
+    public static BlockGasBase waste = null;
     
-    private int ticksUntilBurn = 0;
+    private int ticksUntilBurn = ticksPerBurn;
     
-	public TileEntityPhosphateEngine() {
-		this(20, 20, 80);
+	public TileEntityNitrateEngine() {
+		ticksUntilBurn = ticksPerBurn;
+		energy = 0;
 	}
-
-	private int energy;
-	private int energyCap;
 	
 	protected FluidStack fluidTank;
-    protected int wasteCapacity;
-    protected int ticksPerExhaust; //How long until we try to spawn smog?
-    public static BlockGasBase waste = null;
-    protected int wasteProductionSpeed;
-    
-    public float explosionStrength = 4.0F;
-
-	public TileEntityPhosphateEngine(int rfpb, int rfpt, int cap) {
-		super();
-		energy = 0;
-		this.rfPerDirt = rfpb;
-		this.rfPerTick = rfpt;
-		energyCap = cap;
-	    dirtPerBurn = 32; //Amount of dirt to attempt to consume at once.
-	    ticksPerBurn = 20; //Time between ticks where we burn dirt. To reduce lag.
-	    wasteProductionSpeed = 80; 
-		ticksUntilBurn = ticksPerBurn;
-		wasteCapacity = wasteProductionSpeed * 64;
-		//waste = setWaste;
-	}
 
 	public static void setWaste(BlockGasBase b) {
 		waste = b;
@@ -147,7 +136,7 @@ public class TileEntityPhosphateEngine extends TileEntity implements IEnergyHand
 
 	@Override
 	public String getInvName() {
-		return "PhosphateEngine";
+		return "NitrateEngine";
 	}
 
 	@Override
@@ -569,5 +558,34 @@ public class TileEntityPhosphateEngine extends TileEntity implements IEnergyHand
 	@Override
 	public void onInventoryChanged() {
 		// TODO Do we need to do anything with this?
+	}
+
+	@Override
+	public void doConfig(Configuration config, ContentRegistry cr) {
+		this.rfPerDirt = config.get("Nitrate Engine", "RF generated per dirt", 20).getInt();
+		this.rfPerTick = config.get("Nitrate Engine", "RF transfer rate", 20).getInt();
+		energyCap = config.get("Nitrate Engine", "Capacity of internal buffer", 200).getInt();
+	    dirtPerBurn = 32; //Amount of dirt to attempt to consume at once.
+	    ticksPerBurn = 20; //Time between ticks where we burn dirt. To reduce lag.
+	    wasteProductionSpeed = config.get("Nitrate Engine", "Smog produced per dirt burned in milibuckets", 16).getInt();
+		ticksUntilBurn = ticksPerBurn;
+		wasteCapacity = config.get("Nitrate Engine", "Internal smog tank capacity", wasteProductionSpeed * 2).getInt();
+	}
+
+	@Override
+	public String getEnglishName() {
+		// TODO Auto-generated method stub
+		return "NitrateEngine";
+	}
+
+	@Override
+	public String getGameRegistryName() {
+		// TODO Auto-generated method stub
+		return "engineNitrate";
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return true;
 	}
 }

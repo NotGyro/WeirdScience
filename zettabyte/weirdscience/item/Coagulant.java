@@ -1,17 +1,13 @@
 package zettabyte.weirdscience.item;
 
-import zettabyte.weirdscience.CreativeTabWeirdScience;
-import zettabyte.weirdscience.WeirdScience;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumMovingObjectType;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
+import zettabyte.weirdscience.WeirdScience;
 
 public class Coagulant extends Item {
 	public static final int BONEMEAL_ID = 15;
@@ -28,9 +24,7 @@ public class Coagulant extends Item {
 	
 	@Override
 	public void registerIcons(IconRegister reg) {
-		if (this.itemID == WeirdScience.coagulant.itemID) {
-			this.itemIcon = reg.registerIcon("weirdscience:coagulant");
-		}
+		this.itemIcon = reg.registerIcon("weirdscience:coagulant");
 	}
 	
 	@Override
@@ -52,10 +46,10 @@ public class Coagulant extends Item {
 					return heldStack;
 				}
 				// If it's fluid blood, make it congealed and remove a coagulant
-				if (currentWorld.getBlockId(x, y, z) == WeirdScience.fluidBloodBlock.blockID) {
+				/*if (currentWorld.getBlockId(x, y, z) == WeirdScience.fluidBloodBlock.blockID) {
 					currentWorld.setBlock(x, y, z, WeirdScience.congealedBloodBlock.blockID);
 					--heldStack.stackSize;
-				}
+				}*/
 				return heldStack;
 			}
 			else {

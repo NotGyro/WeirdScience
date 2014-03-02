@@ -1,4 +1,4 @@
-package zettabyte.weirdscience.block;
+package zettabyte.weirdscience.core;
 
 import net.minecraft.block.StepSound;
 
