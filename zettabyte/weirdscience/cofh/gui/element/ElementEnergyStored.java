@@ -3,11 +3,11 @@ package zettabyte.weirdscience.cofh.gui.element;
 import java.util.List;
 
 import net.minecraft.util.ResourceLocation;
-import zettabyte.weirdscience.cofh.api.energy.IEnergyStorage;
 import zettabyte.weirdscience.cofh.gui.GuiBase;
 import zettabyte.weirdscience.cofh.gui.GuiProps;
 import zettabyte.weirdscience.cofh.render.RenderHelper;
 import zettabyte.weirdscience.cofh.util.MathHelper;
+import cofh.api.energy.IEnergyStorage;
 
 public class ElementEnergyStored extends ElementBase {
 

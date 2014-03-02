@@ -200,10 +200,12 @@ public class ContentRegistry {
 		return true;
 	}
 	//Tell the deferred init users that we're all set.
-	protected void DeferredInit() {
+	public void DeferredInit() {
 		for(int i = 0; i < initToDo.size(); ++i) {
 			initToDo.get(i).DeferredInit(this);
 		}
+
+		initToDo = null;
 	}
 	
 	//Init the blocks that we've got to register after all of the config is done.
@@ -292,14 +294,11 @@ public class ContentRegistry {
 		
 		FinalizeTileEntities();
 		
-		DeferredInit();
-		
 		//This is where you can tell I'm used to C++.
 		itemsToRegister = null;
 		blocksToRegister = null;
 		fluidsToRegister = null;
 		tileentitiesToRegister = null;
-		initToDo = null;
 		recipesToRegister = null;
 	}
 }

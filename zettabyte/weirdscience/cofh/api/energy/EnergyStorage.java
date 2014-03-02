@@ -1,6 +1,7 @@
 package zettabyte.weirdscience.cofh.api.energy;
 
 import net.minecraft.nbt.NBTTagCompound;
+import cofh.api.energy.IEnergyStorage;
 
 /**
  * Reference implementation of {@link IEnergyStorage}. Use/extend this or
