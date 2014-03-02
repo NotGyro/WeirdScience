@@ -12,7 +12,6 @@ public class ItemFoodBase extends ItemFood implements IWeirdScienceItem {
 	protected String englishName;
 	
 	//Exclude viable block IDs from default ID values.
-	protected static final int itemIDSearchLowerBound = 4096;
 	
 
 	public static int defaultHungerRestore = 1;

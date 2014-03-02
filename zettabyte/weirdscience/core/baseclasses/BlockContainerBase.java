@@ -18,6 +18,9 @@ public abstract class BlockContainerBase extends BlockContainer implements IWeir
 	
 	//Exclude vanilla / terrain IDs from default ID values.
 	protected static final int blockIDSearchLowerBound = 256;
+	
+	protected TileEntity protoTileEntity;
+	
 	public BlockContainerBase(Configuration config, String name, int defaultID, Material material) {
 		/* 
 		 * Real version of the constructor. Ultimately all other versions of the constructor turn into this.

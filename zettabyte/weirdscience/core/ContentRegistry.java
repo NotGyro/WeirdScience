@@ -155,7 +155,9 @@ public class ContentRegistry {
 		 */
 		if(item instanceof ItemBucketBase) {
 			ItemBucketBase bucket = (ItemBucketBase)item;
-	        FluidContainerRegistry.registerFluidContainer(bucket.getFluid(), new ItemStack(item), new ItemStack(Item.bucketEmpty));
+			if(bucket.getFluid() != null) {
+				FluidContainerRegistry.registerFluidContainer(bucket.getFluid(), new ItemStack(item), new ItemStack(Item.bucketEmpty));
+	        }
 	        bucketMan.addRecipe(bucket.getContained(), new ItemStack(bucket, 1));
 		}
 		

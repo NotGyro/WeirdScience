@@ -16,24 +16,27 @@ import zettabyte.weirdscience.core.interfaces.IRegistrable;
 import cofh.api.energy.IEnergyHandler;
 import cofh.api.tileentity.IEnergyInfo;
 
-public class TileEntityFluidEngine extends TileEnergyHandler implements
+public class TileEntityBloodEngine extends TileEnergyHandler implements
 		IFluidHandler, IEnergyInfo, IConfiggable, IDeferredInit, IRegistrable, IEnergyHandler {
-
-	protected FluidStack tank = null;
+	
+	//Static values
 	protected static int tankCap;
 	protected static int energyCap;
 	protected static int rfPerMB;
 	protected static int mbPerBurn;
 	protected static int ticksPerBurn;
 	protected static int rfPerTick;
-	protected int ticksUntilBurn;
 
 	protected final String fuelName;
 	protected final String engineName;
-	
+
 	private int fuelFluidID;
 	
-	public TileEntityFluidEngine(String fName, String engName) {
+	//Instance-specific values.
+	protected int ticksUntilBurn;
+	protected FluidStack tank = null;
+		
+	public TileEntityBloodEngine(String engName, String fName) {
 		super();
 		fuelName = fName;
 		engineName = engName;
@@ -185,24 +188,21 @@ public class TileEntityFluidEngine extends TileEnergyHandler implements
 
 	@Override
 	public int getEnergyPerTick() {
-		// TODO Auto-generated method stub
 		return rfPerTick;
 	}
 
 	@Override
 	public int getMaxEnergyPerTick() {
-		// TODO Auto-generated method stub
 		return rfPerTick;
 	}
 
 	@Override
 	public int getEnergy() {
-		// TODO Auto-generated method stub
 		return storage.getEnergyStored();
 	}
 
 	@Override
 	public int getMaxEnergy() {
-		return energyCap;
+		return storage.getMaxEnergyStored();
 	}
 }

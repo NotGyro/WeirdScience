@@ -106,11 +106,11 @@ public class WeirdScienceContent {
 
 		ItemBucketBase bucketBlood = new ItemBucketBase(config, "Blood Bucket", bloodBlock);
 		bucketBlood.setTextureName("weirdscience:bloodbucket");
+		cr.RegisterItem(bucketBlood);
+		
 		ItemBucketBase bucketAcid = new ItemBucketBase(config, "Acid Bucket", acidBlock);
 		bucketAcid.setTextureName("weirdscience:acidbucket");
-
 		cr.RegisterItem(bucketAcid);
-		cr.RegisterItem(bucketBlood);
 		//Register recipes.
 		cr.RegisterRecipe(new DisableableRecipe(itemMelonPan, new Object[]{Item.bread, Item.melon}, true, false));
 		

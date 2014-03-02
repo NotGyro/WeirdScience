@@ -18,7 +18,6 @@ public class ItemBucketBase extends ItemBucket implements IWeirdScienceItem, IFl
 	protected String englishName;
 	
 	//Exclude viable block IDs from default ID values.
-	protected static final int itemIDSearchLowerBound = 4096;
 	protected static final int emptyBucketID = 69;
 	
     /** Mojang hates us for making this private the first time around. */
@@ -63,7 +62,7 @@ public class ItemBucketBase extends ItemBucket implements IWeirdScienceItem, IFl
 		 * an ID, since this finds a free block ID rather than erroring if the requested block
 		 * ID is not free.
 		 */
-		this(config, name, FindFreeItemID(), bucketedBlock);
+		this(config, name, ItemBase.FindFreeItemID(), bucketedBlock);
 	}
 	
 	public ItemBucketBase(int id, Block bucketedBlock) {
@@ -110,20 +109,14 @@ public class ItemBucketBase extends ItemBucket implements IWeirdScienceItem, IFl
 		return true;
 	}
 	
-	protected static int FindFreeItemID() {
-		for(int i = itemIDSearchLowerBound; i < 32000 /* max item ID */; ++i) {
-			if(itemsList[i] == null) {
-				return i;
-			}
-		}
-		//Should never be reached in practice.
-        throw new IllegalArgumentException("No free item IDs above " + itemIDSearchLowerBound + " available upon inspection in Weird Science's ItemBase.FindFreeItemID().");
-	}
-
 	@Override
 	public FluidStack getFluid(ItemStack container) {
-		// TODO Auto-generated method stub
-		return new FluidStack(fluid, 1000);
+		if(fluid != null) {
+			return new FluidStack(fluid, 1000);
+		}
+		else {
+			return null;
+		}
 	}
 
 	@Override
@@ -140,6 +133,9 @@ public class ItemBucketBase extends ItemBucket implements IWeirdScienceItem, IFl
 
 	@Override
 	public FluidStack drain(ItemStack container, int maxDrain, boolean doDrain) {
+		if(fluid == null) {
+			return null;
+		}
 		//Cannot drain a whole bucket
 		if(maxDrain < 1000) {
 			return null;

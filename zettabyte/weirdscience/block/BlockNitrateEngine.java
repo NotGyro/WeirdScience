@@ -125,4 +125,5 @@ public class BlockNitrateEngine extends BlockContainerBase {
 		player.openGui(WeirdScience.instance, 0, world, x, y, z);
 	    return true;
 	}
+
 }

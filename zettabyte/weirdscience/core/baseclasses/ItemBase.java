@@ -77,13 +77,15 @@ public class ItemBase extends Item implements IWeirdScienceItem {
 	}
 	
 	protected static int FindFreeItemID() {
-		for(int i = itemIDSearchLowerBound; i < 32000 /* max item ID */; ++i) {
+		int i = itemIDSearchLowerBound;
+		for(i = itemIDSearchLowerBound; i < 32000 /* max item ID */; ++i) {
 			if(itemsList[i] == null) {
 				return i;
 			}
 		}
+		i = itemIDSearchLowerBound;
 		//Should never be reached in practice.
-        throw new IllegalArgumentException("No free item IDs above " + itemIDSearchLowerBound + " available upon inspection in Weird Science's ItemBase.FindFreeItemID().");
+        throw new RuntimeException("No free item IDs above " + itemIDSearchLowerBound + " available upon inspection in Weird Science's ItemBase.FindFreeItemID().");
 	}
 
 }
