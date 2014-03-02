@@ -10,6 +10,7 @@ import zettabyte.weirdscience.block.BlockNitrateEngine;
 import zettabyte.weirdscience.block.CongealedBloodBlock;
 import zettabyte.weirdscience.core.ContentRegistry;
 import zettabyte.weirdscience.core.baseclasses.BlockFluidClassicWS;
+import zettabyte.weirdscience.core.baseclasses.ItemBase;
 import zettabyte.weirdscience.core.baseclasses.ItemBucketBase;
 import zettabyte.weirdscience.core.baseclasses.ItemFoodBase;
 import zettabyte.weirdscience.core.fluid.BlockGasBase;
@@ -97,18 +98,29 @@ public class WeirdScienceContent {
 		
 		BlockBloodEngine bloodEngineBlock = new BlockBloodEngine(config, "Hemoionic Dynamo", Material.rock);
 		bloodEngineBlock.setTextureName("weirdscience:genericmachine");
+		bloodEngineBlock.addTopTextureName("weirdscience:genericmachine6_off");
+		bloodEngineBlock.addTopTextureName("weirdscience:genericmachine6_on");
+		bloodEngineBlock.addTankTextureName("weirdscience:genericmachine_tank_0");
+		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_1");
+		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_2");
+		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_3");
+		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_4");
+		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_5");
+		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_6");
+		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_7");
+		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_8");
 		cr.RegisterBlock(bloodEngineBlock);
 		
 		//Init and register items.
-		ItemFoodBase itemMelonPan = new ItemFoodBase(config, "Melonpan", 3, 0.6f);
+		ItemFoodBase itemMelonPan = new ItemFoodBase(config, "Melonpan", ItemBase.FindFreeItemID(), 3, 0.6f);
 		itemMelonPan.setTextureName("weirdscience:melonpan");
 		cr.RegisterItem(itemMelonPan);
 
-		ItemBucketBase bucketBlood = new ItemBucketBase(config, "Blood Bucket", bloodBlock);
+		ItemBucketBase bucketBlood = new ItemBucketBase(config, "Blood Bucket", ItemBase.FindFreeItemID(), bloodBlock);
 		bucketBlood.setTextureName("weirdscience:bloodbucket");
 		cr.RegisterItem(bucketBlood);
 		
-		ItemBucketBase bucketAcid = new ItemBucketBase(config, "Acid Bucket", acidBlock);
+		ItemBucketBase bucketAcid = new ItemBucketBase(config, "Acid Bucket", ItemBase.FindFreeItemID(), acidBlock);
 		bucketAcid.setTextureName("weirdscience:acidbucket");
 		cr.RegisterItem(bucketAcid);
 		//Register recipes.

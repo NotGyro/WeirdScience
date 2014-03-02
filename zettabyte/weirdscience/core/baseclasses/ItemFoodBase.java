@@ -26,7 +26,7 @@ public class ItemFoodBase extends ItemFood implements IWeirdScienceItem {
 				config.getItem(name + " properties", name + " hunger restore", defaultHungerRestore).getInt(defaultHungerRestore), 
 				(float)config.get(name + " properties", name + " saturation", defaultSaturation).getDouble(defaultSaturation), false);
 		englishName = name;
-		setUnlocalizedName("item" + name.replace(" ", "")); //A default value. Absolutely acceptable to not keep it.
+		setUnlocalizedName(name.replace(" ", "")); //A default value. Absolutely acceptable to not keep it.
 	}
 
 	public ItemFoodBase(Configuration config, String name) {

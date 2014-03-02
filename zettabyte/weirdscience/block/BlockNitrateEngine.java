@@ -75,7 +75,7 @@ public class BlockNitrateEngine extends BlockContainerBase {
 
     @SideOnly(Side.CLIENT)
     public void registerIcons(IconRegister iconRegister) {	
-    	sidesIcon = iconRegister.registerIcon("weirdscience:genericmachine1");
+    	sidesIcon = iconRegister.registerIcon("weirdscience:genericmachine6");
     	topandbottomIcon = iconRegister.registerIcon("weirdscience:genericmachine");
     }
     

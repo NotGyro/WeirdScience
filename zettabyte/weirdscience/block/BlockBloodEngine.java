@@ -17,10 +17,9 @@ import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidBlock;
-import zettabyte.weirdscience.core.baseclasses.BlockContainerBase;
 import zettabyte.weirdscience.tileentity.TileEntityBloodEngine;
 
-public class BlockBloodEngine extends BlockContainerBase {
+public class BlockBloodEngine extends BlockMetaTank {
 	
 	protected static final String fuelName= "blood";
 

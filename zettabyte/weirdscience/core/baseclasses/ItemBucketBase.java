@@ -44,7 +44,7 @@ public class ItemBucketBase extends ItemBucket implements IWeirdScienceItem, IFl
 		 */
 		super(config.getItem(name + " item ID", defaultID).getInt(), bucketedBlock.blockID);
 		englishName = name;
-		setUnlocalizedName("item" + name.replace(" ", "")); //A default value. Absolutely acceptable to not keep it.
+		setUnlocalizedName(name.replace(" ", "")); //A default value. Absolutely acceptable to not keep it.
 		
 		contained = bucketedBlock;
 		

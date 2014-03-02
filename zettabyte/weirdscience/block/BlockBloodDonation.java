@@ -134,8 +134,8 @@ public class BlockBloodDonation extends BlockContainerBase implements IConfiggab
 			//Try to harm the player. Bucketlessness is a sin.
 		    float previousPlayerHealth = player.getHealth();
 			player.attackEntityFrom(DamageSource.magic, (float)dmgPerDonation);
-			//If the player has taken damage, fill the tank.
-			if(player.getHealth() < previousPlayerHealth) {
+			//If the player has taken damage, fill the tank. (Prevent cheesing via fakeplayers.)
+			if((player.getHealth() < previousPlayerHealth) || player.capabilities.isCreativeMode){
 				if(donationEntity != null) {
 					donationEntity.fill(new FluidStack(bloodFluid, mbPerDonation), true);
 				}
