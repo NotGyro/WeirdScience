@@ -56,7 +56,8 @@ public class BlockNitrateEngine extends BlockContainerBase {
     @SideOnly(Side.CLIENT)
     public Icon sidesIcon;
     @SideOnly(Side.CLIENT)
-    public Icon topandbottomIcon;
+    public Icon topIcon;
+    public Icon bottomIcon;
     @Override
     @SideOnly(Side.CLIENT)
     public Icon getBlockTexture(IBlockAccess world, int x, int y, int z, int side) {
@@ -65,8 +66,11 @@ public class BlockNitrateEngine extends BlockContainerBase {
     @Override
     @SideOnly(Side.CLIENT)
     public Icon getIcon(int side, int metadata) {
-    	if((side == 1) || (side == 0)) {
-    		return topandbottomIcon;
+    	if(side == 1) {
+    		return topIcon;
+    	}
+    	else if(side == 0) {
+    		return bottomIcon;
     	}
     	else {
     		return sidesIcon;
@@ -75,8 +79,9 @@ public class BlockNitrateEngine extends BlockContainerBase {
 
     @SideOnly(Side.CLIENT)
     public void registerIcons(IconRegister iconRegister) {	
-    	sidesIcon = iconRegister.registerIcon("weirdscience:genericmachine6");
-    	topandbottomIcon = iconRegister.registerIcon("weirdscience:genericmachine");
+    	sidesIcon = iconRegister.registerIcon("weirdscience:genericmachine5");
+    	bottomIcon = iconRegister.registerIcon("weirdscience:genericmachine");
+    	topIcon = iconRegister.registerIcon("weirdscience:genericmachine3");
     }
     
     public static BlockGasBase waste = null;

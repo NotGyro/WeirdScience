@@ -96,15 +96,15 @@ public class WeirdScienceContent {
 		bloodEngineBlock.setTextureName("weirdscience:genericmachine");
 		bloodEngineBlock.addTopTextureName("weirdscience:genericmachine6_off");
 		bloodEngineBlock.addTopTextureName("weirdscience:genericmachine6_on");
-		bloodEngineBlock.addTankTextureName("weirdscience:genericmachine_tank_0");
-		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_1");
-		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_2");
-		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_3");
-		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_4");
-		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_5");
-		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_6");
-		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_7");
-		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_8");
+		bloodEngineBlock.addSidesTextureName("weirdscience:genericmachine_tank_0");
+		bloodEngineBlock.addSidesTextureName("weirdscience:blood_tank_1");
+		bloodEngineBlock.addSidesTextureName("weirdscience:blood_tank_2");
+		bloodEngineBlock.addSidesTextureName("weirdscience:blood_tank_3");
+		bloodEngineBlock.addSidesTextureName("weirdscience:blood_tank_4");
+		bloodEngineBlock.addSidesTextureName("weirdscience:blood_tank_5");
+		bloodEngineBlock.addSidesTextureName("weirdscience:blood_tank_6");
+		bloodEngineBlock.addSidesTextureName("weirdscience:blood_tank_7");
+		bloodEngineBlock.addSidesTextureName("weirdscience:blood_tank_8");
 		cr.RegisterBlock(bloodEngineBlock);
 
 		BlockBloodDonation donationBlock = new BlockBloodDonation(config, "Blood Donation Station", Material.rock);
@@ -113,15 +113,15 @@ public class WeirdScienceContent {
 		donationBlock.setTextureName("weirdscience:genericmachine");
 		donationBlock.addTopTextureName("weirdscience:blooddonationtop");
 		donationBlock.addTopTextureName("weirdscience:blooddonationtop");
-		donationBlock.addTankTextureName("weirdscience:genericmachine_tank_0");
-		donationBlock.addTankTextureName("weirdscience:blood_tank_1");
-		donationBlock.addTankTextureName("weirdscience:blood_tank_2");
-		donationBlock.addTankTextureName("weirdscience:blood_tank_3");
-		donationBlock.addTankTextureName("weirdscience:blood_tank_4");
-		donationBlock.addTankTextureName("weirdscience:blood_tank_5");
-		donationBlock.addTankTextureName("weirdscience:blood_tank_6");
-		donationBlock.addTankTextureName("weirdscience:blood_tank_7");
-		donationBlock.addTankTextureName("weirdscience:blood_tank_8");
+		donationBlock.addSidesTextureName("weirdscience:genericmachine_tank_0");
+		donationBlock.addSidesTextureName("weirdscience:blood_tank_1");
+		donationBlock.addSidesTextureName("weirdscience:blood_tank_2");
+		donationBlock.addSidesTextureName("weirdscience:blood_tank_3");
+		donationBlock.addSidesTextureName("weirdscience:blood_tank_4");
+		donationBlock.addSidesTextureName("weirdscience:blood_tank_5");
+		donationBlock.addSidesTextureName("weirdscience:blood_tank_6");
+		donationBlock.addSidesTextureName("weirdscience:blood_tank_7");
+		donationBlock.addSidesTextureName("weirdscience:blood_tank_8");
 		cr.RegisterBlock(donationBlock);
 		
 		//Init and register items.

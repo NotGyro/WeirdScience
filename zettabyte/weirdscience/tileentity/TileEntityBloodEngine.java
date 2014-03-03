@@ -203,8 +203,6 @@ public class TileEntityBloodEngine extends TileEntity implements IEnergyHandler,
 		            	}
 		        		flagHasPower = true;
 						//updateTank()
-		        		
-		            	System.out.println(energy + " , " + energyCap);
 						
 			            ticksUntilBurn = ticksPerBurn; //Reset the timer, but only if we did anything.
 		            }
