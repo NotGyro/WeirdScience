@@ -1,25 +1,20 @@
 package zettabyte.weirdscience.block;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import zettabyte.weirdscience.core.ContentRegistry;
-import zettabyte.weirdscience.core.baseclasses.BlockContainerBase;
 import zettabyte.weirdscience.core.interfaces.IConfiggable;
 import zettabyte.weirdscience.tileentity.TileEntityBloodDonation;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
-public class BlockBloodDonation extends BlockContainerBase implements IConfiggable {
+public class BlockBloodDonation extends BlockMetaTank implements IConfiggable {
 	
 	public BlockBloodDonation(Configuration config, String name, int defaultID,
 			Material material) {
@@ -57,27 +52,6 @@ public class BlockBloodDonation extends BlockContainerBase implements IConfiggab
 	public static void setDonationAmt(int setAmt) {
 		mbPerDonation = setAmt;
 	}
-
-    @SideOnly(Side.CLIENT)
-    protected Icon iconTop;
-
-    @SideOnly(Side.CLIENT)
-    public Icon getIcon(int side, int par2)
-    {
-        if(side == 1) { //Top
-        	return this.iconTop;
-        }
-        else {
-        	return this.blockIcon;
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-    public void registerIcons(IconRegister iconRegister)
-    {
-        this.blockIcon = iconRegister.registerIcon("weirdscience:genericmachine");
-        this.iconTop = iconRegister.registerIcon("weirdscience:blooddonationtop");
-    }
 
 	@Override
 	public TileEntity createNewTileEntity(World world) {
@@ -137,7 +111,7 @@ public class BlockBloodDonation extends BlockContainerBase implements IConfiggab
 			//If the player has taken damage, fill the tank. (Prevent cheesing via fakeplayers.)
 			if((player.getHealth() < previousPlayerHealth) || player.capabilities.isCreativeMode){
 				if(donationEntity != null) {
-					donationEntity.fill(new FluidStack(bloodFluid, mbPerDonation), true);
+					donationEntity.fillFromBlock(new FluidStack(bloodFluid, mbPerDonation), true);
 				}
 			}
 		    return true;

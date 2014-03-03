@@ -121,8 +121,7 @@ public class TileEntityBloodDonation extends TileEntity implements IFluidHandler
 		return new FluidTankInfo(this);
 	}
 
-	@Override
-	public int fill(FluidStack resource, boolean doFill) {
+	public int fillFromBlock(FluidStack resource, boolean doFill) {
 		//Is our blood fluid set?
 		if (bloodFluid != null) {
 			//Is our resource set?
@@ -130,7 +129,7 @@ public class TileEntityBloodDonation extends TileEntity implements IFluidHandler
 		        return 0;
 		    }
 			//Make sure our resource is blood.
-			if(bloodFluid.getID() == resource.getFluid().getID()) {
+			if(bloodFluid.getName().contentEquals(resource.getFluid().getName())) {
 				//Get simulation values.
 				if (!doFill) {
 		            if (fluidTank == null) {
@@ -162,6 +161,9 @@ public class TileEntityBloodDonation extends TileEntity implements IFluidHandler
 		        	//Some network thing.
 		            FluidEvent.fireEvent(new FluidEvent.FluidFillingEvent(fluidTank, this.worldObj, this.xCoord, this.yCoord, this.zCoord, this));
 		        }
+
+	            updateTank();
+	            
 		        return filled;
 		
 			}
@@ -173,12 +175,17 @@ public class TileEntityBloodDonation extends TileEntity implements IFluidHandler
 			return 0;
 		}
 	}
+	
+	@Override
+	public int fill(FluidStack resource, boolean doFill) {
+		return 0;
+	}
 
 	//If doDrain is false, the drain is only simulated
 	//to get the FluidStack that would be returned.
 	@Override
 	public FluidStack drain(int maxDrain, boolean doDrain) {
-		if (fluidTank == null) {
+		if ((fluidTank == null) || (maxDrain == 0)) {
             return null;
         }
 
@@ -201,16 +208,25 @@ public class TileEntityBloodDonation extends TileEntity implements IFluidHandler
 	@Override
 	public void updateEntity()
 	{		
-		if(fluidTank != null) {
-			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-				TileEntity tileEntity = worldObj.getBlockTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
-				if(tileEntity != null) {
-					if(tileEntity instanceof IFluidHandler) {
-						FluidStack toDrain = new FluidStack(fluidTank.getFluid(), Math.min(outputSpeed, fluidTank.amount));
-						drain(((IFluidHandler)tileEntity).fill(dir.getOpposite(), toDrain, true), true);
-						
-						if(fluidTank == null) {
-							break;
+		//Clientside is for suckers.
+		if(!worldObj.isRemote) {
+			//Do we have blood to dispense?
+			if(fluidTank != null) {
+				//For each direction
+				for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+					TileEntity tileEntity = worldObj.getBlockTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
+					if(tileEntity != null) {
+						if(tileEntity instanceof IFluidHandler) {
+							FluidStack toDrain = new FluidStack(fluidTank.getFluid(), Math.min(outputSpeed, fluidTank.amount));
+							if(((IFluidHandler)tileEntity).fill(dir.getOpposite(), toDrain, false) > 0) {
+								drain(((IFluidHandler)tileEntity).fill(dir.getOpposite(), toDrain, true), true);
+							}
+
+				            updateTank();
+				            
+							if(fluidTank == null) {
+								break;
+							}
 						}
 					}
 				}
@@ -242,15 +258,18 @@ public class TileEntityBloodDonation extends TileEntity implements IFluidHandler
 	}
 	
 
+	
 	public void updateTank() { 
-		if(Block.blocksList[worldObj.getBlockId(xCoord, yCoord, zCoord)] instanceof BlockMetaTank) {
-			BlockMetaTank bmt = (BlockMetaTank)(Block.blocksList[worldObj.getBlockId(xCoord, yCoord, zCoord)]);
-			if(fluidTank == null) {
-				bmt.setMetaByFillPercent(worldObj, xCoord, yCoord, zCoord, 0);
-			} 
-			else {
-				bmt.setMetaByFillPercent(worldObj, xCoord, yCoord, zCoord,
-						(this.fluidTank.amount*100)/this.capacity);
+		if(!worldObj.isRemote) {
+			if(Block.blocksList[worldObj.getBlockId(xCoord, yCoord, zCoord)] instanceof BlockMetaTank) {
+				BlockMetaTank bmt = (BlockMetaTank)(Block.blocksList[worldObj.getBlockId(xCoord, yCoord, zCoord)]);
+				if(fluidTank == null) {
+					bmt.setMetaByFillPercent(worldObj, xCoord, yCoord, zCoord, 0);
+				} 
+				else {
+					bmt.setMetaByFillPercent(worldObj, xCoord, yCoord, zCoord,
+							(fluidTank.amount*100)/capacity);
+				}
 			}
 		}
 	}

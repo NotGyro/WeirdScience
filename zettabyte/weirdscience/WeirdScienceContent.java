@@ -86,10 +86,6 @@ public class WeirdScienceContent {
 		cr.RegisterBlock(congealedBlock);
 		
 		//Init & register tile-entity-bearing blocks.
-		BlockBloodDonation donationBlock = new BlockBloodDonation(config, "Blood Donation Station", Material.rock);
-		donationBlock.setUnlocalizedName("blockBloodDonation");
-		donationBlock.setFluid(fluidBlood);
-		cr.RegisterBlock(donationBlock);
 
 		BlockNitrateEngine phosphateEngineBlock = new BlockNitrateEngine(config, "Nitrate Engine", Material.rock);
 		phosphateEngineBlock.setUnlocalizedName("blockNitrateEngine");
@@ -110,6 +106,23 @@ public class WeirdScienceContent {
 		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_7");
 		bloodEngineBlock.addTankTextureName("weirdscience:blood_tank_8");
 		cr.RegisterBlock(bloodEngineBlock);
+
+		BlockBloodDonation donationBlock = new BlockBloodDonation(config, "Blood Donation Station", Material.rock);
+		donationBlock.setUnlocalizedName("blockBloodDonation");
+		donationBlock.setFluid(fluidBlood);
+		donationBlock.setTextureName("weirdscience:genericmachine");
+		donationBlock.addTopTextureName("weirdscience:blooddonationtop");
+		donationBlock.addTopTextureName("weirdscience:blooddonationtop");
+		donationBlock.addTankTextureName("weirdscience:genericmachine_tank_0");
+		donationBlock.addTankTextureName("weirdscience:blood_tank_1");
+		donationBlock.addTankTextureName("weirdscience:blood_tank_2");
+		donationBlock.addTankTextureName("weirdscience:blood_tank_3");
+		donationBlock.addTankTextureName("weirdscience:blood_tank_4");
+		donationBlock.addTankTextureName("weirdscience:blood_tank_5");
+		donationBlock.addTankTextureName("weirdscience:blood_tank_6");
+		donationBlock.addTankTextureName("weirdscience:blood_tank_7");
+		donationBlock.addTankTextureName("weirdscience:blood_tank_8");
+		cr.RegisterBlock(donationBlock);
 		
 		//Init and register items.
 		ItemFoodBase itemMelonPan = new ItemFoodBase(config, "Melonpan", ItemBase.FindFreeItemID(), 3, 0.6f);
