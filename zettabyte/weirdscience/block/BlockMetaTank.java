@@ -22,7 +22,7 @@ public abstract class BlockMetaTank extends BlockContainerBase {
 	protected ArrayList<String> topTexNames = new ArrayList<String>(2);
 	protected ArrayList<Icon> topIcons;
 
-	public void addTankTextureName(String str) {
+	public void addSidesTextureName(String str) {
 		tankTexNames.add(str);
 	}
 	public void addTopTextureName(String str) {

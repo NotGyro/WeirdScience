@@ -30,8 +30,8 @@ public class TileEntityBloodEngine extends TileEntity implements IEnergyHandler,
 	protected static int ticksPerBurn;
 	protected static int rfPerTick;
 
-	protected final String fuelName;
-	protected final String engineName;
+	protected static String fuelName;
+	protected static String engineName;
 
 	private int fuelFluidID;
 	
@@ -48,6 +48,9 @@ public class TileEntityBloodEngine extends TileEntity implements IEnergyHandler,
 		ticksUntilBurn = ticksPerBurn;
 
 		energy = 0;
+	}
+	public TileEntityBloodEngine() {
+		super();
 	}
 	
 
@@ -66,9 +69,6 @@ public class TileEntityBloodEngine extends TileEntity implements IEnergyHandler,
             	tank = fluid;
             }
         }
-        //Fix the metadata for the block.
-        updateTank();
-
         //Get energy
         energy = nbt.getInteger("Energy");
     }
@@ -107,34 +107,24 @@ public class TileEntityBloodEngine extends TileEntity implements IEnergyHandler,
 	@Override
 	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
 		if(resource.getFluid().getName() == fuelName) {
-			if(tank == null) {
-				if(doFill) {
-					updateTank();
-					tank = resource.copy();
-					if(tank.amount > tankCap) {
-						tank.amount = tankCap;
-					}
-				}
-				return Math.min(resource.amount, tankCap);
+			int ourValue = 0;
+			if(tank != null) {
+				ourValue = tank.amount;
 			}
-			else {
-				//We have fuel in the tank already.
-				int fin = tank.amount + resource.amount;
-				if(fin > tankCap) {
-					if(doFill) {
-						tank.amount = tankCap;
-						updateTank();
-					}
-					return fin - tankCap;
+			int resultValue = ourValue + resource.amount;
+			if(resultValue > tankCap) {
+				resultValue = tankCap;
+			}
+			if(doFill) {
+				if (tank != null) {
+					tank.amount = resultValue;
 				}
 				else {
-					if(doFill) {
-						tank.amount = tank.amount + resource.amount;
-						updateTank();
-					}
-					return resource.amount;
+					tank = resource.copy();
 				}
+				this.updateTank();
 			}
+			return resultValue - ourValue;
 		}
 		else {
 			return 0;
@@ -190,36 +180,40 @@ public class TileEntityBloodEngine extends TileEntity implements IEnergyHandler,
 	@Override
 	public void updateEntity() //The meat of our block.
     {
-		//Burn logic:
-		//Are we still waiting to burn fuel?
-		boolean flagHasPower = energy > 0;
-		
-        if (this.ticksUntilBurn > 0) {
-        	--this.ticksUntilBurn;
-        }
-        else {
-        	//Do we have fuel?
-			if (this.tank != null) {
-				//Bugs are hard and Tile Entities are eccentric.
-	            if ((this.tank.amount >= 1) && (energy < energyCap)) {
-	            	int toBurn = Math.min(mbPerBurn, this.tank.amount); //Either eat dirtPerBurn fuel or the entire stack.
-	            	drain(ForgeDirection.UP, toBurn, true);
-	            	
-	            	energy += (int)(((float)toBurn)*rfPerMB);
-	        		flagHasPower = true;
-					//updateTank()
-	        		
-	            	System.out.println(energy + " , " + energyCap);
-					
-		            ticksUntilBurn = ticksPerBurn; //Reset the timer, but only if we did anything.
-	            }
-			}
-        }
-		//And now, attempt to charge surrounding blocks.
-		if (flagHasPower) {
-			for(int i = 0; i < 6; ++i) {
-				//Try every side.
-				energy -= EnergyHelper.insertEnergyIntoAdjacentEnergyHandler(this, i, Math.min(rfPerTick, energy), false);
+		//Clientside is for suckers.
+		if(!worldObj.isRemote) {
+			//Burn logic:
+			//Are we still waiting to burn fuel?
+			boolean flagHasPower = energy > 0;
+			
+	        if (this.ticksUntilBurn > 0) {
+	        	--this.ticksUntilBurn;
+	        }
+	        else {
+	        	//Do we have fuel?
+				if (this.tank != null) {
+					//Bugs are hard and Tile Entities are eccentric.
+		            if ((this.tank.amount >= 1) && (energy < energyCap)) {
+		            	int toBurn = Math.min(mbPerBurn, this.tank.amount); //Either eat mbPerBurn fuel or the entire stack.
+		            	drain(ForgeDirection.UP, toBurn, true);
+		            	
+		            	energy += (int)(((float)toBurn)*rfPerMB);
+		            	if(energy > energyCap) {
+		            		energy = energyCap;
+		            	}
+		        		flagHasPower = true;
+						//updateTank()
+						
+			            ticksUntilBurn = ticksPerBurn; //Reset the timer, but only if we did anything.
+		            }
+				}
+	        }
+			//And now, attempt to charge surrounding blocks.
+			if (flagHasPower) {
+				for(int i = 0; i < 6; ++i) {
+					//Try every side.
+					energy -= EnergyHelper.insertEnergyIntoAdjacentEnergyHandler(this, i, Math.min(rfPerTick, energy), false);
+				}
 			}
 		}
     }

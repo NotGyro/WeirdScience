@@ -15,9 +15,9 @@ import net.minecraft.util.Icon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.Configuration;
+import net.minecraftforge.fluids.Fluid;
 import zettabyte.weirdscience.WeirdScience;
 import zettabyte.weirdscience.core.baseclasses.BlockContainerBase;
-import zettabyte.weirdscience.core.fluid.BlockGasBase;
 import zettabyte.weirdscience.tileentity.TileEntityNitrateEngine;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -56,7 +56,8 @@ public class BlockNitrateEngine extends BlockContainerBase {
     @SideOnly(Side.CLIENT)
     public Icon sidesIcon;
     @SideOnly(Side.CLIENT)
-    public Icon topandbottomIcon;
+    public Icon topIcon;
+    public Icon bottomIcon;
     @Override
     @SideOnly(Side.CLIENT)
     public Icon getBlockTexture(IBlockAccess world, int x, int y, int z, int side) {
@@ -65,8 +66,11 @@ public class BlockNitrateEngine extends BlockContainerBase {
     @Override
     @SideOnly(Side.CLIENT)
     public Icon getIcon(int side, int metadata) {
-    	if((side == 1) || (side == 0)) {
-    		return topandbottomIcon;
+    	if(side == 1) {
+    		return topIcon;
+    	}
+    	else if(side == 0) {
+    		return bottomIcon;
     	}
     	else {
     		return sidesIcon;
@@ -75,13 +79,14 @@ public class BlockNitrateEngine extends BlockContainerBase {
 
     @SideOnly(Side.CLIENT)
     public void registerIcons(IconRegister iconRegister) {	
-    	sidesIcon = iconRegister.registerIcon("weirdscience:genericmachine6");
-    	topandbottomIcon = iconRegister.registerIcon("weirdscience:genericmachine");
+    	sidesIcon = iconRegister.registerIcon("weirdscience:genericmachine5");
+    	bottomIcon = iconRegister.registerIcon("weirdscience:genericmachine");
+    	topIcon = iconRegister.registerIcon("weirdscience:genericmachine3");
     }
     
-    public static BlockGasBase waste = null;
+    public static Fluid waste = null;
 
-    public static void setWaste(BlockGasBase w) {
+    public static void setWaste(Fluid w) {
     	waste = w;
     }
 	@Override

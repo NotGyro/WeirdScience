@@ -1,5 +1,6 @@
 package zettabyte.weirdscience.tileentity;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import net.minecraft.block.Block;
@@ -7,7 +8,6 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -23,17 +23,22 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fluids.IFluidTank;
 import zettabyte.weirdscience.core.ContentRegistry;
+import zettabyte.weirdscience.core.SolidFuelInfo;
 import zettabyte.weirdscience.core.fluid.BlockGasBase;
 import zettabyte.weirdscience.core.interfaces.IConfiggable;
+import zettabyte.weirdscience.core.interfaces.IDeferredInit;
 import zettabyte.weirdscience.core.interfaces.IRegistrable;
+import zettabyte.weirdscience.core.interfaces.ISolidFuelInfo;
+import zettabyte.weirdscience.core.tileentity.TileEntitySolidFueled;
 import cofh.api.energy.IEnergyHandler;
 import cofh.api.tileentity.IEnergyInfo;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 //import static java.lang.System.out;
 
-public class TileEntityNitrateEngine extends TileEntity implements IEnergyHandler, IEnergyInfo,
-		ISidedInventory, IFluidHandler, IFluidTank, IConfiggable, IRegistrable {
+public class TileEntityNitrateEngine extends TileEntitySolidFueled implements IEnergyHandler, IEnergyInfo,
+		ISidedInventory, IFluidHandler, IFluidTank, IConfiggable, IRegistrable, IDeferredInit {
 	private static final int[] accessibleSlots = new int[] {0,1};
 
     /**
@@ -45,26 +50,59 @@ public class TileEntityNitrateEngine extends TileEntity implements IEnergyHandle
     
     public static int rfPerTick;
     public static int rfPerDirt;
-    public static int dirtPerBurn; //Amount of dirt to attempt to consume at once.
+    public static int quantityPerBurn; //Amount of dirt to attempt to consume at once.
     public static int ticksPerBurn; //Time between ticks where we burn dirt. To reduce lag.
-	private static int energy;
-	private static int energyCap;
+	//private static int energy;
+	private static int staticEnergyCap;
     public static float explosionStrength = 4.0F;
     protected static int wasteCapacity;
     protected static int ticksPerExhaust; //How long until we try to spawn smog?
-    protected static int wasteProductionSpeed;
-    public static BlockGasBase waste = null;
+    protected static int exhaustPerDirt;
+    protected static int exhaustPerGrass;
+    protected static int exhaustPerMycelium;
+    
+    public static Fluid waste = null;
+    private static ArrayList<ISolidFuelInfo> staticFuelInfo = new ArrayList<ISolidFuelInfo>(3);
+    
+    //Fuel config.
+    static boolean enableDirt = true;
+    static SolidFuelInfo dirtFuel;
+    static boolean enableGrassyDirt = true;
+    static SolidFuelInfo grassyDirtFuel;
+    static boolean enableMycelium = true;
+    static SolidFuelInfo myceliumFuel;
+    
+    //Burning Natura nether dirts / sands / etc.
+    static boolean enableNaturaCompat = true;
+    static boolean enableTaintedSoil = true;
+    static boolean enableHeatSand = true;
+    static SolidFuelInfo taintedSoilFuel;
+    static SolidFuelInfo heatSandFuel;
+    protected static int exhaustPerHeatSand;
+    protected static int exhaustPerTaintedSoil;
     
     private int ticksUntilBurn = ticksPerBurn;
     
 	public TileEntityNitrateEngine() {
+		super();
+		setEnergyCapacity(staticEnergyCap);
 		ticksUntilBurn = ticksPerBurn;
 		energy = 0;
+		//Tell our instance everything it needs to know.
+		fuelInfo.addAll(staticFuelInfo);
+	}
+
+	//Adds a fuel.
+	@Override
+	public void addSolidFuelInfo(ISolidFuelInfo isf) {
+		if(isf != null) {
+			staticFuelInfo.add(isf);
+		}
 	}
 	
 	protected FluidStack fluidTank;
 
-	public static void setWaste(BlockGasBase b) {
+	public static void setWaste(Fluid b) {
 		waste = b;
 	}
 	public void setWasteCapacity(int amt) {
@@ -72,10 +110,6 @@ public class TileEntityNitrateEngine extends TileEntity implements IEnergyHandle
 	}
 	public void setTicksPerExhaust(int amt) {
 		ticksPerExhaust = amt;
-	}
-	//Warning: This is a *per dirt* value.
-	public void setWasteProductionSpeed(int amt) {
-		wasteProductionSpeed = amt;
 	}
 
 	@Override
@@ -165,7 +199,7 @@ public class TileEntityNitrateEngine extends TileEntity implements IEnergyHandle
 	public void closeChest() {}
 	
 	public boolean isItemFuel(Item item) {
-		if(item.itemID == 3) {
+		if(canBurn(new ItemStack(item)) != null) {
 			//Vanilla item ID / block ID #3 is dirt.
 			//Using this rather than the class for Chisel compat.
 			//(Chisel hijacks the same ID for a new class
@@ -175,6 +209,15 @@ public class TileEntityNitrateEngine extends TileEntity implements IEnergyHandle
 		else {
 			return false;
 		}
+	}
+
+	public boolean isItemWaste(Item item) {
+		for(ISolidFuelInfo fuel : staticFuelInfo) {
+			if(fuel.getByproduct().getItem().getUnlocalizedName().contentEquals(item.getUnlocalizedName())) {
+				return true;
+			}
+		}
+		return false;
 	}
 	@Override
 	public boolean isItemValidForSlot(int slotID, ItemStack itemstack) {
@@ -378,7 +421,7 @@ public class TileEntityNitrateEngine extends TileEntity implements IEnergyHandle
 
 	@Override
 	public int getMaxEnergy() {
-		return energyCap;
+		return staticEnergyCap;
 	}
 
 	@Override
@@ -424,7 +467,7 @@ public class TileEntityNitrateEngine extends TileEntity implements IEnergyHandle
 
 	@Override
 	public int getMaxEnergyStored(ForgeDirection from) {
-		return energyCap;
+		return staticEnergyCap;
 	}
 	//ENTITY UPDATE:
 	@Override
@@ -444,45 +487,12 @@ public class TileEntityNitrateEngine extends TileEntity implements IEnergyHandle
 			//Make sure we have fuel, somewhere to put waste products, and energy storage capacity.
 			
 			if (this.engineItemStacks[0] != null) {
-	            if ((this.engineItemStacks[0].stackSize >= 1) && (energy < energyCap)) {
-	                int itemID = this.engineItemStacks[0].getItem().itemID;
-	                //Burn dirt.
-	            	if (this.engineItemStacks[0].getItem() instanceof ItemBlock) {
-	                    Block block = Block.blocksList[itemID];
-	        			//if(block == net.minecraft.block.BlockDirt.dirt) { //Is the item in slot 0 our fuel?
-	            		if(itemID == 3) { //Is the item in slot 0 our fuel?
-	            			//Decide how much fuel to burn.
-	            			toBurn = Math.min(dirtPerBurn, this.engineItemStacks[0].stackSize); //Either eat dirtPerBurn fuel or the entire stack.
-	        				this.engineItemStacks[0].stackSize -= toBurn;
-	        				if(engineItemStacks[1] == null) { //Make sure we have a sand stack to add to.
-	        					engineItemStacks[1] = new ItemStack(12, toBurn, 0);
-	        				}
-	        				else if((engineItemStacks[1].stackSize + toBurn) > this.getInventoryStackLimit()) {
-	        					//Drop excess waste
-	                            if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) { //prevent ghost item stupidity
-		        					float xr = this.itemDropRand.nextFloat() * 0.8F + 0.1F;
-		        					float yr = this.itemDropRand.nextFloat() * 0.8F + 0.1F;
-		        					float zr = this.itemDropRand.nextFloat() * 0.8F + 0.1F;
-		                            EntityItem entityItem = new EntityItem(this.worldObj, (double)((float)xCoord + xr), 
-		                            		(double)((float)yCoord + yr), (double)((float)zCoord + zr), new ItemStack(12, getInventoryStackLimit(), 0));
-	
-	                            	worldObj.spawnEntityInWorld(entityItem);
-	                            }
-	                            engineItemStacks[1].stackSize = toBurn;
-	        				}
-	        				else {
-	        					engineItemStacks[1].stackSize += toBurn;
-	        				}
-	        				
-	        	            flagInvChanged = true;
-	
-	        	            energy += (rfPerDirt * toBurn);
-
-	        				smogProduced = wasteProductionSpeed * toBurn;
-	        	            
-	        				flagHasPower = true;
-	        			}
-	        		}
+	            if (this.engineItemStacks[0].stackSize >= 1) {
+	            	//Do the burny thing. 
+	            	int deltaItems = doBurn(this.engineItemStacks[0], quantityPerBurn);
+	            	this.engineItemStacks[0].stackSize -= deltaItems;
+	            	flagHasPower = (deltaItems != 0);
+	        	    flagInvChanged = flagHasPower;
 	                if (this.engineItemStacks[0].stackSize <= 0) {
 	                	this.engineItemStacks[0] = null;
 	                }
@@ -495,53 +505,7 @@ public class TileEntityNitrateEngine extends TileEntity implements IEnergyHandle
         }
 		//And now, attempt to charge surrounding blocks.
 		if (flagHasPower) {
-			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-				TileEntity tileEntity = worldObj.getBlockTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
-				if(tileEntity != null) {
-					if(tileEntity instanceof IEnergyHandler) {
-						((IEnergyHandler)tileEntity).receiveEnergy(dir.getOpposite(), Math.min(energy, rfPerTick), false);
-						energy -= Math.min(energy, rfPerTick);
-						if(energy == 0) {
-							//Don't bother trying to output energy if we're out of it.
-							break;
-						}
-					}
-				}
-			}
-		}
-		//Smog logic:
-		if(waste != null) {
-			if(smogProduced > 0) {
-				if(fluidTank == null) {
-					fluidTank = new FluidStack(waste.getFluidType(),0);
-				}
-				if(fluidTank.amount < wasteCapacity) {
-					int amountToStore = Math.min((wasteCapacity - fluidTank.amount), smogProduced);
-					fluidTank.amount += amountToStore;
-					smogProduced -= amountToStore;
-				}
-				//Is there still smog left over? If so, we could not fit it into the tank. Exhaust into the adjacent air.
-				if(smogProduced > 0) {
-					for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-						if(dir != ForgeDirection.UP)
-						{
-							smogProduced = waste.pushIntoBlock(worldObj, xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ, smogProduced);
-							if(smogProduced <= 0) {
-								break;
-							}
-						}
-					}
-				}
-				//Is there STILL smog left over? If so, explode violently.
-				if(smogProduced > 0) {
-			        if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) { //prevent general stupidity
-			        	worldObj.createExplosion(null, xCoord, yCoord, zCoord, explosionStrength, true);
-			        }
-				}
-			}
-			else {
-				//TODO: Empty the tank into the atmosphere.
-			}
+			this.powerAdjacent();
 		}
 		//Attempt to dump tank into surrounding Forge fluid handlers.
 		if(fluidTank != null) {
@@ -561,20 +525,143 @@ public class TileEntityNitrateEngine extends TileEntity implements IEnergyHandle
 		}
     }
 	@Override
+	public void receiveByproduct(ItemStack byproductStack) {
+		if(byproductStack == null) {
+			//If we're just receiving a null value, do nothing with it.
+			return;
+		}
+		else if(engineItemStacks[1] == null)  { //Make sure we have a sand stack to add to.
+			engineItemStacks[1] = byproductStack;
+		}
+		else {
+			//Only do the simple behavior if we've got two item stacks of the same type and added items will fit.
+			if((engineItemStacks[1].itemID == byproductStack.itemID) && 
+					((engineItemStacks[1].stackSize + byproductStack.stackSize) > this.getInventoryStackLimit())) {
+			}
+			else {
+				//...Otherwise, remove everything from that slot and put our byproduct stack in there.
+				ejectWaste();
+				engineItemStacks[1] = byproductStack.copy();
+			}
+		}
+	}
+	public void ejectWaste() {
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) { //prevent ghost item stupidity
+			float xr = this.itemDropRand.nextFloat() * 0.8F + 0.1F;
+			float yr = this.itemDropRand.nextFloat() * 0.8F + 0.1F;
+			float zr = this.itemDropRand.nextFloat() * 0.8F + 0.1F;
+            EntityItem entityItem = new EntityItem(this.worldObj, (double)((float)xCoord + xr), 
+            		(double)((float)yCoord + yr), (double)((float)zCoord + zr), engineItemStacks[1].copy());
+
+        	worldObj.spawnEntityInWorld(entityItem);
+        	engineItemStacks[1] = null;
+        }
+	}
+	//else {
+	//	engineItemStacks[1].stackSize += toBurn;
+	//}
+	
+	/*
+	 * Emit deadly smog.
+	 * This particular implementation of recieveExhaust() is only smart enough to operate
+	 * with fluids whose block extends BlockGasBase.
+	 */
+	@Override
+	public void receiveExhaust(FluidStack exhaustStack) {
+		if((exhaustStack == null) || (exhaustStack.amount == 0)) {
+			//If we're just receiving a null value, do nothing with it.
+			return;
+		}
+		else {
+			int smogProduced = exhaustStack.amount;
+			if(fluidTank == null) {
+				fluidTank = exhaustStack.copy();
+				fluidTank.amount = 0;
+			}
+			//Stash some smog in the fluid tank.
+			if(fluidTank.amount < wasteCapacity) {
+				int amountToStore = Math.min((wasteCapacity - fluidTank.amount), smogProduced);
+				fluidTank.amount += amountToStore;
+				smogProduced -= amountToStore;
+			}
+			//Is there still smog left over? If so, we could not fit it into the tank. Exhaust into the adjacent air.
+			if(smogProduced > 0) {
+				int fBlock = exhaustStack.getFluid().getBlockID();
+				if(Block.blocksList[fBlock] instanceof BlockGasBase) {
+					BlockGasBase ourWaste = (BlockGasBase)Block.blocksList[fBlock];
+					for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+						if(dir != ForgeDirection.UP)
+						{
+							smogProduced = ourWaste.pushIntoBlock(worldObj, xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ, smogProduced);
+							if(smogProduced <= 0) {
+								break;
+							}
+						}
+					}
+				}
+				//If this isn't a fluid we can handle sanely...
+				else {
+					//Don't punish the player for it.
+					smogProduced = 0;
+				}
+			}
+			//Is there STILL smog left over? If so, explode violently.
+			if(smogProduced > 0) {
+		        if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) { //prevent general stupidity
+		        	worldObj.createExplosion(null, xCoord, yCoord, zCoord, explosionStrength, true);
+		        }
+			}
+		}
+	}
+	
+	@Override
 	public void onInventoryChanged() {
 		// TODO Do we need to do anything with this?
 	}
 
 	@Override
 	public void doConfig(Configuration config, ContentRegistry cr) {
-		this.rfPerDirt = config.get("Nitrate Engine", "RF generated per dirt", 20).getInt();
-		this.rfPerTick = config.get("Nitrate Engine", "RF transfer rate", 20).getInt();
-		energyCap = config.get("Nitrate Engine", "Capacity of internal buffer", 200).getInt();
-	    dirtPerBurn = 32; //Amount of dirt to attempt to consume at once.
+		staticEnergyCap = config.get(getEnglishName(), "Capacity of internal buffer", 2000).getInt();
+	    quantityPerBurn = 32; //Amount of dirt to attempt to consume at once.
 	    ticksPerBurn = 20; //Time between ticks where we burn dirt. To reduce lag.
-	    wasteProductionSpeed = config.get("Nitrate Engine", "Smog produced per dirt burned in milibuckets", 16).getInt();
+		rfPerTick = config.get(getEnglishName(), "RF transfer rate", 20).getInt();
+	    enableNaturaCompat = config.get(getEnglishName(), "Enable Natura fuels", true).getBoolean(true);
+
+	    enableDirt = config.get(getEnglishName(), "Enable dirt as fuel", true).getBoolean(true);
+	    enableGrassyDirt = config.get(getEnglishName(), "Enable grassy dirt as fuel", true).getBoolean(true);
+	    enableMycelium = config.get(getEnglishName(), "Enable mycelium as fuel", true).getBoolean(true);
+
+	    if(enableDirt) {
+	    	dirtFuel = new SolidFuelInfo();
+	    	dirtFuel.energyPer = config.get(getEnglishName(), "RF generated per dirt", 2).getInt();
+	    	exhaustPerDirt = config.get(getEnglishName(), "Smog produced per dirt burned in milibuckets", 16).getInt();
+	    }
+	    if(enableGrassyDirt) {
+	    	grassyDirtFuel = new SolidFuelInfo();
+	    	grassyDirtFuel.energyPer = config.get(getEnglishName(), "RF generated per grassy dirt", 3).getInt();
+	    	exhaustPerGrass = config.get(getEnglishName(), "Smog produced per grassy dirt burned in milibuckets", 16).getInt();
+	    }
+	    if(enableMycelium) {
+	    	myceliumFuel = new SolidFuelInfo();
+	    	myceliumFuel.energyPer = config.get(getEnglishName(), "RF generated per mycelium", 5).getInt();
+	    	exhaustPerMycelium = config.get(getEnglishName(), "Smog produced per mycelium burned in milibuckets", 16).getInt();
+	    }
+	    if(enableNaturaCompat) {
+		    enableTaintedSoil = config.get(getEnglishName(), "Enable tainted soil as fuel", true).getBoolean(true);
+		    enableHeatSand = config.get(getEnglishName(), "Enable heat sand as fuel", true).getBoolean(true);
+		    if(enableTaintedSoil) {
+		    	taintedSoilFuel = new SolidFuelInfo();
+		    	taintedSoilFuel.energyPer = config.get(getEnglishName(), "RF generated per Tainted Soil", 4).getInt();
+		    	exhaustPerTaintedSoil = config.get(getEnglishName(), "Smog produced per Tainted Soil burned in milibuckets", 32).getInt();
+		    }
+		    if(enableHeatSand) {
+		    	heatSandFuel = new SolidFuelInfo();
+		    	heatSandFuel.energyPer = config.get(getEnglishName(), "RF generated per heat sand", 16).getInt();
+		    	exhaustPerHeatSand = config.get(getEnglishName(), "waste produced per heat sand burned in milibuckets", 2).getInt();
+		    }
+	    }
 		ticksUntilBurn = ticksPerBurn;
-		wasteCapacity = config.get("Nitrate Engine", "Internal smog tank capacity", wasteProductionSpeed * 2).getInt();
+		wasteCapacity = config.get(getEnglishName(), "Internal smog tank capacity", (exhaustPerDirt * quantityPerBurn) * 2).getInt();
 	}
 
 	@Override
@@ -593,4 +680,58 @@ public class TileEntityNitrateEngine extends TileEntity implements IEnergyHandle
 	public boolean isEnabled() {
 		return true;
 	}
+	@Override
+	public void DeferredInit(ContentRegistry cr) {
+		if(dirtFuel != null) {
+			//In case somebody overrides the terrain block classes like a weirdo, this is here.
+			dirtFuel.ourFuel = new ItemStack(Item.itemsList[Block.dirt.blockID]);
+			dirtFuel.byproduct = new ItemStack(Item.itemsList[Block.sand.blockID]);
+			dirtFuel.exhaust = new FluidStack(waste, exhaustPerDirt);
+			staticFuelInfo.add(dirtFuel);
+		}
+		if(grassyDirtFuel != null) {
+			//In case somebody overrides the terrain block classes like a weirdo, this is here.
+			grassyDirtFuel.ourFuel = new ItemStack(Item.itemsList[Block.grass.blockID]);
+			grassyDirtFuel.byproduct = new ItemStack(Item.itemsList[Block.sand.blockID]);
+			grassyDirtFuel.exhaust = new FluidStack(waste, exhaustPerDirt);
+			staticFuelInfo.add(grassyDirtFuel);
+		}
+		if(myceliumFuel != null) {
+			//In case somebody overrides the terrain block classes like a weirdo, this is here.
+			myceliumFuel.ourFuel = new ItemStack(Item.itemsList[Block.mycelium.blockID]);
+			myceliumFuel.byproduct = new ItemStack(Item.itemsList[Block.sand.blockID]);
+			myceliumFuel.exhaust = new FluidStack(waste, exhaustPerDirt/2);
+			staticFuelInfo.add(myceliumFuel);
+		}
+		
+		if(enableNaturaCompat) {
+			int tsBlockID = 0;
+			int hsBlockID = 0;
+			if(GameRegistry.findBlock("Natura", "soil.tainted") != null) {
+				tsBlockID = GameRegistry.findBlock("Natura", "soil.tainted").blockID;
+				System.out.println(GameRegistry.findBlock("Natura", "soil.tainted").blockID);
+			}
+			if(GameRegistry.findBlock("Natura", "heatsand") != null) {
+				hsBlockID = GameRegistry.findBlock("Natura", "heatsand").blockID;
+				System.out.println(GameRegistry.findBlock("Natura", "heatsand").blockID);
+			}
+			if((taintedSoilFuel != null) && (tsBlockID != 0)) {
+				System.out.println("yoyoyo");
+				taintedSoilFuel.ourFuel = new ItemStack(Item.itemsList[tsBlockID]);
+				taintedSoilFuel.byproduct = new ItemStack(Item.itemsList[Block.sand.blockID]);
+				taintedSoilFuel.exhaust = new FluidStack(waste, exhaustPerTaintedSoil);
+				staticFuelInfo.add(taintedSoilFuel);
+			}
+			//Heat sand works but tainted soil does not...?
+			if((heatSandFuel != null) && (hsBlockID != 0)) {
+				System.out.println("hey");
+				heatSandFuel.ourFuel = new ItemStack(Item.itemsList[hsBlockID]);
+				heatSandFuel.byproduct = new ItemStack(Item.itemsList[Block.sand.blockID]);
+				heatSandFuel.exhaust = new FluidStack(waste, exhaustPerHeatSand);
+				heatSandFuel.byproductMult = 0.5f;
+				staticFuelInfo.add(heatSandFuel);
+			}
+		}
+	}
+	
 }

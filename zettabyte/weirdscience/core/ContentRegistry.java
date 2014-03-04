@@ -19,6 +19,8 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import zettabyte.weirdscience.core.baseclasses.ItemBucketBase;
+import zettabyte.weirdscience.core.chemistry.IReactionReceiver;
+import zettabyte.weirdscience.core.chemistry.IReactionSpec;
 import zettabyte.weirdscience.core.interfaces.IConfiggable;
 import zettabyte.weirdscience.core.interfaces.IDeferredInit;
 import zettabyte.weirdscience.core.interfaces.IRegistrable;
@@ -56,6 +58,9 @@ public class ContentRegistry {
 	private ArrayList<IDeferredInit> initToDo;
 	ArrayList<IWorkbenchRecipe> recipesToRegister;
 	
+
+	private ArrayList<IReactionReceiver> reactants;
+	
 	private Configuration config;
 	
 	public Logger logger;
@@ -82,6 +87,7 @@ public class ContentRegistry {
 		tileentitiesToRegister = new ArrayList<TileEntity>(32);
 		initToDo = new ArrayList<IDeferredInit>(64);
 		recipesToRegister = new ArrayList<IWorkbenchRecipe>(128);
+		reactants = new ArrayList<IReactionReceiver>(8);
 	}
 
 	//Gets anything registered with this.
@@ -100,6 +106,9 @@ public class ContentRegistry {
 		//Don't just silently break if we're overwriting things.
 		if(reg instanceof IRegistrable) {
 			RegisterRegistrable((IRegistrable)reg);
+		}
+		if(reg instanceof IReactionReceiver) {
+			RegisterReactionReceiver((IReactionReceiver)reg);
 		}
 	}
 
@@ -302,5 +311,16 @@ public class ContentRegistry {
 		fluidsToRegister = null;
 		tileentitiesToRegister = null;
 		recipesToRegister = null;
+		reactants = null;
+	}
+
+	//Chemistry stuff goes here:
+	public void RegisterReactionReceiver(IReactionReceiver rec) {
+		reactants.add(rec);
+	}
+	public void RegisterReaction(IReactionSpec reaction) {
+		for(IReactionReceiver rec : reactants) {
+			rec.registerReaction(reaction);
+		}
 	}
 }

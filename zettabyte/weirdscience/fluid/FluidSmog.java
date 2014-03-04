@@ -4,7 +4,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.fluids.Fluid;
-import zettabyte.weirdscience.chemistry.IBioactive;
+import zettabyte.weirdscience.core.chemistry.IBioactive;
 import zettabyte.weirdscience.core.interfaces.IRegistrable;
 
 public class FluidSmog extends Fluid implements IBioactive, IRegistrable {

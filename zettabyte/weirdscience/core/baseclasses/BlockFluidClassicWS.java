@@ -12,7 +12,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.fluids.BlockFluidClassic;
 import net.minecraftforge.fluids.Fluid;
-import zettabyte.weirdscience.chemistry.IBioactive;
+import zettabyte.weirdscience.core.chemistry.IBioactive;
 import zettabyte.weirdscience.core.interfaces.IWeirdScienceBlock;
 
 public class BlockFluidClassicWS extends BlockFluidClassic implements IWeirdScienceBlock {

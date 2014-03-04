@@ -1,4 +1,4 @@
-package zettabyte.weirdscience.chemistry;
+package zettabyte.weirdscience.core.chemistry;
 
 import net.minecraft.entity.EntityLivingBase;
 
