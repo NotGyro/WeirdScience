@@ -15,9 +15,9 @@ import net.minecraft.util.Icon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.Configuration;
+import net.minecraftforge.fluids.Fluid;
 import zettabyte.weirdscience.WeirdScience;
 import zettabyte.weirdscience.core.baseclasses.BlockContainerBase;
-import zettabyte.weirdscience.core.fluid.BlockGasBase;
 import zettabyte.weirdscience.tileentity.TileEntityNitrateEngine;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -84,9 +84,9 @@ public class BlockNitrateEngine extends BlockContainerBase {
     	topIcon = iconRegister.registerIcon("weirdscience:genericmachine3");
     }
     
-    public static BlockGasBase waste = null;
+    public static Fluid waste = null;
 
-    public static void setWaste(BlockGasBase w) {
+    public static void setWaste(Fluid w) {
     	waste = w;
     }
 	@Override

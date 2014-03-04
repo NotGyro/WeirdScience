@@ -15,6 +15,10 @@ public class BlockBase extends Block implements IWeirdScienceBlock {
 	
 	//Exclude vanilla / terrain IDs from default ID values.
 	protected static final int blockIDSearchLowerBound = 256;
+	
+	public String harvestType = "pickaxe";
+	public int harvestLevel = 1;
+	
 	public BlockBase(Configuration config, String name, int defaultID, Material material) {
 		/* 
 		 * Real version of the constructor. Ultimately all other versions of the constructor turn into this.
@@ -118,13 +122,13 @@ public class BlockBase extends Block implements IWeirdScienceBlock {
 	@Override
 	public int getHarvestLevel(int subBlockMeta) {
 		//By default, no metadata-based sub-blocks.
-		return 1;
+		return harvestLevel;
 	}
 
 	@Override
 	public String getHarvestType(int subBlockMeta) {
 		//By default, no metadata-based sub-blocks.
-		return "pickaxe";
+		return harvestType;
 	}
 
 	@Override

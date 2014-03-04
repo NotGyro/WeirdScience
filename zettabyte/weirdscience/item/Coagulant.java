@@ -1,31 +1,50 @@
 package zettabyte.weirdscience.item;
 
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumMovingObjectType;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
-import zettabyte.weirdscience.WeirdScience;
+import net.minecraftforge.common.Configuration;
+import net.minecraftforge.fluids.IFluidBlock;
+import zettabyte.weirdscience.core.baseclasses.ItemBase;
 
-public class Coagulant extends Item {
+public class Coagulant extends ItemBase {
+	public Coagulant(Configuration config, String name, int defaultID) {
+		super(config, name, defaultID);
+		// TODO Auto-generated constructor stub
+	}
+
+	public Coagulant(Configuration config, String name) {
+		super(config, name);
+		// TODO Auto-generated constructor stub
+	}
+
+	public Coagulant(int id) {
+		super(id);
+		// TODO Auto-generated constructor stub
+	}
+
+	public static int congealedBlockID = 0;
+	
 	public static final int BONEMEAL_ID = 15;
 	
 	public static final int craftCount = 2;
 	public static Object[] recipe = {new ItemStack(Item.dyePowder, 1, BONEMEAL_ID), Item.wheat};
-	
+	/*
 	public Coagulant(int par1) {
 		super(par1);
 		
-		setCreativeTab(WeirdScience.tabWeirdScience);
-		setUnlocalizedName("coagulant");
-	}
-	
+		//setCreativeTab(WeirdScience.tabWeirdScience);
+		//setUnlocalizedName("coagulant");
+	}*/
+	/*
 	@Override
 	public void registerIcons(IconRegister reg) {
 		this.itemIcon = reg.registerIcon("weirdscience:coagulant");
-	}
+	}*/
 	
 	@Override
 	public ItemStack onItemRightClick(ItemStack heldStack, World currentWorld, EntityPlayer clickingPlayer) {
@@ -46,10 +65,17 @@ public class Coagulant extends Item {
 					return heldStack;
 				}
 				// If it's fluid blood, make it congealed and remove a coagulant
-				/*if (currentWorld.getBlockId(x, y, z) == WeirdScience.fluidBloodBlock.blockID) {
-					currentWorld.setBlock(x, y, z, WeirdScience.congealedBloodBlock.blockID);
-					--heldStack.stackSize;
-				}*/
+				if (currentWorld.getBlockId(x, y, z) != 0) {
+					if (Block.blocksList[currentWorld.getBlockId(x, y, z)] instanceof IFluidBlock) {
+						IFluidBlock fluidBlock = (IFluidBlock)Block.blocksList[currentWorld.getBlockId(x, y, z)];
+						if(fluidBlock.getFluid().getName().contentEquals("blood")) {
+							currentWorld.setBlock(x, y, z, congealedBlockID);
+							if(!clickingPlayer.capabilities.isCreativeMode) {
+								--heldStack.stackSize;
+							}
+						}
+					}
+				}
 				return heldStack;
 			}
 			else {

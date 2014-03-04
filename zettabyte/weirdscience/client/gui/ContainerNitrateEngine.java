@@ -1,19 +1,12 @@
 package zettabyte.weirdscience.client.gui;
 
-import zettabyte.weirdscience.tileentity.TileEntityNitrateEngine;
-
-import zettabyte.weirdscience.cofh.gui.slot.SlotOutput;
-import zettabyte.weirdscience.cofh.gui.slot.SlotSpecificItem;
-
-import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.FurnaceRecipes;
-import net.minecraft.tileentity.TileEntityFurnace;
+import zettabyte.weirdscience.cofh.gui.slot.SlotOutput;
+import zettabyte.weirdscience.tileentity.TileEntityNitrateEngine;
 
 public class ContainerNitrateEngine extends Container {
 
@@ -23,8 +16,7 @@ public class ContainerNitrateEngine extends Container {
 			TileEntityNitrateEngine te) {
 		tileEntity = te;
 
-		addSlotToContainer(new SlotSpecificItem(te, 0, 80, 17, new ItemStack(
-				Block.blocksList[3]))); // Add the slot that only accepts dirt.
+		addSlotToContainer(new Slot(te, 0, 80, 17)); // Add the fuel slot.
 										// (slot 0)
 		addSlotToContainer(new SlotOutput(te, 1, 80, 53)); // Slot 1 is output.
 
@@ -70,8 +62,8 @@ public class ContainerNitrateEngine extends Container {
 					return null;
 				}
 				slot.onSlotChange(itemstack1, itemstack);
-			} else if (itemstack1.itemID == 3) { // Is this dirt? If so, put it
-													// in the dirt slot.
+			} else if (tileEntity.canBurn(itemstack1) != null) { // Is this fuel? If so, put it
+																// in the fuel slot.
 				if (!this.mergeItemStack(itemstack1, 0, 1, false)) {
 					return null;
 				}

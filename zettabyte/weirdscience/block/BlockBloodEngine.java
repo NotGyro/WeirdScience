@@ -83,19 +83,20 @@ public class BlockBloodEngine extends BlockMetaTank {
 				//Now that we've tried one wonky kind of reflection, try another for TCon compat.
 				if(playerItem.getItem().getUnlocalizedName().contentEquals("item.tconstruct.bucket")) {
 					//Deeper voodoo begins here.
+					Block[] fluidBlockArry = null;
 					try {
 						Class tcontent = Class.forName("tconstruct.common.TContent");
 						Field f = tcontent.getDeclaredField("fluidBlocks");
-						Block[] fluidBlockArry = (Block[]) f.get(null);
-						if(fluidBlockArry[playerItem.getItemDamage()].getUnlocalizedName().contentEquals("tile.liquid.blood")) {
-							Fluid fluidTry = FluidRegistry.getFluid("blood");
-							if(FillTank(fluidTry, tileEntity) && !player.capabilities.isCreativeMode) {
-								player.inventory.setInventorySlotContents(player.inventory.currentItem, FluidContainerRegistry.EMPTY_BUCKET);
-							}
-							return true;
-						}
+						fluidBlockArry = (Block[]) f.get(null);	
 					} catch (Exception e) {
-						e.printStackTrace();
+						//do nothing, all this means is that Tinker's Construct is not loaded.
+					}
+					if(fluidBlockArry[playerItem.getItemDamage()].getUnlocalizedName().contentEquals("tile.liquid.blood")) {
+						Fluid fluidTry = FluidRegistry.getFluid("blood");
+						if(FillTank(fluidTry, tileEntity) && !player.capabilities.isCreativeMode) {
+							player.inventory.setInventorySlotContents(player.inventory.currentItem, FluidContainerRegistry.EMPTY_BUCKET);
+						}
+						return true;
 					}
 				}
 			}

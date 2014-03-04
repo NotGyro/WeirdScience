@@ -15,8 +15,8 @@ import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
-import zettabyte.weirdscience.chemistry.IBioactive;
 import zettabyte.weirdscience.core.baseclasses.BlockBase;
+import zettabyte.weirdscience.core.chemistry.IBioactive;
 
 public class BlockGasBase extends BlockBase implements IFiniteFluidBlock {
 

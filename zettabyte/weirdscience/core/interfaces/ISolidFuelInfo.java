@@ -8,4 +8,5 @@ public interface ISolidFuelInfo {
 	int getEnergyPer();
 	ItemStack getByproduct();
 	FluidStack getExhaust();
+	float getByproductMult();
 }
