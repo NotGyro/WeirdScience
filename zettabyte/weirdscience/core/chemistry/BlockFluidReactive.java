@@ -23,7 +23,7 @@ public class BlockFluidReactive extends BlockFluidClassicWS implements
 	protected ArrayList<Block> solutesBlocks = new ArrayList<Block>(4);
 	@Override
 	public boolean registerReaction(IReactionSpec react) {
-		if(react.getSolvent().getName() == this.getFluid().getName()) {
+		if(react.getSolvent().getName().contentEquals(this.getFluid().getName())) {
 			Reactions.add(react);
 			//Build sub-lists for sanity here:
 			//Items
@@ -72,7 +72,7 @@ public class BlockFluidReactive extends BlockFluidClassicWS implements
 					for(int i = 0; i < solutesItems.size(); ++i) {
 						//System.out.println(itemStack.getItem().getUnlocalizedName());
 						//System.out.println(solutesItems.get(i).getItem().getUnlocalizedName());
-						if(itemStack.getItem().getUnlocalizedName().contentEquals(solutesItems.get(i).getItem().getUnlocalizedName())) {
+						if(itemStack.getItem().getUnlocalizedName(itemStack).contentEquals(solutesItems.get(i).getItem().getUnlocalizedName(solutesItems.get(i)))) {
 							//And now, the meat of the reaction code.
 							//Is this reaction possible for us?
 							if(1000 >= Reactions.get(i).getSolventMin()) {

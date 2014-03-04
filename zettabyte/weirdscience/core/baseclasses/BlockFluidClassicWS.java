@@ -13,6 +13,7 @@ import net.minecraftforge.common.Configuration;
 import net.minecraftforge.fluids.BlockFluidClassic;
 import net.minecraftforge.fluids.Fluid;
 import zettabyte.weirdscience.core.chemistry.IBioactive;
+import zettabyte.weirdscience.core.interfaces.ISubBlock;
 import zettabyte.weirdscience.core.interfaces.IWeirdScienceBlock;
 
 public class BlockFluidClassicWS extends BlockFluidClassic implements IWeirdScienceBlock {
@@ -125,7 +126,7 @@ public class BlockFluidClassicWS extends BlockFluidClassic implements IWeirdScie
         canBlockGrass[blockID] = !m.getCanBlockGrass();
     }
 	@Override
-	public ArrayList<IWeirdScienceBlock> getSubBlocks() {
+	public ArrayList<ISubBlock> getSubBlocks() {
 		//By default, no metadata-based sub-blocks.
 		return null;
 	}
@@ -143,13 +144,13 @@ public class BlockFluidClassicWS extends BlockFluidClassic implements IWeirdScie
 	}
 
 	@Override
-	public IWeirdScienceBlock getSubBlock(int meta) {
+	public ISubBlock getSubBlock(int meta) {
 		//By default, no metadata-based sub-blocks.
 		return null;
 	}
 	
 	@Override
-	public boolean InCreativeTab() { 
+	public boolean InCreativeTab(int meta) { 
 		//TODO
 		//True by default for debugging. Should be false by default in release?
 		return true;
