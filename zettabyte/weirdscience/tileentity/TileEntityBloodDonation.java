@@ -4,7 +4,6 @@ import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet132TileEntityData;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
@@ -15,10 +14,11 @@ import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fluids.IFluidTank;
 import zettabyte.weirdscience.block.BlockMetaTank;
 import zettabyte.weirdscience.core.ContentRegistry;
+import zettabyte.weirdscience.core.baseclasses.TileEntityBase;
 import zettabyte.weirdscience.core.interfaces.IConfiggable;
 import zettabyte.weirdscience.core.interfaces.IRegistrable;
 
-public class TileEntityBloodDonation extends TileEntity implements IFluidHandler, IFluidTank, IConfiggable, IRegistrable {
+public class TileEntityBloodDonation extends TileEntityBase implements IFluidHandler, IFluidTank, IConfiggable, IRegistrable {
 	
     protected FluidStack fluidTank;
     protected static int capacity = 0;
@@ -190,7 +190,7 @@ public class TileEntityBloodDonation extends TileEntity implements IFluidHandler
         }
 
         int drained = maxDrain;
-        if (fluidTank.amount < drained) {
+        if (fluidTank.amount <= drained) {
             drained = fluidTank.amount;
         }
 
@@ -200,6 +200,7 @@ public class TileEntityBloodDonation extends TileEntity implements IFluidHandler
             if (fluidTank.amount <= 0) {
             	fluidTank = null;
             }
+            updateTank();
             FluidEvent.fireEvent(new FluidEvent.FluidDrainingEvent(fluidTank, this.worldObj, this.xCoord, this.yCoord, this.zCoord, this));
         }
         return stack;
@@ -208,20 +209,21 @@ public class TileEntityBloodDonation extends TileEntity implements IFluidHandler
 	@Override
 	public void updateEntity()
 	{		
+		super.updateEntity();
 		//Clientside is for suckers.
 		if(!worldObj.isRemote) {
 			//Do we have blood to dispense?
 			if(fluidTank != null) {
-				//For each direction
-				for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-					TileEntity tileEntity = worldObj.getBlockTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
-					if(tileEntity != null) {
-						if(tileEntity instanceof IFluidHandler) {
-							FluidStack toDrain = new FluidStack(fluidTank.getFluid(), Math.min(outputSpeed, fluidTank.amount));
-							if(((IFluidHandler)tileEntity).fill(dir.getOpposite(), toDrain, false) > 0) {
-								drain(((IFluidHandler)tileEntity).fill(dir.getOpposite(), toDrain, true), true);
-							}
-
+				//Attempt to dump tank into surrounding Forge fluid handlers.
+				if(fluidTank != null) {
+					ForgeDirection dir;
+					IFluidHandler adjFluidHandler;
+					for(int i = 0; i < 6; ++i) {
+						dir = ForgeDirection.VALID_DIRECTIONS[i];
+						adjFluidHandler = this.adjFluidHandlers[i];
+						if(adjFluidHandler != null) {
+							FluidStack toDrain = new FluidStack(fluidTank.getFluid(), fluidTank.amount);
+							drain(adjFluidHandler.fill(dir.getOpposite(), toDrain, true), true);
 				            updateTank();
 				            
 							if(fluidTank == null) {

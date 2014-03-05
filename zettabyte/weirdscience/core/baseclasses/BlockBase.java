@@ -115,7 +115,7 @@ public class BlockBase extends Block implements IWeirdScienceBlock {
         canBlockGrass[blockID] = !m.getCanBlockGrass();
     }
 	@Override
-	public ArrayList<IWeirdScienceBlock> getSubBlocks() {
+	public ArrayList<ISubBlock> getSubBlocks() {
 		//By default, no metadata-based sub-blocks.
 		return null;
 	}

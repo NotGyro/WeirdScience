@@ -68,7 +68,7 @@ public class BlockBloodDonation extends BlockMetaTank implements IConfiggable {
 			return false;
 		}
 		ItemStack playerItem = player.inventory.getCurrentItem();
-
+		
 		//Check to see if the player is holding something that can be filled with a fluid.
 		if (playerItem != null) {
 			//Make sure there is fluid to take.
@@ -83,8 +83,12 @@ public class BlockBloodDonation extends BlockMetaTank implements IConfiggable {
 						//Do we have more than one bucket/canister/whatever?
 						if (playerItem.stackSize > 1) {
 							//If so, try to add the item to the player's inventory
-							if (!player.inventory.addItemStackToInventory(filledItem)) {
-								return false;
+							if(donationEntity.drain(toDrain.amount, false) != null){
+								if(donationEntity.drain(toDrain.amount, false).amount >= toDrain.amount) {
+									if (!player.inventory.addItemStackToInventory(filledItem)) {
+										return false;
+									}
+								}
 							}
 							//Decrement our stack size.
 							--playerItem.stackSize;
@@ -92,12 +96,16 @@ public class BlockBloodDonation extends BlockMetaTank implements IConfiggable {
 							player.inventory.setInventorySlotContents(player.inventory.currentItem, playerItem);
 						}
 						else {
-							//Set the slot to our filled item.
-							player.inventory.setInventorySlotContents(player.inventory.currentItem, filledItem);
-							playerItem = null;
+							//If so, try to add the item to the player's inventory
+							if(donationEntity.drain(toDrain.amount, false) != null){
+								if(donationEntity.drain(toDrain.amount, false).amount >= toDrain.amount) {
+									donationEntity.drain(toDrain.amount, true);
+									//Set the slot to our filled item.
+									player.inventory.setInventorySlotContents(player.inventory.currentItem, filledItem);
+									playerItem = null;
+								}
+							}
 						}
-						//Remove the blood from our tile entity.
-						donationEntity.drain(toDrain.amount, true);
 					}
 				}
 			}

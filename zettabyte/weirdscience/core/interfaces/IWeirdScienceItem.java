@@ -11,5 +11,5 @@ public interface IWeirdScienceItem extends IRegistrable {
 	 */
 	ArrayList<ISubItem> getSubItems();
     
-    boolean InCreativeTab(int subItemMeta);
+    boolean InCreativeTab();
 }

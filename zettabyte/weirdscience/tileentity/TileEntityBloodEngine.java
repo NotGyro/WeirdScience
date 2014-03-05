@@ -2,7 +2,6 @@ package zettabyte.weirdscience.tileentity;
 
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
@@ -11,46 +10,41 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 import zettabyte.weirdscience.block.BlockMetaTank;
-import zettabyte.weirdscience.cofh.util.EnergyHelper;
 import zettabyte.weirdscience.core.ContentRegistry;
 import zettabyte.weirdscience.core.interfaces.IConfiggable;
 import zettabyte.weirdscience.core.interfaces.IDeferredInit;
 import zettabyte.weirdscience.core.interfaces.IRegistrable;
-import cofh.api.energy.IEnergyHandler;
-import cofh.api.tileentity.IEnergyInfo;
+import zettabyte.weirdscience.core.tileentity.TileEntityGenerator;
 
-public class TileEntityBloodEngine extends TileEntity implements IEnergyHandler,
-		IFluidHandler, IEnergyInfo, IConfiggable, IDeferredInit, IRegistrable {
+public class TileEntityBloodEngine extends TileEntityGenerator implements
+		IFluidHandler, IConfiggable, IDeferredInit, IRegistrable {
 	
 	//Static values
 	protected static int tankCap;
-	protected static int energyCap;
 	protected static float rfPerMB;
 	protected static int mbPerBurn;
 	protected static int ticksPerBurn;
-	protected static int rfPerTick;
+	protected static int rfPerTickStatic;
+	protected static int energyCapStatic;
 
-	protected static String fuelName;
-	protected static String engineName;
+	protected static String fuelName = "blood";
+	protected static String engineName = "Hemoionic Dynamo";
 
 	private int fuelFluidID;
 	
 	//Instance-specific values.
 	protected int ticksUntilBurn;
-	protected int energy = 0;
 	protected FluidStack tank = null;
-		
-	public TileEntityBloodEngine(String engName, String fName) {
+
+	public TileEntityBloodEngine() {
 		super();
-		fuelName = fName;
-		engineName = engName;
-		ticksPerBurn = 20;
+		this.setEnergyCapacity(energyCapStatic);
+		this.setEnergyTransferRate(rfPerTickStatic);
 		ticksUntilBurn = ticksPerBurn;
 
 		energy = 0;
-	}
-	public TileEntityBloodEngine() {
-		super();
+
+        this.energyCap = energyCapStatic;
 	}
 	
 
@@ -69,8 +63,7 @@ public class TileEntityBloodEngine extends TileEntity implements IEnergyHandler,
             	tank = fluid;
             }
         }
-        //Get energy
-        energy = nbt.getInteger("Energy");
+        this.energyCap = energyCapStatic;
     }
 
 	@Override
@@ -85,19 +78,17 @@ public class TileEntityBloodEngine extends TileEntity implements IEnergyHandler,
         else {
         	nbt.setString("Empty", "");
         }
-
-        //Write energy
-        nbt.setInteger("Energy", this.energy);
     }
 	@Override
 	public void doConfig(Configuration config, ContentRegistry cr) {
 		rfPerMB = (float)config.get(engineName, "RF generated per MB of fuel", 0.1f).getDouble(0.1d);
-		rfPerTick = config.get(engineName, "RF transfer rate", 20).getInt();
-		energyCap = config.get(engineName, "Capacity of internal energy buffer", 4000).getInt();
+		rfPerTickStatic = config.get(engineName, "RF transfer rate", 20).getInt();
+		energyCapStatic = config.get(engineName, "Capacity of internal energy buffer", 4000).getInt();
 		tankCap = config.get(engineName, "Internal fuel tank capacity", 4000).getInt();
 		mbPerBurn = 400; //Amount of fuel to attempt to consume at once.
 	    ticksPerBurn = 20; //Time between ticks where we burn fuel. To reduce lag.
 		ticksUntilBurn = ticksPerBurn;
+		energyCap = energyCapStatic;
 	}
 	@Override
 	public void DeferredInit(ContentRegistry cr) {
@@ -180,6 +171,7 @@ public class TileEntityBloodEngine extends TileEntity implements IEnergyHandler,
 	@Override
 	public void updateEntity() //The meat of our block.
     {
+		super.updateEntity();
 		//Clientside is for suckers.
 		if(!worldObj.isRemote) {
 			//Burn logic:
@@ -193,13 +185,13 @@ public class TileEntityBloodEngine extends TileEntity implements IEnergyHandler,
 	        	//Do we have fuel?
 				if (this.tank != null) {
 					//Bugs are hard and Tile Entities are eccentric.
-		            if ((this.tank.amount >= 1) && (energy < energyCap)) {
+		            if ((this.tank.amount >= 1) && (energy < energyCapStatic)) {
 		            	int toBurn = Math.min(mbPerBurn, this.tank.amount); //Either eat mbPerBurn fuel or the entire stack.
 		            	drain(ForgeDirection.UP, toBurn, true);
 		            	
 		            	energy += (int)(((float)toBurn)*rfPerMB);
-		            	if(energy > energyCap) {
-		            		energy = energyCap;
+		            	if(energy > energyCapStatic) {
+		            		energy = energyCapStatic;
 		            	}
 		        		flagHasPower = true;
 						//updateTank()
@@ -208,13 +200,10 @@ public class TileEntityBloodEngine extends TileEntity implements IEnergyHandler,
 		            }
 				}
 	        }
-			//And now, attempt to charge surrounding blocks.
-			if (flagHasPower) {
-				for(int i = 0; i < 6; ++i) {
-					//Try every side.
-					energy -= EnergyHelper.insertEnergyIntoAdjacentEnergyHandler(this, i, Math.min(rfPerTick, energy), false);
-				}
-			}
+	        if(flagHasPower) {
+	    		//And now, attempt to charge surrounding blocks.
+	            this.powerAdjacent();
+	        }
 		}
     }
 
@@ -232,26 +221,6 @@ public class TileEntityBloodEngine extends TileEntity implements IEnergyHandler,
 	public boolean isEnabled() {
 		return true;
 	}
-
-	@Override
-	public int getEnergyPerTick() {
-		return rfPerTick;
-	}
-
-	@Override
-	public int getMaxEnergyPerTick() {
-		return rfPerTick;
-	}
-
-	@Override
-	public int getEnergy() {
-		return energy;
-	}
-
-	@Override
-	public int getMaxEnergy() {
-		return energyCap;
-	}
 	
 	public void updateTank() { 
 		if(!worldObj.isRemote) {
@@ -266,40 +235,5 @@ public class TileEntityBloodEngine extends TileEntity implements IEnergyHandler,
 				}
 			}
 		}
-	}
-
-
-	@Override
-	public int receiveEnergy(ForgeDirection from, int maxReceive,
-			boolean simulate) {
-		return 0;
-	}
-
-
-	@Override
-	public int extractEnergy(ForgeDirection from, int maxExtract,
-			boolean simulate) {
-		if(!simulate) {
-			energy -= Math.min(maxExtract, rfPerTick);
-		}
-		return Math.min(maxExtract, rfPerTick);
-	}
-
-
-	@Override
-	public boolean canInterface(ForgeDirection from) {
-		return true;
-	}
-
-
-	@Override
-	public int getEnergyStored(ForgeDirection from) {
-		return energy;
-	}
-
-
-	@Override
-	public int getMaxEnergyStored(ForgeDirection from) {
-		return energyCap;
 	}
 }

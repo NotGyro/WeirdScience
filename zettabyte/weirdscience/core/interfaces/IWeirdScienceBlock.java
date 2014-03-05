@@ -21,5 +21,5 @@ public interface IWeirdScienceBlock extends IRegistrable {
     
     //Class<? extends ItemBlock> getItemBlock();
     
-    boolean InCreativeTab(int subBlockMeta);
+    boolean InCreativeTab();
 }
