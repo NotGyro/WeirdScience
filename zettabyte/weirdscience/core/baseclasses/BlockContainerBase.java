@@ -10,6 +10,8 @@ import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.ForgeDirection;
+import zettabyte.weirdscience.core.interfaces.ISubBlock;
 import zettabyte.weirdscience.core.interfaces.IWeirdScienceBlock;
 
 public abstract class BlockContainerBase extends BlockContainer implements IWeirdScienceBlock {
@@ -20,6 +22,9 @@ public abstract class BlockContainerBase extends BlockContainer implements IWeir
 	protected static final int blockIDSearchLowerBound = 256;
 	
 	protected TileEntity protoTileEntity;
+	
+	public String harvestType = "pickaxe";
+	public int harvestLevel = 1;
 	
 	public BlockContainerBase(Configuration config, String name, int defaultID, Material material) {
 		/* 
@@ -117,7 +122,7 @@ public abstract class BlockContainerBase extends BlockContainer implements IWeir
         canBlockGrass[blockID] = !m.getCanBlockGrass();
     }
 	@Override
-	public ArrayList<IWeirdScienceBlock> getSubBlocks() {
+	public ArrayList<ISubBlock> getSubBlocks() {
 		//By default, no metadata-based sub-blocks.
 		return null;
 	}
@@ -125,17 +130,17 @@ public abstract class BlockContainerBase extends BlockContainer implements IWeir
 	@Override
 	public int getHarvestLevel(int subBlockMeta) {
 		//By default, no metadata-based sub-blocks.
-		return 1;
+		return harvestLevel;
 	}
 
 	@Override
 	public String getHarvestType(int subBlockMeta) {
 		//By default, no metadata-based sub-blocks.
-		return "pickaxe";
+		return harvestType;
 	}
 
 	@Override
-	public IWeirdScienceBlock getSubBlock(int meta) {
+	public ISubBlock getSubBlock(int meta) {
 		//By default, no metadata-based sub-blocks.
 		return null;
 	}
@@ -146,5 +151,20 @@ public abstract class BlockContainerBase extends BlockContainer implements IWeir
 	}
 	
 	@Override
-	abstract public TileEntity createNewTileEntity(World world);
+	public void onNeighborTileChange(World world, int x, int y, int z,
+			int tileX, int tileY, int tileZ) {
+		super.onNeighborTileChange(world, x, y, z, tileX, tileY, tileZ);
+		TileEntity te = world.getBlockTileEntity(x, y, z);
+		if(te != null) {
+			TileEntityBase b = (TileEntityBase)te;
+			TileEntity te2 = world.getBlockTileEntity(tileX, tileY, tileZ);
+			//Check directionality
+			for(int i = 0; i < 6; i++) {
+			if(( ((tileX - x) == ForgeDirection.VALID_DIRECTIONS[i].offsetX) &&
+					((tileY - y) == ForgeDirection.VALID_DIRECTIONS[i].offsetY)) &&
+					((tileZ - z) == ForgeDirection.VALID_DIRECTIONS[i].offsetZ))
+				b.updateAdjacency(te2, i);
+			}
+		}
+	}
 }

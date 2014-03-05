@@ -12,19 +12,21 @@ import net.minecraftforge.event.Event.Result;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.FillBucketEvent;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+
 public class BucketEventManager {
-	protected Map<Integer, ItemStack> fluidToBucket;
+	protected Map<ImmutablePair<Integer, Integer>, ItemStack> fluidToBucket;
 	
 	public BucketEventManager() {
-		fluidToBucket = new HashMap<Integer, ItemStack>();
+		fluidToBucket = new HashMap<ImmutablePair<Integer, Integer>, ItemStack>();
 	};
 	
-	public boolean addRecipe(Block sourceBlock, ItemStack bucket) {
-		if((sourceBlock.blockID == 0) || (fluidToBucket.containsKey(sourceBlock.blockID))) {
+	public boolean addRecipe(Block sourceBlock, int meta, ItemStack bucket) {
+		if((sourceBlock.blockID == 0) || (fluidToBucket.containsKey(new ImmutablePair<Integer, Integer>(sourceBlock.blockID, meta)))) {
 			return false;
 		}
 		else {
-			fluidToBucket.put(sourceBlock.blockID, bucket);
+			fluidToBucket.put(new ImmutablePair<Integer, Integer>(sourceBlock.blockID, meta), bucket);
 			return true;
 		}
 	};
@@ -36,9 +38,11 @@ public class BucketEventManager {
 			//Have we clicked a tile with an empty bucket?
 			if (event.current.getItem() == Item.bucketEmpty && event.target.typeOfHit == EnumMovingObjectType.TILE) {
 				//Is there an entry for this block's ID?
-				if(fluidToBucket.get(event.world.getBlockId(target.blockX, target.blockY, target.blockZ)) != null) {
+				ImmutablePair<Integer, Integer> iPair = new ImmutablePair<Integer, Integer>(event.world.getBlockId(target.blockX, target.blockY, target.blockZ), 
+						event.world.getBlockMetadata(target.blockX, target.blockY, target.blockZ));
+				if(fluidToBucket.get(iPair) != null) {
 					//Set our event's item to our fluid.
-					event.result = fluidToBucket.get(event.world.getBlockId(target.blockX, target.blockY, target.blockZ)).copy();
+					event.result = fluidToBucket.get(iPair).copy();
 					//Allow this to happen.
 					event.setResult(Result.ALLOW);
 					//Set the block to 0 so we don't just have infinite liquid.

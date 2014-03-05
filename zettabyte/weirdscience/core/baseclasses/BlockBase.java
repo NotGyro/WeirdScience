@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraftforge.common.Configuration;
+import zettabyte.weirdscience.core.interfaces.ISubBlock;
 import zettabyte.weirdscience.core.interfaces.IWeirdScienceBlock;
 
 public class BlockBase extends Block implements IWeirdScienceBlock {
@@ -114,7 +115,7 @@ public class BlockBase extends Block implements IWeirdScienceBlock {
         canBlockGrass[blockID] = !m.getCanBlockGrass();
     }
 	@Override
-	public ArrayList<IWeirdScienceBlock> getSubBlocks() {
+	public ArrayList<ISubBlock> getSubBlocks() {
 		//By default, no metadata-based sub-blocks.
 		return null;
 	}
@@ -132,7 +133,7 @@ public class BlockBase extends Block implements IWeirdScienceBlock {
 	}
 
 	@Override
-	public IWeirdScienceBlock getSubBlock(int meta) {
+	public ISubBlock getSubBlock(int meta) {
 		//By default, no metadata-based sub-blocks.
 		return null;
 	}

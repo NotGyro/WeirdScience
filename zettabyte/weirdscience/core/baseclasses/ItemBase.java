@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import net.minecraft.item.Item;
 import net.minecraftforge.common.Configuration;
-import zettabyte.weirdscience.core.interfaces.IWeirdScienceBlock;
+import zettabyte.weirdscience.core.interfaces.ISubItem;
 import zettabyte.weirdscience.core.interfaces.IWeirdScienceItem;
 
 public class ItemBase extends Item implements IWeirdScienceItem {
@@ -59,13 +59,13 @@ public class ItemBase extends Item implements IWeirdScienceItem {
 	}
 
 	@Override
-	public IWeirdScienceBlock getSubItem(int meta) {
+	public ISubItem getSubItem(int meta) {
 		// No sub items by default.
 		return null;
 	}
 
 	@Override
-	public ArrayList<IWeirdScienceItem> getSubItems() {
+	public ArrayList<ISubItem> getSubItems() {
 		// No sub items by default.
 		return null;
 	}

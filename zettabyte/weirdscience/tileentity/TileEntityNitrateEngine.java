@@ -13,7 +13,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet132TileEntityData;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
@@ -22,6 +21,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fluids.IFluidTank;
+import zettabyte.weirdscience.block.IBlockMetaPower;
 import zettabyte.weirdscience.core.ContentRegistry;
 import zettabyte.weirdscience.core.SolidFuelInfo;
 import zettabyte.weirdscience.core.fluid.BlockGasBase;
@@ -82,10 +82,13 @@ public class TileEntityNitrateEngine extends TileEntitySolidFueled implements IE
     protected static int exhaustPerTaintedSoil;
     
     private int ticksUntilBurn = ticksPerBurn;
+    private boolean wasRunningLastBurn = false;
+    
     
 	public TileEntityNitrateEngine() {
 		super();
 		setEnergyCapacity(staticEnergyCap);
+		setEnergyTransferRate(rfPerTick);
 		ticksUntilBurn = ticksPerBurn;
 		energy = 0;
 		//Tell our instance everything it needs to know.
@@ -269,6 +272,14 @@ public class TileEntityNitrateEngine extends TileEntitySolidFueled implements IE
                 this.engineItemStacks[b0] = ItemStack.loadItemStackFromNBT(nbttagcompound1);
             }
         }
+        //Simple behavior for performance reasons: If there's fuel in the slot, assume the engine was running.
+        if(this.engineItemStacks[0] != null) {
+            this.wasRunningLastBurn = true;
+        }
+        //...otherwise, assume it was not.
+        else {
+            this.wasRunningLastBurn = false;
+        }
         //Read how far we are from doing another engine tick.
         this.ticksUntilBurn = nbt.getShort("BurnTime");
 
@@ -280,9 +291,6 @@ public class TileEntityNitrateEngine extends TileEntitySolidFueled implements IE
             	fluidTank = fluid;
             }
         }
-
-        //Get energy
-        energy = nbt.getInteger("Energy");
     }
 
 	@Override
@@ -291,7 +299,6 @@ public class TileEntityNitrateEngine extends TileEntitySolidFueled implements IE
         //Write time until next engine burn tick.
         nbt.setShort("BurnTime", (short)this.ticksUntilBurn);
         //Write energy
-        nbt.setInteger("Energy", this.energy);
         //Write item stacks.
         NBTTagList nbttaglist = new NBTTagList();
         for (int i = 0; i < this.engineItemStacks.length; ++i) {
@@ -314,7 +321,6 @@ public class TileEntityNitrateEngine extends TileEntitySolidFueled implements IE
 	public Packet getDescriptionPacket() { //Very Complex And Difficult Network Code
 	    NBTTagCompound nbt = new NBTTagCompound();
 	    writeToNBT(nbt);
-	    super.writeToNBT(nbt);
 	    return new Packet132TileEntityData(xCoord, yCoord, zCoord, 1, nbt);
 	}
 
@@ -473,48 +479,64 @@ public class TileEntityNitrateEngine extends TileEntitySolidFueled implements IE
 	@Override
 	public void updateEntity() //The meat of our block.
     {
-		//Burn logic:
-		//Are we still waiting to burn fuel?
-		boolean flagHasPower = energy > 0;
-		int smogProduced = 0;
-        if (this.ticksUntilBurn > 0) {
-        	--this.ticksUntilBurn;
-        }
-        else {
-        	//If we are not waiting, update the entity.
-			boolean flagInvChanged = false;
-			int toBurn = 0;
-			//Make sure we have fuel, somewhere to put waste products, and energy storage capacity.
-			
-			if (this.engineItemStacks[0] != null) {
-	            if (this.engineItemStacks[0].stackSize >= 1) {
-	            	//Do the burny thing. 
-	            	int deltaItems = doBurn(this.engineItemStacks[0], quantityPerBurn);
-	            	this.engineItemStacks[0].stackSize -= deltaItems;
-	            	flagHasPower = (deltaItems != 0);
-	        	    flagInvChanged = flagHasPower;
-	                if (this.engineItemStacks[0].stackSize <= 0) {
-	                	this.engineItemStacks[0] = null;
-	                }
-	            }
-	            ticksUntilBurn = ticksPerBurn; //Reset the timer, but only if we did anything.
-			}
-	        if (flagInvChanged) {
-	            this.onInventoryChanged();
+		super.updateEntity();
+		boolean flagInvChanged = false;
+		if(!worldObj.isRemote) {
+			//Burn logic:
+			//Are we still waiting to burn fuel?
+			boolean flagHasPower = energy > 0;
+			int smogProduced = 0;
+	        if (this.ticksUntilBurn > 0) {
+	        	--this.ticksUntilBurn;
 	        }
-        }
-		//And now, attempt to charge surrounding blocks.
-		if (flagHasPower) {
-			this.powerAdjacent();
-		}
-		//Attempt to dump tank into surrounding Forge fluid handlers.
-		if(fluidTank != null) {
-			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-				TileEntity tileEntity = worldObj.getBlockTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
-				if(tileEntity != null) {
-					if(tileEntity instanceof IFluidHandler) {
+	        else {
+	        	//If we are not waiting, update the entity.
+				int toBurn = 0;
+				//Make sure we have fuel, somewhere to put waste products, and energy storage capacity.
+				
+				if (this.engineItemStacks[0] != null) {
+		            if (this.engineItemStacks[0].stackSize >= 1) {
+		            	//Do the burny thing. 
+		            	int deltaItems = doBurn(this.engineItemStacks[0], quantityPerBurn);
+		            	this.engineItemStacks[0].stackSize -= deltaItems;
+		            	flagHasPower = (deltaItems != 0);
+		        	    flagInvChanged = flagHasPower;
+		                if (this.engineItemStacks[0].stackSize <= 0) {
+		                	this.engineItemStacks[0] = null;
+		                }
+		                if(deltaItems != 0) {
+		                	TurnBlockOn();
+		                }
+		                else {
+		                	TurnBlockOff();
+		                }
+		            }
+	                else {
+	                	TurnBlockOff();
+	                }
+		            ticksUntilBurn = ticksPerBurn; //Reset the timer, but only if we did anything.
+				}
+				else {
+	            	TurnBlockOff();
+				}
+		        if (flagInvChanged) {
+		            this.onInventoryChanged();
+		        }
+	        }
+			//And now, attempt to charge surrounding blocks.
+			if (flagHasPower) {
+				this.powerAdjacent();
+			}
+			//Attempt to dump tank into surrounding Forge fluid handlers.
+			if(fluidTank != null) {
+				ForgeDirection dir;
+				IFluidHandler adjFluidHandler;
+				for(int i = 0; i < 6; ++i) {
+					dir = ForgeDirection.VALID_DIRECTIONS[i];
+					adjFluidHandler = this.adjFluidHandlers[i];
+					if(adjFluidHandler != null) {
 						FluidStack toDrain = new FluidStack(fluidTank.getFluid(), fluidTank.amount);
-						drain(((IFluidHandler)tileEntity).fill(dir.getOpposite(), toDrain, true), true);
+						drain(adjFluidHandler.fill(dir.getOpposite(), toDrain, true), true);
 						
 						if(fluidTank == null) {
 							break;
@@ -523,7 +545,30 @@ public class TileEntityNitrateEngine extends TileEntitySolidFueled implements IE
 				}
 			}
 		}
+
+        if (flagInvChanged) {
+            this.onInventoryChanged();
+        }
     }
+
+	private void TurnBlockOff() {
+        if(wasRunningLastBurn == true) {
+        	Block block = Block.blocksList[worldObj.getBlockId(xCoord, yCoord, zCoord)];
+        	if(block instanceof IBlockMetaPower) {
+        		((IBlockMetaPower)block).recievePowerOff(worldObj, xCoord, yCoord, zCoord);
+        	}
+        }
+        wasRunningLastBurn = false;
+	}
+	private void TurnBlockOn() {
+        if(wasRunningLastBurn == false) {
+        	Block block = Block.blocksList[worldObj.getBlockId(xCoord, yCoord, zCoord)];
+        	if(block instanceof IBlockMetaPower) {
+        		((IBlockMetaPower)block).recievePowerOn(worldObj, xCoord, yCoord, zCoord);
+        	}
+        }
+        wasRunningLastBurn = true;
+	}
 	@Override
 	public void receiveByproduct(ItemStack byproductStack) {
 		if(byproductStack == null) {
@@ -616,6 +661,7 @@ public class TileEntityNitrateEngine extends TileEntitySolidFueled implements IE
 	
 	@Override
 	public void onInventoryChanged() {
+		super.onInventoryChanged();
 		// TODO Do we need to do anything with this?
 	}
 

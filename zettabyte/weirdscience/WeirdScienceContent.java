@@ -13,10 +13,11 @@ import zettabyte.weirdscience.block.BlockBloodEngine;
 import zettabyte.weirdscience.block.BlockNitrateEngine;
 import zettabyte.weirdscience.block.CongealedBloodBlock;
 import zettabyte.weirdscience.core.ContentRegistry;
+import zettabyte.weirdscience.core.SubBucket;
 import zettabyte.weirdscience.core.baseclasses.BlockBase;
 import zettabyte.weirdscience.core.baseclasses.BlockFluidClassicWS;
 import zettabyte.weirdscience.core.baseclasses.ItemBase;
-import zettabyte.weirdscience.core.baseclasses.ItemBucketBase;
+import zettabyte.weirdscience.core.baseclasses.ItemBucketWS;
 import zettabyte.weirdscience.core.baseclasses.ItemFoodBase;
 import zettabyte.weirdscience.core.chemistry.BlockFluidReactive;
 import zettabyte.weirdscience.core.chemistry.ReactionSpec;
@@ -30,6 +31,9 @@ import zettabyte.weirdscience.fluid.FluidSmog;
 import zettabyte.weirdscience.item.Coagulant;
 import cpw.mods.fml.common.registry.GameRegistry;
 
+
+//TODO: Write some sort of generic reflection proxy class that caches the results it finds.
+// ^ Actually a really strong use case for a Singleton.
 
 public class WeirdScienceContent {
 	public static final void RegisterContent(Configuration config, ContentRegistry cr) {
@@ -155,19 +159,27 @@ public class WeirdScienceContent {
 		itemAlum.setTextureName("weirdscience:coagulant");
 		itemAlum.congealedBlockID = congealedBlock.blockID;
 		cr.RegisterItem(itemAlum);
-
-		ItemBucketBase bucketBlood = new ItemBucketBase(config, "Blood Bucket", ItemBase.FindFreeItemID(), bloodBlock);
+		
+		ItemBucketWS bucket = new ItemBucketWS(config, "Bucket", ItemBase.FindFreeItemID());
+		bucket.addSubBucket(new SubBucket("Blood Bucket", "weirdscience:bloodbucket", bloodBlock));
+		bucket.addSubBucket(new SubBucket("Acid Bucket", "weirdscience:acidbucket", acidBlock));
+		SubBucket bucketBase = new SubBucket("Base Bucket", "weirdscience:basebucket", baseBlock);
+		bucket.addSubBucket(bucketBase);
+		
+		/*
+		ItemBucketWS bucketBlood = new ItemBucketWS(config, "Blood Bucket", ItemBase.FindFreeItemID(), bloodBlock);
 		bucketBlood.setTextureName("weirdscience:bloodbucket");
 		cr.RegisterItem(bucketBlood);
 
-		ItemBucketBase bucketAcid = new ItemBucketBase(config, "Acid Bucket", ItemBase.FindFreeItemID(), acidBlock);
+		ItemBucketWS bucketAcid = new ItemBucketWS(config, "Acid Bucket", ItemBase.FindFreeItemID(), acidBlock);
 		bucketAcid.setTextureName("weirdscience:acidbucket");
 		cr.RegisterItem(bucketAcid);
 		
 		//heh
-		ItemBucketBase bucketBase = new ItemBucketBase(config, "Lye Solution Bucket", ItemBase.FindFreeItemID(), baseBlock);
+		ItemBucketWS bucketBase = new ItemBucketWS(config, "Lye Solution Bucket", ItemBase.FindFreeItemID(), baseBlock);
 		bucketBase.setTextureName("weirdscience:basebucket");
-		cr.RegisterItem(bucketBase);
+		cr.RegisterItem(bucketBase);*/
+		cr.RegisterItem(bucket);
 		
 		ItemBase ingotAluminum = new ItemBase(config, "Aluminum Ingot", ItemBase.FindFreeItemID());
 		ingotAluminum.setTextureName("weirdscience:aluminumingot");
@@ -187,7 +199,7 @@ public class WeirdScienceContent {
 		//Register recipes.
 		cr.RegisterRecipe(new DisableableRecipe(itemMelonPan, new Object[]{Item.bread, Item.melon}, true, false));
 		//Leaching ashes with water gives you lye!
-		cr.RegisterRecipe(new DisableableRecipe(bucketBase, new Object[]{Item.bucketWater, itemAshes}, true, false));
+		cr.RegisterRecipe(new DisableableRecipe(new ItemStack(bucket.itemID, 1, bucketBase.getAssociatedMeta()), new Object[]{Item.bucketWater, itemAshes}, true, false));
 
 		
 		//Register chemistry.

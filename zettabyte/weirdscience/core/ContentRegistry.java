@@ -18,13 +18,15 @@ import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
-import zettabyte.weirdscience.core.baseclasses.ItemBucketBase;
+import zettabyte.weirdscience.core.baseclasses.ItemBucketWS;
 import zettabyte.weirdscience.core.chemistry.IReactionReceiver;
 import zettabyte.weirdscience.core.chemistry.IReactionSpec;
 import zettabyte.weirdscience.core.interfaces.IConfiggable;
 import zettabyte.weirdscience.core.interfaces.IDeferredInit;
 import zettabyte.weirdscience.core.interfaces.IRegistrable;
 import zettabyte.weirdscience.core.interfaces.ISoundProvider;
+import zettabyte.weirdscience.core.interfaces.ISubBucket;
+import zettabyte.weirdscience.core.interfaces.ISubItem;
 import zettabyte.weirdscience.core.interfaces.IWeirdScienceBlock;
 import zettabyte.weirdscience.core.interfaces.IWeirdScienceItem;
 import zettabyte.weirdscience.core.recipe.IRecipeProvider;
@@ -162,12 +164,19 @@ public class ContentRegistry {
 		/*
 		 * Fluid Container / bucket stuff
 		 */
-		if(item instanceof ItemBucketBase) {
-			ItemBucketBase bucket = (ItemBucketBase)item;
-			if(bucket.getFluid() != null) {
-				FluidContainerRegistry.registerFluidContainer(bucket.getFluid(), new ItemStack(item), new ItemStack(Item.bucketEmpty));
-	        }
-	        bucketMan.addRecipe(bucket.getContained(), new ItemStack(bucket, 1));
+		if(item instanceof ItemBucketWS) {
+			ItemBucketWS bucket = (ItemBucketWS)item;
+			ISubBucket sb = null;
+			ArrayList<ISubItem> subItems = bucket.getSubItems();
+			if(subItems != null) {
+				for(int i = 0; i < subItems.size(); i++) {
+					sb = (ISubBucket)subItems.get(i);
+					if(sb.getFluid() != null) {
+						FluidContainerRegistry.registerFluidContainer(sb.getFluid(), new ItemStack(item, 1, sb.getAssociatedMeta()), new ItemStack(Item.bucketEmpty));
+			        }
+			        bucketMan.addRecipe(sb.getContained(), sb.getContainedMeta(), new ItemStack(bucket, 1, sb.getAssociatedMeta()));
+				}
+			}
 		}
 		
 		itemsToRegister.add(item);
@@ -230,13 +239,20 @@ public class ContentRegistry {
 			}
 			if(b instanceof IWeirdScienceBlock) {
 				IWeirdScienceBlock wsb = (IWeirdScienceBlock)b;
+				//Do per-metadata things.
 				if(wsb.InCreativeTab()) {
 					b.setCreativeTab(cTab);
 				}
-				//Get and set harvest levels for each metadata of the block.
 				for(int j = 0; j <= 15; ++j) {
 					MinecraftForge.setBlockHarvestLevel(b, j, wsb.getHarvestType(j), wsb.getHarvestLevel(j));
 				}
+				
+				//ArrayList<ISubBlock> subBlocks = wsb.getSubBlocks();
+				//if(subBlocks != null) {
+				//	for(ISubBlock sb : subBlocks) {
+				//		//Per-subblock operations
+				//	}
+				//}
 			}
 		}
 	}
@@ -255,7 +271,16 @@ public class ContentRegistry {
 				if(wsi.InCreativeTab()) {
 					item.setCreativeTab(cTab);
 				}
+				ArrayList<ISubItem> subItems = wsi.getSubItems();
+				if(subItems != null) {
+					for(ISubItem si : subItems) {
+						//Per-subblock operations
+						GeneralRegister(si);
+						LanguageRegistry.addName(new ItemStack(item, 1, si.getAssociatedMeta()), si.getEnglishName());
+					}
+				}
 			}
+			
 		}
 	}
 	

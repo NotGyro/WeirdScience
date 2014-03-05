@@ -17,6 +17,7 @@ import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidBlock;
+import zettabyte.weirdscience.core.baseclasses.ItemBucketWS;
 import zettabyte.weirdscience.tileentity.TileEntityBloodEngine;
 
 public class BlockBloodEngine extends BlockMetaTank {
@@ -43,11 +44,14 @@ public class BlockBloodEngine extends BlockMetaTank {
 
 	@Override
 	public TileEntity createNewTileEntity(World world) {
-		return new TileEntityBloodEngine(englishName, fuelName);
+		return new TileEntityBloodEngine();
 	}
 	
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int metadata, float par1, float par2, float par3) {
-		TileEntityBloodEngine tileEntity = (TileEntityBloodEngine)world.getBlockTileEntity(x, y, z);
+		TileEntityBloodEngine tileEntity = null;
+		if(world.getBlockTileEntity(x, y, z) instanceof TileEntityBloodEngine) {
+			tileEntity = (TileEntityBloodEngine)world.getBlockTileEntity(x, y, z);
+		}
 	    if (tileEntity == null || player.isSneaking()) {
 	            return false;
 	    }
@@ -56,7 +60,19 @@ public class BlockBloodEngine extends BlockMetaTank {
 		//Check to see if the player is holding something that can be filled with a fluid.
 		if (playerItem != null) {
 			//Is the player's item THE ONE TRUE ITEM we're lookin' for?
-			if (playerItem.getItem() instanceof ItemBucket) {
+			//First try the Zettabyte version.
+			if (playerItem.getItem() instanceof ItemBucketWS) {
+				ItemBucketWS bucket = (ItemBucketWS)playerItem.getItem();
+				//Is it blood?
+				if(bucket.getFluid(playerItem).getFluid().getName().contentEquals(fuelName)) {
+					if(FillTank(bucket.getFluid(playerItem).getFluid(), tileEntity) && !player.capabilities.isCreativeMode) {
+						player.inventory.setInventorySlotContents(player.inventory.currentItem, FluidContainerRegistry.EMPTY_BUCKET);
+					}
+					return true;
+				}
+				
+			}
+			else if (playerItem.getItem() instanceof ItemBucket) {
 				ItemBucket bucket = (ItemBucket)playerItem.getItem();
 				//Do deep black Worst Practices hoodoo because Notch didn't design anything to be extended or generalized
 				//Lucky for us the performance impact of reflection is negligable in this case since there won't be 
@@ -73,7 +89,7 @@ public class BlockBloodEngine extends BlockMetaTank {
 				if(blocksList[dumpedBlockID] instanceof IFluidBlock) {
 					Fluid fluidTry = ((IFluidBlock)blocksList[dumpedBlockID]).getFluid();
 					//Is it blood?
-					if(fluidTry.getName() == fuelName) {
+					if(fluidTry.getName().contentEquals(fuelName)) {
 						if(FillTank(fluidTry, tileEntity) && !player.capabilities.isCreativeMode) {
 							player.inventory.setInventorySlotContents(player.inventory.currentItem, FluidContainerRegistry.EMPTY_BUCKET);
 						}
