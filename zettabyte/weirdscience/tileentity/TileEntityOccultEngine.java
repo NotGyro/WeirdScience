@@ -74,7 +74,7 @@ public class TileEntityOccultEngine extends TileEntityBloodEngine implements ICo
 		eggData.explPower = 4.0f;
 		eggData.evilHunger = staticMbPerBurn;
 		eggData.evilRF = staticRfPerTick * 2;
-		idols.put("dragonEgg", eggData);
+		idols.put(Block.dragonEgg.getUnlocalizedName(), eggData);
 		
 		//wither skull
 		IdolData skullData = new IdolData();
@@ -84,7 +84,7 @@ public class TileEntityOccultEngine extends TileEntityBloodEngine implements ICo
 		skullData.evilRF = staticRfPerTick * 2;
 		skullData.spawnWitherOnFail = true;
 		skullData.anihilationRange = 2;
-		idols.put("skull", skullData);
+		idols.put(Block.skull.getUnlocalizedName(), skullData);
 		
 		
 		
@@ -199,42 +199,47 @@ public class TileEntityOccultEngine extends TileEntityBloodEngine implements ICo
 	}
 	//Something went wrong while we were in evil mode:
 	protected void doFailure() {
-		if(currentIdol != null) {
-			int aRange = currentIdol.anihilationRange;
-			//Do we have an anihilation range?
-			if(aRange > 0) {
-				//Iterate through...
-				for(int xr = -aRange; xr <= aRange; ++xr) {
-					for(int yr = -aRange; yr <= aRange; ++yr) {
-						for(int zr = -aRange; zr <= aRange; ++zr) {
-							///...clearing a space.
-							if(Block.blocksList[worldObj.getBlockId(xCoord + xr, yCoord + yr, zCoord + zr)]
-									.canEntityDestroy(worldObj, xCoord + xr, yCoord + yr, zCoord + zr, null)) {
-								worldObj.setBlockToAir(xCoord + xr, yCoord + yr, zCoord + zr);
+		if(!worldObj.isRemote) {
+			if(currentIdol != null) {
+				int aRange = currentIdol.anihilationRange;
+				//Do we have an anihilation range?
+				if(aRange > 0) {
+					//Iterate through...
+					for(int xr = -aRange; xr <= aRange; ++xr) {
+						for(int yr = -aRange; yr <= aRange; ++yr) {
+							for(int zr = -aRange; zr <= aRange; ++zr) {
+								///...clearing a space.
+								if(Block.blocksList[worldObj.getBlockId(xCoord + xr, yCoord + yr, zCoord + zr)] != null) {
+									if(Block.blocksList[worldObj.getBlockId(xCoord + xr, yCoord + yr, zCoord + zr)]
+											.canEntityDestroy(worldObj, xCoord + xr, yCoord + yr, zCoord + zr, null)
+											&& !Block.blocksList[worldObj.getBlockId(xCoord + xr, yCoord + yr, zCoord + zr)]
+													.getUnlocalizedName().contentEquals(Block.bedrock.getUnlocalizedName())) {
+										worldObj.setBlockToAir(xCoord + xr, yCoord + yr, zCoord + zr);
+									}
+								}
 							}
 						}
 					}
 				}
-			}
-			//Do we have an explosion?
-			if(currentIdol.explPower > 0.3f) {
-				worldObj.createExplosion(null, xCoord, yCoord, zCoord, currentIdol.explPower, true);
-			}
-			//Do we have an entity to spawn?
-			if((currentIdol.spawnWitherOnFail == true) && (worldObj.difficultySetting > 0)) {
-				EntityWither entitywither = new EntityWither(worldObj);
-                entitywither.setLocationAndAngles((double)xCoord + 0.5D, (double)yCoord - 1.45D, (double)zCoord + 1.5D, 90.0F, 0.0F);
-                entitywither.renderYawOffset = 90.0F;
-                entitywither.func_82206_m();
-                worldObj.spawnEntityInWorld(entitywither);
-			}
-			//Do we have something special to switch this block to?
-			if(currentIdol.engineTo != null) {
-				worldObj.setBlock(xCoord, yCoord, zCoord, currentIdol.engineTo.blockID);
-			}
-			//...otherwise, set it to air.
-			else {
-				worldObj.setBlockToAir(xCoord, yCoord, zCoord);
+				//Do we have an explosion?
+				if(currentIdol.explPower > 0.3f) {
+					worldObj.createExplosion(null, xCoord, yCoord, zCoord, currentIdol.explPower, true);
+				}
+				//Do we have an entity to spawn?
+				if((currentIdol.spawnWitherOnFail == true) && (worldObj.difficultySetting > 0)) {
+					EntityWither entitywither = new EntityWither(worldObj);
+	                entitywither.setLocationAndAngles((double)xCoord + 0.5D, (double)yCoord + 0.5D, (double)zCoord + 0.5D, 0.0F, 0.0F);
+	                entitywither.func_82206_m();
+	                worldObj.spawnEntityInWorld(entitywither);
+				}
+				//Do we have something special to switch this block to?
+				if(currentIdol.engineTo != null) {
+					worldObj.setBlock(xCoord, yCoord, zCoord, currentIdol.engineTo.blockID);
+				}
+				//...otherwise, set it to air.
+				else {
+					worldObj.setBlockToAir(xCoord, yCoord, zCoord);
+				}
 			}
 		}
 	}

@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockSkull;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
+import zettabyte.weirdscience.block.BlockSkullOverride;
 import zettabyte.weirdscience.client.gui.WeirdScienceGUIHandler;
 import zettabyte.weirdscience.core.ContentRegistry;
 import cpw.mods.fml.common.FMLLog;
@@ -56,6 +59,14 @@ public class WeirdScience {
 	
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+    	//Do strange hacks.
+    	Block.blocksList[Block.skull.blockID] = null;
+    	Block.blocksList[Block.skull.blockID] = (new BlockSkullOverride(Block.skull.blockID))
+    			.setHardness(1.0F).setStepSound(Block.soundStoneFootstep)
+    			.setUnlocalizedName("skull").setTextureName("skull");
+    	//Block.skull = Block.blocksList[Block.skull.blockID];
+    	
+    	//Get on with things.
     	config = new Configuration(event.getSuggestedConfigurationFile());
         config.load();
         weirdRegistry = new ContentRegistry(config, logger, tabWeirdScience);

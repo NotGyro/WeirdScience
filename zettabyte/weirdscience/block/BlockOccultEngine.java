@@ -17,28 +17,32 @@ import zettabyte.weirdscience.tileentity.TileEntityOccultEngine;
 public class BlockOccultEngine extends BlockBloodEngine implements
 		IBlockMetaPower {
 	
-	public static ArrayList<String> idols = new ArrayList<String>(8);
+	public static ArrayList<String> idols = new ArrayList<String>(2);
 
+	private void initIdols(){
+		idols.add(Block.skull.getUnlocalizedName());
+		idols.add(Block.dragonEgg.getUnlocalizedName());
+	}
 	public BlockOccultEngine(Configuration config, String name, int defaultID,
 			Material material) {
 		super(config, name, defaultID, material);
-		// TODO Auto-generated constructor stub
+		initIdols();
 	}
 
 	public BlockOccultEngine(Configuration config, String name, int defaultID) {
 		super(config, name, defaultID);
-		// TODO Auto-generated constructor stub
+		initIdols();
 	}
 
 	public BlockOccultEngine(Configuration config, String name,
 			Material material) {
 		super(config, name, material);
-		// TODO Auto-generated constructor stub
+		initIdols();
 	}
 
 	public BlockOccultEngine(Configuration config, String name) {
 		super(config, name);
-		// TODO Auto-generated constructor stub
+		initIdols();
 	}
 
 
@@ -61,11 +65,16 @@ public class BlockOccultEngine extends BlockBloodEngine implements
 	
 	@Override
 	public void onNeighborBlockChange(World world, int x, int y, int z, int neighborBlockID) {
+		super.onNeighborBlockChange(world, x, y, z, neighborBlockID);
+		updateIdol(world, x, y, z);
+	}
+	
+	private void updateIdol(World world, int x, int y, int z) {
 		Block b = blocksList[world.getBlockId(x, y+1, z)];
 		if(b != null) {
 			for(String s : idols) {
 				if(s.contentEquals(b.getUnlocalizedName())) {
-					if(b instanceof BlockSkull) {
+					if(b.getUnlocalizedName().contentEquals(Block.skull.getUnlocalizedName())) {
 						//Special case for the wither skull
 						TileEntity teUp = world.getBlockTileEntity(x, y+1, z);
 						if(teUp != null) {
@@ -76,6 +85,7 @@ public class BlockOccultEngine extends BlockBloodEngine implements
 									if(te != null) {
 										if(te instanceof TileEntityOccultEngine) {
 											((TileEntityOccultEngine)te).updateCurrentIdol(b.getUnlocalizedName());
+											return;
 										}
 									}
 								}
@@ -93,6 +103,26 @@ public class BlockOccultEngine extends BlockBloodEngine implements
 					}
 				}
 			}
+			if(b.blockID == 0) {
+				//air
+
+				TileEntity te = world.getBlockTileEntity(x, y, z);
+				if(te != null) {
+					if(te instanceof TileEntityOccultEngine) {
+						((TileEntityOccultEngine)te).updateCurrentIdol(null);
+					}
+				}
+				
+			}
+		}
+		else {
+			TileEntity te = world.getBlockTileEntity(x, y, z);
+			if(te != null) {
+				if(te instanceof TileEntityOccultEngine) {
+					((TileEntityOccultEngine)te).updateCurrentIdol(null);
+				}
+			}
 		}
 	}
+	
 }
