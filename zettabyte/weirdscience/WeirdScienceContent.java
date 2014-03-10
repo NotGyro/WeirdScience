@@ -2,6 +2,7 @@ package zettabyte.weirdscience;
 
 import java.util.ArrayList;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -11,6 +12,7 @@ import net.minecraftforge.oredict.OreDictionary;
 import zettabyte.weirdscience.block.BlockBloodDonation;
 import zettabyte.weirdscience.block.BlockBloodEngine;
 import zettabyte.weirdscience.block.BlockNitrateEngine;
+import zettabyte.weirdscience.block.BlockOccultEngine;
 import zettabyte.weirdscience.block.CongealedBloodBlock;
 import zettabyte.weirdscience.core.ContentRegistry;
 import zettabyte.weirdscience.core.SubBucket;
@@ -25,6 +27,7 @@ import zettabyte.weirdscience.core.fluid.BlockGasBase;
 import zettabyte.weirdscience.core.fluid.GasFactory;
 import zettabyte.weirdscience.core.fluid.GasWrapper;
 import zettabyte.weirdscience.core.recipe.DisableableRecipe;
+import zettabyte.weirdscience.core.recipe.SimpleRecipe;
 import zettabyte.weirdscience.fluid.BlockGasSmog;
 import zettabyte.weirdscience.fluid.FluidAcid;
 import zettabyte.weirdscience.fluid.FluidSmog;
@@ -111,6 +114,17 @@ public class WeirdScienceContent {
 		aluminumSludge.setHardness(0.3F);
 		cr.RegisterBlock(aluminumSludge);
 		
+		BlockBase blockRust = new BlockBase(config, "Rust", Material.iron);
+		blockRust.setTextureName("weirdscience:rustblock");
+		blockRust.harvestType = "pickaxe";
+		blockRust.harvestLevel = 0;
+		blockRust.setHardness(0.6F);
+		cr.RegisterBlock(blockRust);
+
+		((BlockGasSmog)smogManager.blocks.get(0)).blockRust = blockRust;
+		((BlockGasSmog)smogManager.blocks.get(0)).metaRust = 0; 
+		
+		
 		//Init & register tile-entity-bearing blocks.
 
 		BlockNitrateEngine phosphateEngineBlock = new BlockNitrateEngine(config, "Nitrate Engine", Material.rock);
@@ -149,6 +163,19 @@ public class WeirdScienceContent {
 		donationBlock.addSidesTextureName("weirdscience:blood_tank_7");
 		donationBlock.addSidesTextureName("weirdscience:blood_tank_8");
 		cr.RegisterBlock(donationBlock);
+		
+
+		BlockOccultEngine occultEngineBlock = new BlockOccultEngine(config, "Occult Engine", Material.rock);
+		occultEngineBlock.setTextureName("weirdscience:occultengine_bottom");
+		occultEngineBlock.addTopTextureName("weirdscience:occultengine_top");
+		occultEngineBlock.addSidesTextureName("weirdscience:occultengine_empty");
+		occultEngineBlock.addSidesTextureName("weirdscience:occultengine_1");
+		occultEngineBlock.addSidesTextureName("weirdscience:occultengine_2");
+		occultEngineBlock.addSidesTextureName("weirdscience:occultengine_3");
+		occultEngineBlock.addSidesTextureName("weirdscience:occultengine_4");
+		occultEngineBlock.addSidesTextureName("weirdscience:occultengine_5");
+		occultEngineBlock.addSidesTextureName("weirdscience:occultengine_6");
+		cr.RegisterBlock(occultEngineBlock);
 		
 		//Init and register items.
 		ItemFoodBase itemMelonPan = new ItemFoodBase(config, "Melonpan", ItemBase.FindFreeItemID(), 3, 0.6f);
@@ -195,11 +222,40 @@ public class WeirdScienceContent {
 		itemAshes.setTextureName("weirdscience:ashes");
 		OreDictionary.registerOre("ashes", itemAshes);
 		cr.RegisterItem(itemAshes);
+
+
+		ItemBase itemRust = new ItemBase(config, "Rust Pile");
+		itemRust.setTextureName("weirdscience:rustpile");
+		cr.RegisterItem(itemRust);
+		
+		blockRust.setItemDropped(new ItemStack(itemRust, 6, 0));
+		blockRust.setDroppedRandomBonus(3);
+		
+		//TODO: Thermite item behavior.
+		ItemBase itemThermite = new ItemBase(config, "Thermite");
+		itemThermite.setTextureName("weirdscience:thermiteitem");
+		cr.RegisterItem(itemThermite);
+		
 		
 		//Register recipes.
+		
+		DisableableRecipe thermiteRecipe = new DisableableRecipe(new ItemStack(itemThermite.itemID, 1, 0), new Object[]{itemRust, dustAluminum}, true, false);
 		cr.RegisterRecipe(new DisableableRecipe(itemMelonPan, new Object[]{Item.bread, Item.melon}, true, false));
-		//Leaching ashes with water gives you lye!
 		cr.RegisterRecipe(new DisableableRecipe(new ItemStack(bucket.itemID, 1, bucketBase.getAssociatedMeta()), new Object[]{Item.bucketWater, itemAshes}, true, false));
+		cr.RegisterRecipe(thermiteRecipe);
+		cr.RegisterRecipe(new SimpleRecipe(new ItemStack(blockRust.blockID, 1, 0), new Object[]{"rrr", "rrr", "rrr", 'r', itemRust}, false, false));
+		
+		if(thermiteRecipe.isEnabled()) {
+			//Registers other aluminum dusts as items from which thermite can be made.
+			ArrayList<ItemStack> aluminumDusts = OreDictionary.getOres("dustAluminum");
+			if(aluminumDusts != null) {
+				if(aluminumDusts.size() > 0) {
+					for(ItemStack item : aluminumDusts) {
+						cr.RegisterRecipe(new SimpleRecipe(new ItemStack(itemThermite.itemID, 1, 0), new Object[]{itemRust, item}, true, false));
+					}
+				}
+			}
+		}
 
 		
 		//Register chemistry.
@@ -258,6 +314,11 @@ public class WeirdScienceContent {
 					GameRegistry.addSmelting(item.itemID, new ItemStack(itemAshes), 0.0F);
 				}
 			}
+		}
+		GameRegistry.addSmelting(blockRust.blockID, new ItemStack(Block.blockIron.blockID, 1, 0), 0.0F);
+		
+		boolean thermiteFuelEnabled = config.get("recipe", "Enable thermite as furnace fuel", true).getBoolean(true);
+		if(thermiteFuelEnabled) {
 		}
 		
 	}

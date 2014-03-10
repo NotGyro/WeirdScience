@@ -35,12 +35,12 @@ public class SimpleRecipe implements IWorkbenchRecipe {
 
 	@Override
 	public boolean isShapeless() {
-		return false;
+		return shapeless;
 	}
 
 	@Override
 	public boolean usesOredict() {
-		return false;
+		return oredicted;
 	}
 	
 	public void setOredicted(boolean o) {
