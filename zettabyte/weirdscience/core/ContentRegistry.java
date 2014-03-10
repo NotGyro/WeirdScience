@@ -305,7 +305,7 @@ public class ContentRegistry {
 				}
 			}
 			else {
-				if(recipe.isShapeless()) {
+				if(!recipe.isShapeless()) {
 					GameRegistry.addRecipe(new ShapedOreRecipe(recipe.getResult(), recipe.get()));
 				}
 				else {

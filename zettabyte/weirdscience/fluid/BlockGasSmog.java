@@ -14,6 +14,9 @@ public class BlockGasSmog extends BlockGasExplosive implements IConfiggable {
 	}
 	protected int acidThreshhold;
 	protected static Block blockAcid;
+	public static Block blockRust = null;
+	public static int metaRust = 0;
+	
 	public static Block getBlockAcid() {
 		return blockAcid;
 	}
@@ -33,6 +36,12 @@ public class BlockGasSmog extends BlockGasExplosive implements IConfiggable {
 		if((id == Block.waterStill.blockID) && 
 				(this.getConcentration(world, x, y, z) >= acidThreshhold)) {
 			world.setBlock(xO, yO, zO, blockAcid.blockID, 0, 1|2);
+			setConcentration(world, x, y, z, getConcentration(world, x, y, z) - acidThreshhold);
+		}
+		if((id == Block.blockIron.blockID) && 
+				(this.getConcentration(world, x, y, z) >= acidThreshhold) &&
+				this.blockRust != null) {
+			world.setBlock(xO, yO, zO, blockRust.blockID, metaRust, 1|2);
 			setConcentration(world, x, y, z, getConcentration(world, x, y, z) - acidThreshhold);
 		}
 	}

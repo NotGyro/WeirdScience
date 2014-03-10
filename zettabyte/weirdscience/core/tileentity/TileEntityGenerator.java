@@ -7,7 +7,7 @@ import cofh.api.energy.IEnergyHandler;
 import cofh.api.tileentity.IEnergyInfo;
 
 public class TileEntityGenerator extends TileEntityBase implements
-		IEnergyHandler, IEnergyInfo {
+		IEnergyHandler {
 
 	protected int energy;
 	protected int energyCap;
@@ -44,28 +44,7 @@ public class TileEntityGenerator extends TileEntityBase implements
 	public void setEnergyCapacity(int cap) {
 		energyCap = cap;
 	}
-	@Override
-	public int getEnergyPerTick() {
-		// Requirement..?
-		return 0;
-	}
-
-	@Override
-	public int getMaxEnergyPerTick() {
-		// Requirement..?
-		return 0;
-	}
-
-	@Override
-	public int getEnergy() {
-		return energy;
-	}
-
-	@Override
-	public int getMaxEnergy() {
-		return energyCap;
-	}
-
+	
 	@Override
 	public int receiveEnergy(ForgeDirection from, int maxReceive,
 			boolean simulate) {
