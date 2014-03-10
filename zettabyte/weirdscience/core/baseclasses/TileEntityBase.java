@@ -33,6 +33,11 @@ public abstract class TileEntityBase extends TileEntity {
 	@Override
 	public void updateEntity() {
 		super.updateEntity();
+		tryInit();
+	}
+	
+	protected void tryInit() {
+		super.updateEntity();
 		if(!initialized) {
 			init();
 			initialized = true;

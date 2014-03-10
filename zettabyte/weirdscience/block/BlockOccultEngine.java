@@ -3,10 +3,13 @@ package zettabyte.weirdscience.block;
 import java.util.ArrayList;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockSkull;
 import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntitySkull;
 import net.minecraft.world.World;
 import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.ForgeDirection;
 import zettabyte.weirdscience.tileentity.TileEntityOccultEngine;
 
 
@@ -62,15 +65,34 @@ public class BlockOccultEngine extends BlockBloodEngine implements
 		if(b != null) {
 			for(String s : idols) {
 				if(s.contentEquals(b.getUnlocalizedName())) {
-					TileEntity te = world.getBlockTileEntity(x, y, z);
-					if(te != null) {
-						if(te instanceof TileEntityOccultEngine) {
-							((TileEntityOccultEngine)te).updateCurrentIdol(b.getUnlocalizedName());
+					if(b instanceof BlockSkull) {
+						//Special case for the wither skull
+						TileEntity teUp = world.getBlockTileEntity(x, y+1, z);
+						if(teUp != null) {
+							if(teUp instanceof TileEntitySkull) {
+								TileEntitySkull teS = (TileEntitySkull) teUp;
+								if(teS.getSkullType() == 1) {
+									TileEntity te = world.getBlockTileEntity(x, y, z);
+									if(te != null) {
+										if(te instanceof TileEntityOccultEngine) {
+											((TileEntityOccultEngine)te).updateCurrentIdol(b.getUnlocalizedName());
+										}
+									}
+								}
+							}
+						}
+					}
+					else {
+						//Every other block.
+						TileEntity te = world.getBlockTileEntity(x, y, z);
+						if(te != null) {
+							if(te instanceof TileEntityOccultEngine) {
+								((TileEntityOccultEngine)te).updateCurrentIdol(b.getUnlocalizedName());
+							}
 						}
 					}
 				}
 			}
 		}
 	}
-
 }
