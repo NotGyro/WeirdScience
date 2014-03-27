@@ -11,6 +11,7 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.oredict.OreDictionary;
 import ws.zettabyte.weirdscience.block.BlockBloodDonation;
 import ws.zettabyte.weirdscience.block.BlockBloodEngine;
+import ws.zettabyte.weirdscience.block.BlockGunpowderEngine;
 import ws.zettabyte.weirdscience.block.BlockNitrateEngine;
 import ws.zettabyte.weirdscience.block.BlockOccultEngine;
 import ws.zettabyte.weirdscience.block.CongealedBloodBlock;
@@ -32,6 +33,7 @@ import ws.zettabyte.weirdscience.fluid.BlockGasSmog;
 import ws.zettabyte.weirdscience.fluid.FluidAcid;
 import ws.zettabyte.weirdscience.fluid.FluidSmog;
 import ws.zettabyte.weirdscience.item.Coagulant;
+import ws.zettabyte.weirdscience.tileentity.TileEntityGunpowderEngine;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 
@@ -176,6 +178,10 @@ public class WeirdScienceContent {
 		occultEngineBlock.addSidesTextureName("weirdscience:occultengine_5");
 		occultEngineBlock.addSidesTextureName("weirdscience:occultengine_6");
 		cr.RegisterBlock(occultEngineBlock);
+
+		BlockGunpowderEngine gunpowderEngineBlock = new BlockGunpowderEngine(config, "Blast Engine", Material.rock);
+		gunpowderEngineBlock.setUnlocalizedName("blockGunpowderEngine");
+		cr.RegisterBlock(gunpowderEngineBlock);
 		
 		//Init and register items.
 		ItemFoodBase itemMelonPan = new ItemFoodBase(config, "Melonpan", ItemBase.FindFreeItemID(), 3, 0.6f);
@@ -234,8 +240,12 @@ public class WeirdScienceContent {
 		//TODO: Thermite item behavior.
 		ItemBase itemThermite = new ItemBase(config, "Thermite");
 		itemThermite.setTextureName("weirdscience:thermiteitem");
+		//20,000 is the fuel value of a lava bucket.
+		int thermiteFuelValue = config.get("Thermite", "Furnace fuel value of Thermite", 5000).getInt();
+		itemThermite.setFurnaceFuelValue(thermiteFuelValue);
 		cr.RegisterItem(itemThermite);
 		
+		TileEntityGunpowderEngine.thermite = itemThermite;
 		
 		//Register recipes.
 		
@@ -270,6 +280,23 @@ public class WeirdScienceContent {
 		alumDissolve.soluteAffected = true;
 		alumDissolve.solventAffected = false;
 		cr.RegisterReaction(alumDissolve);
+
+		//Acids and bases kill grass dead.
+		ReactionSpec grassDissolveAcid = new ReactionSpec();
+		grassDissolveAcid.solvent = fluidAcid;
+		grassDissolveAcid.solute = Block.grass;
+		grassDissolveAcid.soluteTarget = Block.dirt;
+		grassDissolveAcid.solventAffected = false;
+		grassDissolveAcid.soluteAffected = true;
+		cr.RegisterReaction(grassDissolveAcid);
+		
+		ReactionSpec grassDissolveBase = new ReactionSpec();
+		grassDissolveBase.solvent = fluidBase;
+		grassDissolveBase.solute = Block.grass;
+		grassDissolveBase.soluteTarget = Block.dirt;
+		grassDissolveBase.solventAffected = false;
+		grassDissolveBase.soluteAffected = true;
+		cr.RegisterReaction(grassDissolveBase);
 		
 		
 		ArrayList<ItemStack> aluminumIngots = OreDictionary.getOres("ingotAluminum");

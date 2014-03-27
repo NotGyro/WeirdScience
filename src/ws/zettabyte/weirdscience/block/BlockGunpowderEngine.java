@@ -19,14 +19,17 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.RotationHelper;
-import net.minecraftforge.fluids.Fluid;
-import ws.zettabyte.weirdscience.WeirdScience;
+import ws.zettabyte.weirdscience.tileentity.TileEntityGunpowderEngine;
 import ws.zettabyte.weirdscience.tileentity.TileEntityNitrateEngine;
 import ws.zettabyte.zettalib.baseclasses.BlockContainerBase;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class BlockNitrateEngine extends BlockContainerBase implements
+
+//A copy-and-paste from BlockNitrateEngine.
+//Soon I will abstract this functionality out
+//to a BlockContainerRotatable or something like that.
+public class BlockGunpowderEngine extends BlockContainerBase implements
 		IBlockMetaPower {
 
 	int teCapacity = 0;
@@ -35,8 +38,6 @@ public class BlockNitrateEngine extends BlockContainerBase implements
 
 	private final Random itemDropRand = new Random(); // Randomize item drop
 														// direction.
-
-	public static Fluid waste = null;
 
 	@SideOnly(Side.CLIENT)
 	public Icon frontIcon;
@@ -68,7 +69,7 @@ public class BlockNitrateEngine extends BlockContainerBase implements
 		}
 	}
 
-	protected static void initRotate(BlockNitrateEngine b) {
+	protected static void initRotate(BlockGunpowderEngine b) {
 		BlockHelper.rotateType[b.blockID] = BlockHelper.RotationType.CHEST;
 	}
 
@@ -89,24 +90,24 @@ public class BlockNitrateEngine extends BlockContainerBase implements
 				x, y, z, axis);
 	}
 
-	public BlockNitrateEngine(Configuration config, String name, int defaultID,
+	public BlockGunpowderEngine(Configuration config, String name, int defaultID,
 			Material material) {
 		super(config, name, defaultID, material);
 		initRotate(this);
 	}
 
-	public BlockNitrateEngine(Configuration config, String name, int defaultID) {
+	public BlockGunpowderEngine(Configuration config, String name, int defaultID) {
 		super(config, name, defaultID);
 		initRotate(this);
 	}
 
-	public BlockNitrateEngine(Configuration config, String name,
+	public BlockGunpowderEngine(Configuration config, String name,
 			Material material) {
 		super(config, name, material);
 		initRotate(this);
 	}
 
-	public BlockNitrateEngine(Configuration config, String name) {
+	public BlockGunpowderEngine(Configuration config, String name) {
 		super(config, name);
 		initRotate(this);
 	}
@@ -124,6 +125,7 @@ public class BlockNitrateEngine extends BlockContainerBase implements
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void registerIcons(IconRegister iconRegister) {
+		//TODO: Visually differentiate this from the Nitrate Engine.
 		frontIcon = iconRegister.registerIcon("weirdscience:genericmachine5");
 		sidesIcon = iconRegister.registerIcon("weirdscience:genericmachine");
 		topIcon = iconRegister.registerIcon("weirdscience:genericmachine3");
@@ -164,14 +166,9 @@ public class BlockNitrateEngine extends BlockContainerBase implements
 		}
 	}
 
-	public static void setWaste(Fluid w) {
-		waste = w;
-	}
-
 	@Override
 	public TileEntity createNewTileEntity(World world) {
-		TileEntityNitrateEngine TE = new TileEntityNitrateEngine();
-		TE.setWaste(waste);
+		TileEntityGunpowderEngine TE = new TileEntityGunpowderEngine();
 		return TE;
 	}
 
@@ -186,6 +183,7 @@ public class BlockNitrateEngine extends BlockContainerBase implements
 				.getBlockTileEntity(x, y, z));
 	}
 
+	//Toss away all item stacks on block break.
 	public void breakBlock(World world, int x, int y, int z, int par5, int par6) {
 		TileEntity te = world.getBlockTileEntity(x, y, z);
 		if (te != null) {
@@ -216,7 +214,8 @@ public class BlockNitrateEngine extends BlockContainerBase implements
 		if (tileEntity == null || player.isSneaking()) {
 			return false;
 		}
-		player.openGui(WeirdScience.instance, 0, world, x, y, z);
+		//TODO: A GUI for this block.
+		//player.openGui(WeirdScience.instance, 0, world, x, y, z);
 		return true;
 	}
 

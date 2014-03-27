@@ -519,9 +519,6 @@ public class TileEntityNitrateEngine extends TileEntitySolidFueled implements IE
 				else {
 	            	TurnBlockOff();
 				}
-		        if (flagInvChanged) {
-		            this.onInventoryChanged();
-		        }
 	        }
 			//And now, attempt to charge surrounding blocks.
 			if (flagHasPower) {
@@ -764,15 +761,13 @@ public class TileEntityNitrateEngine extends TileEntitySolidFueled implements IE
 			if((taintedSoilFuel != null) && (tsBlockID != 0)) {
 				System.out.println("yoyoyo");
 				taintedSoilFuel.ourFuel = new ItemStack(Item.itemsList[tsBlockID]);
-				taintedSoilFuel.byproduct = new ItemStack(Item.itemsList[Block.sand.blockID]);
+				taintedSoilFuel.byproduct = new ItemStack(Item.itemsList[Block.slowSand.blockID]);
 				taintedSoilFuel.exhaust = new FluidStack(waste, exhaustPerTaintedSoil);
 				staticFuelInfo.add(taintedSoilFuel);
 			}
-			//Heat sand works but tainted soil does not...?
 			if((heatSandFuel != null) && (hsBlockID != 0)) {
-				System.out.println("hey");
 				heatSandFuel.ourFuel = new ItemStack(Item.itemsList[hsBlockID]);
-				heatSandFuel.byproduct = new ItemStack(Item.itemsList[Block.sand.blockID]);
+				heatSandFuel.byproduct = new ItemStack(Item.itemsList[Block.slowSand.blockID]);
 				heatSandFuel.exhaust = new FluidStack(waste, exhaustPerHeatSand);
 				heatSandFuel.byproductMult = 0.5f;
 				staticFuelInfo.add(heatSandFuel);

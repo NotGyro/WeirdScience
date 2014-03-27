@@ -5,7 +5,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockSkull;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
@@ -26,7 +25,7 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 
 //Packet handler is just a dummy as of this point.
 @Mod(modid = WeirdScience.modid, name = "Weird Science", version = "0.0.0")
-@NetworkMod(channels = {"WS"}, clientSideRequired = true, serverSideRequired = false, packetHandler = zettabyte.weirdscience.network.WeirdPacketHandler.class)
+@NetworkMod(channels = {"WS"}, clientSideRequired = true, serverSideRequired = false, packetHandler = ws.zettabyte.weirdscience.network.WeirdPacketHandler.class)
 public class WeirdScience {
 	public static final String modid = "weirdscience";
 	

@@ -1,11 +1,9 @@
 package ws.zettabyte.weirdscience.tileentity;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.EntityWither;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.ForgeDirection;
