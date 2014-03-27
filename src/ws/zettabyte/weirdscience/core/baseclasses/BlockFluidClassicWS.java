@@ -150,9 +150,10 @@ public class BlockFluidClassicWS extends BlockFluidClassic implements IWeirdScie
 	}
 	
 	@Override
-	public boolean InCreativeTab(int meta) { 
+	public boolean InCreativeTab() { 
 		//TODO
 		//True by default for debugging. Should be false by default in release?
 		return true;
 	}
+
 }

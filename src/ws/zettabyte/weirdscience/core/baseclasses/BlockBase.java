@@ -3,9 +3,11 @@ package zettabyte.weirdscience.core.baseclasses;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.Configuration;
 import zettabyte.weirdscience.core.interfaces.ISubBlock;
 import zettabyte.weirdscience.core.interfaces.IWeirdScienceBlock;
@@ -19,6 +21,8 @@ public class BlockBase extends Block implements IWeirdScienceBlock {
 	
 	public String harvestType = "pickaxe";
 	public int harvestLevel = 1;
+	protected ItemStack itemDropped;
+	protected int droppedRandomBonus;
 	
 	public BlockBase(Configuration config, String name, int defaultID, Material material) {
 		/* 
@@ -115,7 +119,7 @@ public class BlockBase extends Block implements IWeirdScienceBlock {
         canBlockGrass[blockID] = !m.getCanBlockGrass();
     }
 	@Override
-	public ArrayList<IWeirdScienceBlock> getSubBlocks() {
+	public ArrayList<ISubBlock> getSubBlocks() {
 		//By default, no metadata-based sub-blocks.
 		return null;
 	}
@@ -141,6 +145,55 @@ public class BlockBase extends Block implements IWeirdScienceBlock {
 	@Override
 	public boolean InCreativeTab() { 
 		return true;
+	}
+	@Override
+	public int quantityDropped(Random random) {
+		// TODO Auto-generated method stub
+		return this.quantityDroppedWithBonus(0, random);
+	}
+	@Override
+	public int idDropped(int meta, Random random, int par3) {
+		if(this.itemDropped != null) {
+			return itemDropped.itemID;
+		}
+		else {
+			return super.idDropped(meta, random, par3);
+		}
+	}
+	@Override
+	public int quantityDroppedWithBonus(int bonus, Random random) {
+		if(this.itemDropped != null) {
+			return itemDropped.stackSize + random.nextInt(bonus + droppedRandomBonus);
+		}
+		else {
+			return super.quantityDroppedWithBonus(bonus+ droppedRandomBonus, random);
+		}
+	}
+	@Override
+	public int quantityDropped(int meta, int fortune, Random random) {
+		return this.quantityDroppedWithBonus(fortune, random);
+	}
+	@Override
+    public int damageDropped(int par1)
+    {
+		if(this.itemDropped != null) {
+			return itemDropped.getItemDamage();
+		}
+		else {
+			return super.damageDropped(par1);
+		}
+    }
+	public ItemStack getItemDropped() {
+		return itemDropped;
+	}
+	public void setItemDropped(ItemStack itemDropped) {
+		this.itemDropped = itemDropped;
+	}
+	public int getDroppedRandomBonus() {
+		return droppedRandomBonus;
+	}
+	public void setDroppedRandomBonus(int droppedRandomBonus) {
+		this.droppedRandomBonus = droppedRandomBonus;
 	}
 
 }
