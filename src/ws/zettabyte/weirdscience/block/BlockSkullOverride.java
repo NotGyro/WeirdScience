@@ -1,4 +1,4 @@
-package zettabyte.weirdscience.block;
+package ws.zettabyte.weirdscience.block;
 
 import net.minecraft.block.BlockSkull;
 import net.minecraft.world.World;

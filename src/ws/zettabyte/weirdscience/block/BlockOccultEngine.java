@@ -1,4 +1,4 @@
-package zettabyte.weirdscience.block;
+package ws.zettabyte.weirdscience.block;
 
 import java.util.ArrayList;
 
@@ -10,7 +10,7 @@ import net.minecraft.tileentity.TileEntitySkull;
 import net.minecraft.world.World;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.ForgeDirection;
-import zettabyte.weirdscience.tileentity.TileEntityOccultEngine;
+import ws.zettabyte.weirdscience.tileentity.TileEntityOccultEngine;
 
 
 //TODO: Particle effect when an appropriate block is on top of this engine.

@@ -1,4 +1,4 @@
-package zettabyte.weirdscience.tileentity;
+package ws.zettabyte.weirdscience.tileentity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,9 +9,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.EntityWither;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.ForgeDirection;
-import zettabyte.weirdscience.core.ContentRegistry;
-import zettabyte.weirdscience.core.interfaces.IConfiggable;
-import zettabyte.weirdscience.core.interfaces.IRegistrable;
+import ws.zettabyte.zettalib.ContentRegistry;
+import ws.zettabyte.zettalib.interfaces.IConfiggable;
+import ws.zettabyte.zettalib.interfaces.IRegistrable;
 
 public class TileEntityOccultEngine extends TileEntityBloodEngine implements IConfiggable, IRegistrable {
 	

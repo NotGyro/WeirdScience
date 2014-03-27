@@ -1,4 +1,4 @@
-package zettabyte.weirdscience.tileentity;
+package ws.zettabyte.weirdscience.tileentity;
 
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
@@ -9,12 +9,12 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
-import zettabyte.weirdscience.block.BlockMetaTank;
-import zettabyte.weirdscience.core.ContentRegistry;
-import zettabyte.weirdscience.core.interfaces.IConfiggable;
-import zettabyte.weirdscience.core.interfaces.IDeferredInit;
-import zettabyte.weirdscience.core.interfaces.IRegistrable;
-import zettabyte.weirdscience.core.tileentity.TileEntityGenerator;
+import ws.zettabyte.weirdscience.block.BlockMetaTank;
+import ws.zettabyte.zettalib.ContentRegistry;
+import ws.zettabyte.zettalib.interfaces.IConfiggable;
+import ws.zettabyte.zettalib.interfaces.IDeferredInit;
+import ws.zettabyte.zettalib.interfaces.IRegistrable;
+import ws.zettabyte.zettalib.tileentity.TileEntityGenerator;
 
 public class TileEntityBloodEngine extends TileEntityGenerator implements
 		IFluidHandler, IConfiggable, IDeferredInit, IRegistrable {

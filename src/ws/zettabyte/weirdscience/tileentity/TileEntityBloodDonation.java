@@ -1,4 +1,4 @@
-package zettabyte.weirdscience.tileentity;
+package ws.zettabyte.weirdscience.tileentity;
 
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
@@ -12,11 +12,11 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fluids.IFluidTank;
-import zettabyte.weirdscience.block.BlockMetaTank;
-import zettabyte.weirdscience.core.ContentRegistry;
-import zettabyte.weirdscience.core.baseclasses.TileEntityBase;
-import zettabyte.weirdscience.core.interfaces.IConfiggable;
-import zettabyte.weirdscience.core.interfaces.IRegistrable;
+import ws.zettabyte.weirdscience.block.BlockMetaTank;
+import ws.zettabyte.zettalib.ContentRegistry;
+import ws.zettabyte.zettalib.baseclasses.TileEntityBase;
+import ws.zettabyte.zettalib.interfaces.IConfiggable;
+import ws.zettabyte.zettalib.interfaces.IRegistrable;
 
 public class TileEntityBloodDonation extends TileEntityBase implements IFluidHandler, IFluidTank, IConfiggable, IRegistrable {
 	

@@ -1,4 +1,4 @@
-package zettabyte.weirdscience.block;
+package ws.zettabyte.weirdscience.block;
 
 
 import java.lang.reflect.Field;
@@ -17,8 +17,8 @@ import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidBlock;
-import zettabyte.weirdscience.core.baseclasses.ItemBucketWS;
-import zettabyte.weirdscience.tileentity.TileEntityBloodEngine;
+import ws.zettabyte.zettalib.baseclasses.ItemBucketWS;
+import ws.zettabyte.weirdscience.tileentity.TileEntityBloodEngine;
 
 public class BlockBloodEngine extends BlockMetaTank {
 	

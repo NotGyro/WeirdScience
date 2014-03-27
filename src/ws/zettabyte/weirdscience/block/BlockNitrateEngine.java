@@ -1,4 +1,4 @@
-package zettabyte.weirdscience.block;
+package ws.zettabyte.weirdscience.block;
 
 import java.util.Random;
 
@@ -19,10 +19,10 @@ import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.RotationHelper;
 import net.minecraftforge.fluids.Fluid;
-import zettabyte.weirdscience.WeirdScience;
-import zettabyte.weirdscience.cofh.util.BlockHelper;
-import zettabyte.weirdscience.core.baseclasses.BlockContainerBase;
-import zettabyte.weirdscience.tileentity.TileEntityNitrateEngine;
+import ws.zettabyte.weirdscience.WeirdScience;
+import ws.zettabyte.weirdscience.cofh.util.BlockHelper;
+import ws.zettabyte.zettalib.baseclasses.BlockContainerBase;
+import ws.zettabyte.weirdscience.tileentity.TileEntityNitrateEngine;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 

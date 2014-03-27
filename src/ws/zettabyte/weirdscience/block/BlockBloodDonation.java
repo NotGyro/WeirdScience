@@ -1,4 +1,4 @@
-package zettabyte.weirdscience.block;
+package ws.zettabyte.weirdscience.block;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
@@ -10,9 +10,9 @@ import net.minecraftforge.common.Configuration;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
-import zettabyte.weirdscience.core.ContentRegistry;
-import zettabyte.weirdscience.core.interfaces.IConfiggable;
-import zettabyte.weirdscience.tileentity.TileEntityBloodDonation;
+import ws.zettabyte.zettalib.ContentRegistry;
+import ws.zettabyte.zettalib.interfaces.IConfiggable;
+import ws.zettabyte.weirdscience.tileentity.TileEntityBloodDonation;
 
 public class BlockBloodDonation extends BlockMetaTank implements IConfiggable {
 	
