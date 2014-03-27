@@ -1,4 +1,4 @@
-package zettabyte.weirdscience;
+package ws.zettabyte.weirdscience;
 
 import java.util.ArrayList;
 
