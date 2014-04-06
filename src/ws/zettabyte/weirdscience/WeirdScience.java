@@ -24,7 +24,7 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
 //Packet handler is just a dummy as of this point.
-@Mod(modid = WeirdScience.modid, name = "Weird Science", version = "0.0.0")
+@Mod(modid = WeirdScience.modid, name = "Weird Science", version = "0.0.0", dependencies = "required-after:ZettaLib")
 @NetworkMod(channels = {"WS"}, clientSideRequired = true, serverSideRequired = false, packetHandler = ws.zettabyte.weirdscience.network.WeirdPacketHandler.class)
 public class WeirdScience {
 	public static final String modid = "weirdscience";
@@ -32,7 +32,7 @@ public class WeirdScience {
     @Instance("WeirdScience")
     public static WeirdScience instance;
     
-    @SidedProxy(clientSide="zettabyte.weirdscience.client.ClientProxy", serverSide="zettabyte.weirdscience.CommonProxy")
+    @SidedProxy(clientSide="ws.zettabyte.weirdscience.client.ClientProxy", serverSide="ws.zettabyte.weirdscience.CommonProxy")
     public static CommonProxy proxy;
     
     //The logger for the mod. Should this not be static? Since it's Minecraft, it's unlikely that there will be threading issues.
