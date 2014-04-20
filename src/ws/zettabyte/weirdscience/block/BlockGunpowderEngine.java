@@ -2,7 +2,6 @@ package ws.zettabyte.weirdscience.block;
 
 import java.util.Random;
 
-import mods.natura.worldgen.retro.BlockHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
@@ -70,7 +69,7 @@ public class BlockGunpowderEngine extends BlockContainerBase implements
 	}
 
 	protected static void initRotate(BlockGunpowderEngine b) {
-		BlockHelper.rotateType[b.blockID] = BlockHelper.RotationType.CHEST;
+		//BlockHelper.rotateType[b.blockID] = BlockHelper.RotationType.CHEST;
 	}
 
 	@Override
