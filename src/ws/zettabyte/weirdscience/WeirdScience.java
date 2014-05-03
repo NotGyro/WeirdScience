@@ -70,7 +70,7 @@ public class WeirdScience {
         config.load();
         weirdRegistry = new ContentRegistry(config, logger, tabWeirdScience);
         MinecraftForge.EVENT_BUS.register(weirdRegistry.bucketMan);
-        WeirdScienceContent.RegisterContent(config, weirdRegistry);
+        WeirdScienceContent.RegisterContent(config, weirdRegistry, event);
     	//logger.info("Testing.");
     	LanguageRegistry.instance().addStringLocalization("itemGroup.tabWeirdScience", "en_US", "Weird Science");    	
     	NetworkRegistry.instance().registerGuiHandler(this, new WeirdScienceGUIHandler());

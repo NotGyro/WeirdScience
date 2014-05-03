@@ -36,14 +36,16 @@ import ws.zettabyte.zettalib.fluid.GasFactory;
 import ws.zettabyte.zettalib.fluid.GasWrapper;
 import ws.zettabyte.zettalib.recipe.DisableableRecipe;
 import ws.zettabyte.zettalib.recipe.SimpleRecipe;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
 
 //TODO: Write some sort of generic reflection proxy class that caches the results it finds.
 // ^ Actually a really strong use case for a Singleton.
 
 public class WeirdScienceContent
 {
-    public static final void RegisterContent (Configuration config, ContentRegistry cr)
+    public static final void RegisterContent (Configuration config, ContentRegistry cr, FMLPreInitializationEvent event)
     {
         //Constants.
         final int smogDetailDefault = 8;
@@ -95,13 +97,19 @@ public class WeirdScienceContent
         fluidBlood.setBlockID(bloodBlock.blockID);
         fluidBase.setBlockID(baseBlock.blockID);
 
-        fluidAcid.setIcons(acidBlock.getIcon(0, 0));
-        fluidBase.setIcons(baseBlock.getIcon(0, 0));
-        fluidBlood.setIcons(bloodBlock.getIcon(0, 0));
+        if (event.getSide() == Side.CLIENT)
+        {
+            fluidAcid.setIcons(acidBlock.getIcon(0, 0));
+            fluidBase.setIcons(baseBlock.getIcon(0, 0));
+            fluidBlood.setIcons(bloodBlock.getIcon(0, 0));
+        }
 
         if (smogManager.isEnabled())
         {
-            fluidSmog.setIcons(smogManager.blocks.get(0).getIcon(0, 0));
+            if (event.getSide() == Side.CLIENT)
+            {
+                fluidSmog.setIcons(smogManager.blocks.get(0).getIcon(0, 0));
+            }
             fluidSmog.setBlockID(smogManager.blocks.get(0).blockID);
         }
 

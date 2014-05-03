@@ -49,6 +49,7 @@ public class BlockNitrateEngine extends BlockContainerBase implements
 	/**
 	 * Args: side, metadata
 	 */
+    @SideOnly(Side.CLIENT)
 	@Override
 	public Icon getIcon(int side, int meta) {
 		if (side == 1) {
@@ -114,14 +115,15 @@ public class BlockNitrateEngine extends BlockContainerBase implements
 		return true;
 	}
 
+    @SideOnly(Side.CLIENT)
 	@Override
 	public Icon getBlockTexture(IBlockAccess world, int x, int y, int z,
 			int side) {
 		return this.getIcon(side, world.getBlockMetadata(x, y, z));
 	}
 
+    @SideOnly(Side.CLIENT)
 	@Override
-	@SideOnly(Side.CLIENT)
 	public void registerIcons(IconRegister iconRegister) {
 		frontIcon = iconRegister.registerIcon("weirdscience:genericmachine5");
 		sidesIcon = iconRegister.registerIcon("weirdscience:genericmachine");

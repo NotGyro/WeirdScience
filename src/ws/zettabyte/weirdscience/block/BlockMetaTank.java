@@ -18,8 +18,10 @@ import cpw.mods.fml.relauncher.SideOnly;
 public abstract class BlockMetaTank extends BlockContainerBase {
 
 	protected ArrayList<String> tankTexNames = new ArrayList<String>(8);
+    protected ArrayList<String> topTexNames = new ArrayList<String>(2);
+    @SideOnly(Side.CLIENT)
 	protected ArrayList<Icon> tankIcons;
-	protected ArrayList<String> topTexNames = new ArrayList<String>(2);
+    @SideOnly(Side.CLIENT)
 	protected ArrayList<Icon> topIcons;
 
 	public void addSidesTextureName(String str) {
@@ -29,6 +31,7 @@ public abstract class BlockMetaTank extends BlockContainerBase {
 		topTexNames.add(str);
 	}
     @SideOnly(Side.CLIENT)
+    @Override
     public void registerIcons(IconRegister iconRegister)
     {
     	super.registerIcons(iconRegister);
@@ -60,13 +63,13 @@ public abstract class BlockMetaTank extends BlockContainerBase {
         }
     }
 
-    @Override
     @SideOnly(Side.CLIENT)
+    @Override
     public Icon getBlockTexture(IBlockAccess world, int x, int y, int z, int side) {
         return this.getIcon(side, world.getBlockMetadata(x, y, z));
     }
-    @Override
     @SideOnly(Side.CLIENT)
+    @Override
     public Icon getIcon(int side, int metadata) {
     	//Top
     	if(side == 1) {
@@ -84,7 +87,7 @@ public abstract class BlockMetaTank extends BlockContainerBase {
     
     public void setMetaByFillPercent(World world, int x, int y, int z, int fillPercent) {
     	world.setBlockMetadataWithNotify(x, y, z, 
-    			(fillPercent * (tankIcons.size()-1))/100, 
+    			(fillPercent * (tankTexNames.size()-1))/100, 
     			1|2);
     }
     
