@@ -208,3 +208,7 @@ What if heat handlers are already made aware of other heat handlers in radius at
 Dropping XP orbs on a heater / burner turns them to XP gas. Need to condense it to get the liquidXP / ectoplasm you want.
 
 Durum (or perhaps "Urdite"?) can be used to make walls that consume Redstone Flux power to become indestructible.
+
+Builder's Wand alternative
+
+Railgunderbuss that can fire any metal item (well it would be a coilgun but let's not be pedantic.) Fire giant buzzsaws for automated tree farming.
