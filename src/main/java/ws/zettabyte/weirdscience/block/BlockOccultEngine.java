@@ -4,10 +4,12 @@ import java.util.ArrayList;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySkull;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.config.Configuration;
 import ws.zettabyte.weirdscience.tileentity.TileEntityOccultEngine;
 
 
@@ -18,32 +20,10 @@ public class BlockOccultEngine extends BlockBloodEngine implements
 	public static ArrayList<String> idols = new ArrayList<String>(2);
 
 	private void initIdols(){
-		idols.add(Block.skull.getUnlocalizedName());
-		idols.add(Block.dragonEgg.getUnlocalizedName());
+		idols.add(Blocks.skull.getUnlocalizedName());
+		idols.add(Blocks.dragon_egg.getUnlocalizedName());
 	}
-	public BlockOccultEngine(Configuration config, String name, int defaultID,
-			Material material) {
-		super(config, name, defaultID, material);
-		initIdols();
-	}
-
-	public BlockOccultEngine(Configuration config, String name, int defaultID) {
-		super(config, name, defaultID);
-		initIdols();
-	}
-
-	public BlockOccultEngine(Configuration config, String name,
-			Material material) {
-		super(config, name, material);
-		initIdols();
-	}
-
-	public BlockOccultEngine(Configuration config, String name) {
-		super(config, name);
-		initIdols();
-	}
-
-
+	
 	@Override
 	public void recievePowerOn(World world, int x, int y, int z) {
 		//TODO
@@ -62,24 +42,24 @@ public class BlockOccultEngine extends BlockBloodEngine implements
 	}
 	
 	@Override
-	public void onNeighborBlockChange(World world, int x, int y, int z, int neighborBlockID) {
-		super.onNeighborBlockChange(world, x, y, z, neighborBlockID);
+	public void onNeighborChange(IBlockAccess world, int x, int y, int z, int tileX, int tileY, int tileZ) {
+		super.onNeighborChange(world, x, y, z, tileX, tileY, tileZ);
 		updateIdol(world, x, y, z);
 	}
 	
-	private void updateIdol(World world, int x, int y, int z) {
-		Block b = blocksList[world.getBlockId(x, y+1, z)];
+	private void updateIdol(IBlockAccess world, int x, int y, int z) {
+		Block b = world.getBlock(x, y+1, z);
 		if(b != null) {
 			for(String s : idols) {
 				if(s.contentEquals(b.getUnlocalizedName())) {
-					if(b.getUnlocalizedName().contentEquals(Block.skull.getUnlocalizedName())) {
+					if(b.getUnlocalizedName().contentEquals(Blocks.skull.getUnlocalizedName())) {
 						//Special case for the wither skull
-						TileEntity teUp = world.getBlockTileEntity(x, y+1, z);
+						TileEntity teUp = world.getTileEntity(x, y+1, z);
 						if(teUp != null) {
 							if(teUp instanceof TileEntitySkull) {
 								TileEntitySkull teS = (TileEntitySkull) teUp;
-								if(teS.getSkullType() == 1) {
-									TileEntity te = world.getBlockTileEntity(x, y, z);
+								if(teS.getBlockMetadata() == 1) {
+									TileEntity te = world.getTileEntity(x, y, z);
 									if(te != null) {
 										if(te instanceof TileEntityOccultEngine) {
 											((TileEntityOccultEngine)te).updateCurrentIdol(b.getUnlocalizedName());
@@ -92,7 +72,7 @@ public class BlockOccultEngine extends BlockBloodEngine implements
 					}
 					else {
 						//Every other block.
-						TileEntity te = world.getBlockTileEntity(x, y, z);
+						TileEntity te = world.getTileEntity(x, y, z);
 						if(te != null) {
 							if(te instanceof TileEntityOccultEngine) {
 								((TileEntityOccultEngine)te).updateCurrentIdol(b.getUnlocalizedName());
@@ -101,10 +81,10 @@ public class BlockOccultEngine extends BlockBloodEngine implements
 					}
 				}
 			}
-			if(b.blockID == 0) {
+			if((b == null) || (b == Blocks.air)) {
 				//air
 
-				TileEntity te = world.getBlockTileEntity(x, y, z);
+				TileEntity te = world.getTileEntity(x, y, z);
 				if(te != null) {
 					if(te instanceof TileEntityOccultEngine) {
 						((TileEntityOccultEngine)te).updateCurrentIdol(null);
@@ -114,7 +94,7 @@ public class BlockOccultEngine extends BlockBloodEngine implements
 			}
 		}
 		else {
-			TileEntity te = world.getBlockTileEntity(x, y, z);
+			TileEntity te = world.getTileEntity(x, y, z);
 			if(te != null) {
 				if(te instanceof TileEntityOccultEngine) {
 					((TileEntityOccultEngine)te).updateCurrentIdol(null);
@@ -122,4 +102,21 @@ public class BlockOccultEngine extends BlockBloodEngine implements
 			}
 		}
 	}
+
+	public BlockOccultEngine(Configuration config, String name,
+			Material material) {
+		super(config, name, material);
+		// TODO Auto-generated constructor stub
+	}
+
+	public BlockOccultEngine(Configuration config, String name) {
+		super(config, name);
+		// TODO Auto-generated constructor stub
+	}
+
+	public BlockOccultEngine(Material material) {
+		super(material);
+		// TODO Auto-generated constructor stub
+	}
+	
 }

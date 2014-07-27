@@ -6,39 +6,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
-import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import ws.zettabyte.weirdscience.tileentity.TileEntityBloodDonation;
-import ws.zettabyte.zettalib.ContentRegistry;
-import ws.zettabyte.zettalib.interfaces.IConfiggable;
+import ws.zettabyte.weirdscience.core.ContentRegistry;
+import ws.zettabyte.weirdscience.core.interfaces.IConfiggable;
 
 public class BlockBloodDonation extends BlockMetaTank implements IConfiggable {
 	
-	public BlockBloodDonation(Configuration config, String name, int defaultID,
-			Material material) {
-		super(config, name, defaultID, material);
-		// Auto-generated constructor stub. Not a TODO. It's probably fine.
-	}
-	public BlockBloodDonation(Configuration config, String name, int defaultID) {
-		super(config, name, defaultID);
-		// Auto-generated constructor stub. Not a TODO. It's probably fine.
-	}
-	public BlockBloodDonation(Configuration config, String name,
-			Material material) {
-		super(config, name, material);
-		// Auto-generated constructor stub. Not a TODO. It's probably fine.
-	}
-	public BlockBloodDonation(Configuration config, String name) {
-		super(config, name);
-		// Auto-generated constructor stub. Not a TODO. It's probably fine.
-	}
-	public BlockBloodDonation(int id, Material material) {
-		super(id, material);
-		// Auto-generated constructor stub. Not a TODO. It's probably fine.
-	}
-
 	private static Fluid bloodFluid;
 	private static int mbPerDonation;
 	private static int dmgPerDonation;
@@ -62,7 +39,7 @@ public class BlockBloodDonation extends BlockMetaTank implements IConfiggable {
 	}
 
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int metadata, float par1, float par2, float par3) {
-	    TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
+	    TileEntity tileEntity = world.getTileEntity(x, y, z);
 		TileEntityBloodDonation donationEntity = (TileEntityBloodDonation)tileEntity;
 		if (tileEntity == null || player.isSneaking()) {
 			return false;
@@ -131,4 +108,19 @@ public class BlockBloodDonation extends BlockMetaTank implements IConfiggable {
 		mbPerDonation = config.get("Blood", "Blood Donation Station milibuckets of blood per donation", 500).getInt();
 		dmgPerDonation = config.get("Blood", "Blood Donation Station damage per donation", 2).getInt();
 	}
+	public BlockBloodDonation(Configuration config, String name,
+			Material material) {
+		super(config, name, material);
+		// TODO Auto-generated constructor stub
+	}
+	public BlockBloodDonation(Configuration config, String name) {
+		super(config, name);
+		// TODO Auto-generated constructor stub
+	}
+	public BlockBloodDonation(Material material) {
+		super(material);
+		// TODO Auto-generated constructor stub
+	}
+	
+	
 }

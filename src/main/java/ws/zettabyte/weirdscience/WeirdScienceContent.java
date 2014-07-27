@@ -4,9 +4,11 @@ import java.util.ArrayList;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
@@ -17,25 +19,21 @@ import ws.zettabyte.weirdscience.block.BlockGunpowderEngine;
 import ws.zettabyte.weirdscience.block.BlockNitrateEngine;
 import ws.zettabyte.weirdscience.block.BlockOccultEngine;
 import ws.zettabyte.weirdscience.block.CongealedBloodBlock;
-import ws.zettabyte.weirdscience.fluid.BlockGasSmog;
 import ws.zettabyte.weirdscience.fluid.FluidAcid;
 import ws.zettabyte.weirdscience.fluid.FluidSmog;
 import ws.zettabyte.weirdscience.item.Coagulant;
 import ws.zettabyte.weirdscience.tileentity.TileEntityGunpowderEngine;
-import ws.zettabyte.zettalib.ContentRegistry;
-import ws.zettabyte.zettalib.SubBucket;
-import ws.zettabyte.zettalib.baseclasses.BlockBase;
-import ws.zettabyte.zettalib.baseclasses.BlockFluidClassicWS;
-import ws.zettabyte.zettalib.baseclasses.ItemBase;
-import ws.zettabyte.zettalib.baseclasses.ItemBucketWS;
-import ws.zettabyte.zettalib.baseclasses.ItemFoodBase;
-import ws.zettabyte.zettalib.chemistry.BlockFluidReactive;
-import ws.zettabyte.zettalib.chemistry.ReactionSpec;
-import ws.zettabyte.zettalib.fluid.BlockGasBase;
-import ws.zettabyte.zettalib.fluid.GasFactory;
-import ws.zettabyte.zettalib.fluid.GasWrapper;
-import ws.zettabyte.zettalib.recipe.DisableableRecipe;
-import ws.zettabyte.zettalib.recipe.SimpleRecipe;
+import ws.zettabyte.weirdscience.core.ContentRegistry;
+import ws.zettabyte.weirdscience.core.SubBucket;
+import ws.zettabyte.weirdscience.core.baseclasses.BlockBase;
+import ws.zettabyte.weirdscience.core.baseclasses.BlockFluidClassicWS;
+import ws.zettabyte.weirdscience.core.baseclasses.ItemBase;
+import ws.zettabyte.weirdscience.core.baseclasses.ItemBucketWS;
+import ws.zettabyte.weirdscience.core.baseclasses.ItemFoodBase;
+import ws.zettabyte.weirdscience.core.chemistry.BlockFluidReactive;
+import ws.zettabyte.weirdscience.core.chemistry.ReactionSpec;
+import ws.zettabyte.weirdscience.core.recipe.DisableableRecipe;
+import ws.zettabyte.weirdscience.core.recipe.SimpleRecipe;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -66,12 +64,12 @@ public class WeirdScienceContent
 
         //Init fluid blocks.
         //Fluids used must be registered first.
-        BlockFluidClassicWS acidBlock = new BlockFluidReactive(config, "Nitric Acid", fluidAcid);
-        BlockFluidClassicWS baseBlock = new BlockFluidReactive(config, "Lye Solution", fluidBase);
-        BlockFluidClassicWS bloodBlock = new BlockFluidClassicWS(config, "Blood", fluidBlood);
+        BlockFluidClassicWS acidBlock = new BlockFluidReactive(fluidAcid);
+        BlockFluidClassicWS baseBlock = new BlockFluidReactive(fluidBase);
+        BlockFluidClassicWS bloodBlock = new BlockFluidClassicWS("Blood", Material.water, fluidBlood);
 
         //Ugly gas init code goes here.
-        GasWrapper smogManager = new GasWrapper(new GasFactory()
+        /*GasWrapper smogManager = new GasWrapper(new GasFactory()
         {
             public BlockGasBase Make (Configuration config, String name, Fluid fluid)
             {
@@ -80,22 +78,22 @@ public class WeirdScienceContent
         }, "Smog", fluidSmog, smogDetailDefault);
         cr.GeneralRegister(smogManager);
         //Slaving multiple block IDs to one set of behavior is such a pain in this game.
-        ((BlockGasSmog) smogManager.blocks.get(0)).setBlockAcid(acidBlock);
+        ((BlockGasSmog) smogManager.blocks.get(0)).setBlockAcid(acidBlock); */
 
-        acidBlock.setTextureName("weirdscience:placeholderacid");
-        baseBlock.setTextureName("weirdscience:placeholderbase");
-        bloodBlock.setTextureName("weirdscience:bloodStill");
-        smogManager.setTextureName("weirdscience:smog");
+        acidBlock.setBlockTextureName("weirdscience:placeholderacid");
+        baseBlock.setBlockTextureName("weirdscience:placeholderbase");
+        bloodBlock.setBlockTextureName("weirdscience:bloodStill");
+        //smogManager.setTextureName("weirdscience:smog");
 
-        acidBlock.setUnlocalizedName("blockAcid");
-        bloodBlock.setUnlocalizedName("blockBlood");
+        acidBlock.setBlockName("blockAcid");
+        bloodBlock.setBlockName("blockBlood");
 
-        smogManager.setMBMax(1024);
+        //smogManager.setMBMax(1024);
 
         //Give fluids block IDs and icons.
-        fluidAcid.setBlockID(acidBlock.blockID);
-        fluidBlood.setBlockID(bloodBlock.blockID);
-        fluidBase.setBlockID(baseBlock.blockID);
+        fluidAcid.setBlock(acidBlock);
+        fluidBlood.setBlock(bloodBlock);
+        fluidBase.setBlock(baseBlock);
 
         if (event.getSide() == Side.CLIENT)
         {
@@ -103,7 +101,7 @@ public class WeirdScienceContent
             fluidBase.setIcons(baseBlock.getIcon(0, 0));
             fluidBlood.setIcons(bloodBlock.getIcon(0, 0));
         }
-
+/*
         if (smogManager.isEnabled())
         {
             if (event.getSide() == Side.CLIENT)
@@ -112,7 +110,7 @@ public class WeirdScienceContent
             }
             fluidSmog.setBlockID(smogManager.blocks.get(0).blockID);
         }
-
+*/
         //Register normal fluid blocks
         cr.RegisterBlock(acidBlock);
         cr.RegisterBlock(baseBlock);
@@ -120,36 +118,36 @@ public class WeirdScienceContent
 
         //Init & register basic blocks.
         CongealedBloodBlock congealedBlock = new CongealedBloodBlock(config, "Congealed Blood", Material.ground);
-        congealedBlock.setUnlocalizedName("blockBloodCongealed");
-        congealedBlock.setTextureName("weirdscience:congealedBloodBlock");
+        congealedBlock.setBlockName("blockBloodCongealed");
+        congealedBlock.setBlockTextureName("weirdscience:congealedBloodBlock");
         cr.RegisterBlock(congealedBlock);
 
         BlockBase aluminumSludge = new BlockBase(config, "Aluminosilicate Sludge", Material.clay);
-        aluminumSludge.setTextureName("weirdscience:aluminosilicate_sludge");
+        aluminumSludge.setBlockTextureName("weirdscience:aluminosilicate_sludge");
         aluminumSludge.harvestType = "shovel";
         aluminumSludge.harvestLevel = 0;
         aluminumSludge.setHardness(0.3F);
         cr.RegisterBlock(aluminumSludge);
 
         BlockBase blockRust = new BlockBase(config, "Rust", Material.iron);
-        blockRust.setTextureName("weirdscience:rustblock");
+        blockRust.setBlockTextureName("weirdscience:rustblock");
         blockRust.harvestType = "pickaxe";
         blockRust.harvestLevel = 0;
         blockRust.setHardness(0.6F);
         cr.RegisterBlock(blockRust);
 
-        ((BlockGasSmog) smogManager.blocks.get(0)).blockRust = blockRust;
-        ((BlockGasSmog) smogManager.blocks.get(0)).metaRust = 0;
+        //((BlockGasSmog) smogManager.blocks.get(0)).blockRust = blockRust;
+        //((BlockGasSmog) smogManager.blocks.get(0)).metaRust = 0;
 
         //Init & register tile-entity-bearing blocks.
 
         BlockNitrateEngine nitrateEngineBlock = new BlockNitrateEngine(config, "Nitrate Engine", Material.rock);
-        nitrateEngineBlock.setUnlocalizedName("blockNitrateEngine");
+        nitrateEngineBlock.setBlockName("blockNitrateEngine");
         nitrateEngineBlock.setWaste(fluidSmog);
         cr.RegisterBlock(nitrateEngineBlock);
 
         BlockBloodEngine bloodEngineBlock = new BlockBloodEngine(config, "Hemoionic Dynamo", Material.rock);
-        bloodEngineBlock.setTextureName("weirdscience:genericmachine");
+        bloodEngineBlock.setBlockTextureName("weirdscience:genericmachine");
         bloodEngineBlock.addTopTextureName("weirdscience:genericmachine6_off");
         bloodEngineBlock.addTopTextureName("weirdscience:genericmachine6_on");
         bloodEngineBlock.addSidesTextureName("weirdscience:genericmachine_tank_0");
@@ -164,9 +162,9 @@ public class WeirdScienceContent
         cr.RegisterBlock(bloodEngineBlock);
 
         BlockBloodDonation donationBlock = new BlockBloodDonation(config, "Blood Donation Station", Material.rock);
-        donationBlock.setUnlocalizedName("blockBloodDonation");
+        donationBlock.setBlockName("blockBloodDonation");
         donationBlock.setFluid(fluidBlood);
-        donationBlock.setTextureName("weirdscience:genericmachine");
+        donationBlock.setBlockTextureName("weirdscience:genericmachine");
         donationBlock.addTopTextureName("weirdscience:blooddonationtop");
         donationBlock.addTopTextureName("weirdscience:blooddonationtop");
         donationBlock.addSidesTextureName("weirdscience:genericmachine_tank_0");
@@ -181,7 +179,7 @@ public class WeirdScienceContent
         cr.RegisterBlock(donationBlock);
 
         BlockOccultEngine occultEngineBlock = new BlockOccultEngine(config, "Occult Engine", Material.rock);
-        occultEngineBlock.setTextureName("weirdscience:occultengine_bottom");
+        occultEngineBlock.setBlockTextureName("weirdscience:occultengine_bottom");
         occultEngineBlock.addTopTextureName("weirdscience:occultengine_top");
         occultEngineBlock.addSidesTextureName("weirdscience:occultengine_empty");
         occultEngineBlock.addSidesTextureName("weirdscience:occultengine_1");
@@ -193,25 +191,25 @@ public class WeirdScienceContent
         cr.RegisterBlock(occultEngineBlock);
 
         BlockGunpowderEngine gunpowderEngineBlock = new BlockGunpowderEngine(config, "Blast Engine", Material.rock);
-        gunpowderEngineBlock.setUnlocalizedName("blockGunpowderEngine");
+        gunpowderEngineBlock.setBlockName("blockGunpowderEngine");
         cr.RegisterBlock(gunpowderEngineBlock);
 
         BlockFuelBurner fuelBurnerBlock = new BlockFuelBurner(config, "Fuel Burner", Material.rock);
-        fuelBurnerBlock.setUnlocalizedName("blockFuelBurner");
-        fuelBurnerBlock.setTextureName("weirdscience:retardcube");
+        fuelBurnerBlock.setBlockName("blockFuelBurner");
+        fuelBurnerBlock.setBlockTextureName("weirdscience:retardcube");
         cr.RegisterBlock(fuelBurnerBlock);
 
         //Init and register items.
-        ItemFoodBase itemMelonPan = new ItemFoodBase(config, "Melonpan", ItemBase.FindFreeItemID(), 3, 0.6f);
-        itemMelonPan.setTextureName("weirdscience:melonpan");
-        cr.RegisterItem(itemMelonPan);
+        //ItemFoodBase itemMelonPan = new ItemFoodBase(config, "Melonpan", 3, 0.6f);
+        //itemMelonPan.setTextureName("weirdscience:melonpan");
+        //cr.RegisterItem(itemMelonPan);
 
-        Coagulant itemAlum = new Coagulant(config, "Alum", ItemBase.FindFreeItemID());
+        Coagulant itemAlum = new Coagulant(config, "Alum");
         itemAlum.setTextureName("weirdscience:coagulant");
-        itemAlum.congealedBlockID = congealedBlock.blockID;
+        itemAlum.congealedBlock = congealedBlock;
         cr.RegisterItem(itemAlum);
 
-        ItemBucketWS bucket = new ItemBucketWS(config, "Bucket", ItemBase.FindFreeItemID());
+        ItemBucketWS bucket = new ItemBucketWS(config, "Bucket");
         bucket.addSubBucket(new SubBucket("Blood Bucket", "weirdscience:bloodbucket", bloodBlock));
         SubBucket bucketAcid = new SubBucket("Acid Bucket", "weirdscience:acidbucket", acidBlock);
         bucket.addSubBucket(bucketAcid);
@@ -233,17 +231,17 @@ public class WeirdScienceContent
         cr.RegisterItem(bucketBase);*/
         cr.RegisterItem(bucket);
 
-        ItemBase ingotAluminum = new ItemBase(config, "Aluminum Ingot", ItemBase.FindFreeItemID());
+        ItemBase ingotAluminum = new ItemBase(config, "Aluminum Ingot");
         ingotAluminum.setTextureName("weirdscience:aluminumingot");
         OreDictionary.registerOre("ingotAluminum", ingotAluminum);
         cr.RegisterItem(ingotAluminum);
 
-        ItemBase dustAluminum = new ItemBase(config, "Aluminum Dust", ItemBase.FindFreeItemID());
+        ItemBase dustAluminum = new ItemBase(config, "Aluminum Dust");
         dustAluminum.setTextureName("weirdscience:aluminumdust");
         OreDictionary.registerOre("dustAluminum", dustAluminum);
         cr.RegisterItem(dustAluminum);
 
-        ItemBase itemAshes = new ItemBase(config, "Ashes", ItemBase.FindFreeItemID());
+        ItemBase itemAshes = new ItemBase(config, "Ashes");
         itemAshes.setTextureName("weirdscience:ashes");
         OreDictionary.registerOre("ashes", itemAshes);
         cr.RegisterItem(itemAshes);
@@ -267,31 +265,31 @@ public class WeirdScienceContent
 
         //Register recipes.
 
-        DisableableRecipe thermiteRecipe = new DisableableRecipe(new ItemStack(itemThermite.itemID, 1, 0), new Object[] { itemRust, dustAluminum }, true, false);
-        cr.RegisterRecipe(new DisableableRecipe(itemMelonPan, new Object[] { Item.bread, Item.melon }, true, false));
-        cr.RegisterRecipe(new DisableableRecipe(new ItemStack(bucket.itemID, 1, bucketBase.getAssociatedMeta()), new Object[] { Item.bucketWater, itemAshes }, true, false));
-        cr.RegisterRecipe(new DisableableRecipe(new ItemStack(bucket.itemID, 1, bucketAcid.getAssociatedMeta()), new Object[] { Item.bucketWater, Item.gunpowder }, true, false));
+        DisableableRecipe thermiteRecipe = new DisableableRecipe(new ItemStack(itemThermite, 1, 0), new Object[] { itemRust, dustAluminum }, true, false);
+        //cr.RegisterRecipe(new DisableableRecipe(itemMelonPan, new Object[] { Item.bread, Item.melon }, true, false));
+        cr.RegisterRecipe(new DisableableRecipe(new ItemStack(bucket, 1, bucketBase.getAssociatedMeta()), new Object[] { Items.water_bucket, itemAshes }, true, false));
+        cr.RegisterRecipe(new DisableableRecipe(new ItemStack(bucket, 1, bucketAcid.getAssociatedMeta()), new Object[] { Items.water_bucket, Items.gunpowder }, true, false));
         cr.RegisterRecipe(thermiteRecipe);
-        cr.RegisterRecipe(new SimpleRecipe(new ItemStack(blockRust.blockID, 1, 0), new Object[] { "rrr", "rrr", "rrr", 'r', itemRust }, false, false));
+        cr.RegisterRecipe(new SimpleRecipe(new ItemStack(blockRust, 1, 0), new Object[] { "rrr", "rrr", "rrr", 'r', itemRust }, false, false));
 
         //Machine recipes
         //      Nitrate Engine
-        cr.RegisterRecipe(new ShapedOreRecipe(new ItemStack(nitrateEngineBlock, 1, 0), "sss", "gcg", "sbs", Character.valueOf('s'), "blockStone", Character.valueOf('c'), new ItemStack(Item.slimeBall,
-                1, 0), Character.valueOf('g'), new ItemStack(Item.ingotGold), Character.valueOf('b'), new ItemStack(Item.bucketEmpty)));
-        cr.RegisterRecipe(new ShapedOreRecipe(new ItemStack(nitrateEngineBlock, 1, 0), "sss", "gcg", "sbs", Character.valueOf('s'), new ItemStack(Block.stone), Character.valueOf('c'), new ItemStack(
-                Item.slimeBall, 1, 0), Character.valueOf('g'), new ItemStack(Item.ingotGold), Character.valueOf('b'), new ItemStack(Item.bucketEmpty)));
+        cr.RegisterRecipe(new ShapedOreRecipe(new ItemStack(nitrateEngineBlock, 1, 0), "sss", "gcg", "sbs", Character.valueOf('s'), "blockStone", Character.valueOf('c'), new ItemStack(Items.slime_ball,
+                1, 0), Character.valueOf('g'), new ItemStack(Items.gold_ingot), Character.valueOf('b'), new ItemStack(Items.bucket)));
+        cr.RegisterRecipe(new ShapedOreRecipe(new ItemStack(nitrateEngineBlock, 1, 0), "sss", "gcg", "sbs", Character.valueOf('s'), new ItemStack(Blocks.stone), Character.valueOf('c'), new ItemStack(
+                Items.slime_ball, 1, 0), Character.valueOf('g'), new ItemStack(Items.gold_ingot), Character.valueOf('b'), new ItemStack(Items.bucket)));
         //      Blood Donation Station
         cr.RegisterRecipe(new ShapedOreRecipe(new ItemStack(donationBlock, 1, 0), "aba", "aga", "aba", Character.valueOf('a'), "ingotAluminum", Character.valueOf('g'),
-                new ItemStack(Block.glass, 1, 0), Character.valueOf('b'), new ItemStack(Item.bucketEmpty)));
+                new ItemStack(Blocks.glass, 1, 0), Character.valueOf('b'), new ItemStack(Items.bucket)));
         //      Blood Engine
         cr.RegisterRecipe(new ShapedOreRecipe(new ItemStack(bloodEngineBlock, 1, 0), "aba", "afa", "aaa", Character.valueOf('a'), "ingotAluminum", Character.valueOf('f'), new ItemStack(
-                Block.furnaceIdle, 1, 0), Character.valueOf('b'), new ItemStack(Item.bucketEmpty)));
+                Blocks.furnace, 1, 0), Character.valueOf('b'), new ItemStack(Items.bucket)));
         //      Occult Engine
         cr.RegisterRecipe(new ShapedOreRecipe(new ItemStack(occultEngineBlock, 1, 0), "gog", "oeo", "gog", Character.valueOf('e'), new ItemStack(bloodEngineBlock, 1, 0), Character.valueOf('o'),
-                new ItemStack(Block.obsidian), Character.valueOf('g'), new ItemStack(Item.ingotGold)));
+                new ItemStack(Blocks.obsidian), Character.valueOf('g'), new ItemStack(Items.gold_ingot)));
         //      Blast Engine
         cr.RegisterRecipe(new ShapedOreRecipe(new ItemStack(gunpowderEngineBlock, 1, 0), "aia", "afa", "ana", Character.valueOf('a'), "ingotAluminum", Character.valueOf('f'), new ItemStack(
-                Block.furnaceIdle, 1, 0), Character.valueOf('n'), new ItemStack(Block.netherrack), Character.valueOf('i'), new ItemStack(Block.fenceIron)));
+                Blocks.furnace, 1, 0), Character.valueOf('n'), new ItemStack(Blocks.netherrack), Character.valueOf('i'), new ItemStack(Blocks.iron_bars)));
 
         if (thermiteRecipe.isEnabled())
         {
@@ -303,7 +301,7 @@ public class WeirdScienceContent
                 {
                     for (ItemStack item : aluminumDusts)
                     {
-                        cr.RegisterRecipe(new SimpleRecipe(new ItemStack(itemThermite.itemID, 1, 0), new Object[] { itemRust, item }, true, false));
+                        cr.RegisterRecipe(new SimpleRecipe(new ItemStack(itemThermite, 1, 0), new Object[] { itemRust, item }, true, false));
                     }
                 }
             }
@@ -311,7 +309,7 @@ public class WeirdScienceContent
 
         //Register chemistry.
         //Clay to slurry reaction.
-        ReactionSpec clayDissolve = new ReactionSpec(fluidAcid, new ItemStack(Item.clay), aluminumSludge, null);
+        ReactionSpec clayDissolve = new ReactionSpec(fluidAcid, new ItemStack(Items.clay_ball), aluminumSludge, null);
         clayDissolve.soluteMin = 4; //Require 4 clay.
         clayDissolve.soluteAffected = true; //Delete the clay item when the reaction takes place.
         cr.RegisterReaction(clayDissolve);
@@ -325,23 +323,23 @@ public class WeirdScienceContent
         //Acids and bases kill grass dead.
         ReactionSpec grassDissolveAcid = new ReactionSpec();
         grassDissolveAcid.solvent = fluidAcid;
-        grassDissolveAcid.solute = Block.grass;
-        grassDissolveAcid.soluteTarget = Block.dirt;
+        grassDissolveAcid.solute = Blocks.grass;
+        grassDissolveAcid.soluteTarget = Blocks.dirt;
         grassDissolveAcid.solventAffected = false;
         grassDissolveAcid.soluteAffected = true;
         cr.RegisterReaction(grassDissolveAcid);
 
         ReactionSpec grassDissolveBase = new ReactionSpec();
         grassDissolveBase.solvent = fluidBase;
-        grassDissolveBase.solute = Block.grass;
-        grassDissolveBase.soluteTarget = Block.dirt;
+        grassDissolveBase.solute = Blocks.grass;
+        grassDissolveBase.soluteTarget = Blocks.dirt;
         grassDissolveBase.solventAffected = false;
         grassDissolveBase.soluteAffected = true;
         cr.RegisterReaction(grassDissolveBase);
 
         ArrayList<ItemStack> aluminumIngots = OreDictionary.getOres("ingotAluminum");
         ArrayList<ItemStack> aluminumOres = OreDictionary.getOres("oreAluminum");
-        aluminumOres.addAll(OreDictionary.getOres("oreBauxite"));
+        //aluminumOres.addAll(OreDictionary.getOres("oreBauxite"));
         //Register aluminum ingot dissolution.
         if (aluminumIngots != null)
         {
@@ -377,8 +375,8 @@ public class WeirdScienceContent
         }
 
         //Register furnace stuff.
-        GameRegistry.addSmelting(aluminumSludge.blockID, new ItemStack(itemAlum), 0.0F);
-        GameRegistry.addSmelting(dustAluminum.itemID, new ItemStack(ingotAluminum), 0.0F);//plankWood 
+        GameRegistry.addSmelting(aluminumSludge, new ItemStack(itemAlum), 0.0F);
+        GameRegistry.addSmelting(dustAluminum, new ItemStack(ingotAluminum), 0.0F);//plankWood 
         //Wood to ashes smelting.
         ArrayList<ItemStack> woodPlanks = OreDictionary.getOres("plankWood");
         if (woodPlanks != null)
@@ -387,11 +385,11 @@ public class WeirdScienceContent
             {
                 for (ItemStack item : woodPlanks)
                 {
-                    GameRegistry.addSmelting(item.itemID, new ItemStack(itemAshes), 0.0F);
+                    GameRegistry.addSmelting(item, new ItemStack(itemAshes), 0.0F);
                 }
             }
         }
-        GameRegistry.addSmelting(blockRust.blockID, new ItemStack(Block.blockIron.blockID, 1, 0), 0.0F);
+        GameRegistry.addSmelting(blockRust, new ItemStack(Blocks.iron_block, 1, 0), 0.0F);
 
         boolean thermiteFuelEnabled = config.get("recipe", "Enable thermite as furnace fuel", true).getBoolean(true);
         if (thermiteFuelEnabled)

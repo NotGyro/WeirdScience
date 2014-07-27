@@ -1,8 +1,8 @@
 package ws.zettabyte.weirdscience.tileentity;
 
 import net.minecraft.nbt.NBTTagCompound;
-import ws.zettabyte.zettalib.interfaces.IRegistrable;
-import ws.zettabyte.zettalib.tileentity.TileEntityGenerator;
+import ws.zettabyte.weirdscience.core.interfaces.IRegistrable;
+import ws.zettabyte.weirdscience.core.tileentity.TileEntityGenerator;
 
 public class TileEntityFuelBurner extends TileEntityGenerator implements IRegistrable
 {

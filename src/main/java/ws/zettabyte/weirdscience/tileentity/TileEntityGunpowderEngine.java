@@ -5,23 +5,23 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.Packet132TileEntityData;
 import net.minecraft.util.ChunkCoordinates;
-import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fluids.FluidStack;
 import ws.zettabyte.weirdscience.block.IBlockMetaPower;
-import ws.zettabyte.zettalib.ContentRegistry;
-import ws.zettabyte.zettalib.SolidFuelInfo;
-import ws.zettabyte.zettalib.interfaces.IConfiggable;
-import ws.zettabyte.zettalib.interfaces.IDeferredInit;
-import ws.zettabyte.zettalib.interfaces.IRegistrable;
-import ws.zettabyte.zettalib.interfaces.ISolidFuelInfo;
-import ws.zettabyte.zettalib.tileentity.TileEntitySolidFueled;
+import ws.zettabyte.weirdscience.core.ContentRegistry;
+import ws.zettabyte.weirdscience.core.SolidFuelInfo;
+import ws.zettabyte.weirdscience.core.interfaces.IConfiggable;
+import ws.zettabyte.weirdscience.core.interfaces.IDeferredInit;
+import ws.zettabyte.weirdscience.core.interfaces.IRegistrable;
+import ws.zettabyte.weirdscience.core.interfaces.ISolidFuelInfo;
+import ws.zettabyte.weirdscience.core.tileentity.TileEntitySolidFueled;
 
 /*
  * A tile entity is essentially a bit of extra behavior and information that is associated with a block in the world.
@@ -118,7 +118,7 @@ public class TileEntityGunpowderEngine extends TileEntitySolidFueled implements
 				"Enable gunpowder as fuel", true).getBoolean(true);
 		if (enableGunpowder) {
 			SolidFuelInfo gunpowderInfo = new SolidFuelInfo();
-			gunpowderInfo.ourFuel = new ItemStack(Item.gunpowder);
+			gunpowderInfo.ourFuel = new ItemStack(Items.gunpowder);
 			// Remember:                          config secton,   setting name,     default     default
 			gunpowderInfo.energyPer = config.get(getEnglishName(), "RF per Gunpowder", 80).getInt(80);
 			/*
@@ -136,7 +136,7 @@ public class TileEntityGunpowderEngine extends TileEntitySolidFueled implements
 				"Enable blaze powder as fuel", true).getBoolean(true);
 		if (enableBlazePowder) {
 			SolidFuelInfo blazeInfo = new SolidFuelInfo();
-			blazeInfo.ourFuel = new ItemStack(Item.blazePowder);
+			blazeInfo.ourFuel = new ItemStack(Items.blaze_powder);
 			blazeInfo.energyPer = config.get(getEnglishName(),
 					"RF per Blaze Powder", 80).getInt(80);
 			blazeInfo.byproductMult = (float) config.get(getEnglishName(),
@@ -235,17 +235,6 @@ public class TileEntityGunpowderEngine extends TileEntitySolidFueled implements
 				&& fuelStack.stackSize > this.getInventoryStackLimit()) {
 			fuelStack.stackSize = this.getInventoryStackLimit();
 		}
-	}
-
-	@Override
-	public String getInvName() {
-		return "GunpowderEngine";
-	}
-
-	@Override
-	public boolean isInvNameLocalized() {
-		// TODO
-		return false;
 	}
 
 	@Override
@@ -353,12 +342,6 @@ public class TileEntityGunpowderEngine extends TileEntitySolidFueled implements
 		nbt.setTag("Fuel", fuelSubTag);
 	}
 
-	public Packet getDescriptionPacket() { // Very Complex And Difficult Network Code
-		NBTTagCompound nbt = new NBTTagCompound();
-		writeToNBT(nbt);
-		return new Packet132TileEntityData(xCoord, yCoord, zCoord, 1, nbt);
-	}
-
 	// The meat of our engine logic.
 	// ENTITY UPDATE:
 	@Override
@@ -420,7 +403,7 @@ public class TileEntityGunpowderEngine extends TileEntitySolidFueled implements
 		//This is really important: Here, inventory info is syncced.
 		//You get desync if you comment this out.
 		if (flagInvChanged) {
-			this.onInventoryChanged();
+			this.markDirty();
 		}
 	}
 	
@@ -444,13 +427,13 @@ public class TileEntityGunpowderEngine extends TileEntitySolidFueled implements
 							int distanceSquared = (int) coordCheck.getDistanceSquaredToChunkCoordinates(coordOurs);
 							if(distanceSquared <= (radius * radius)) {
 								//Check to see if the block under this one is not air
-								if(worldObj.getBlockId(x+xCoord, (y+yCoord)-1, z+zCoord) != 0) {
+								if(worldObj.getBlock(x+xCoord, (y+yCoord)-1, z+zCoord) != Blocks.air) {
 									//Check to see if THIS block is air
-									if(worldObj.getBlockId(x+xCoord, y+yCoord, z+zCoord) == 0) {
+									if(worldObj.getBlock(x+xCoord, y+yCoord, z+zCoord) == Blocks.air) {
 										//Roll the dice. Adjust to scale off with distance.
 										if(rand.nextInt(100) <= (cpb - (distanceSquared * 2))) {
 											//Set it to fire.
-											worldObj.setBlock(x+xCoord, y+yCoord, z+zCoord, Block.fire.blockID);
+											worldObj.setBlock(x+xCoord, y+yCoord, z+zCoord, Blocks.fire);
 										}
 									}
 								}
@@ -465,8 +448,7 @@ public class TileEntityGunpowderEngine extends TileEntitySolidFueled implements
 	//Do metadata things to our block, changing its textures based on if the engine is on or off.
 	private void TurnBlockOff() {
 		if (wasRunningLastBurn == true) {
-			Block block = Block.blocksList[worldObj.getBlockId(xCoord, yCoord,
-					zCoord)];
+			Block block = worldObj.getBlock(xCoord, yCoord, zCoord);
 			if (block instanceof IBlockMetaPower) {
 				((IBlockMetaPower) block).recievePowerOff(worldObj, xCoord,
 						yCoord, zCoord);
@@ -478,14 +460,37 @@ public class TileEntityGunpowderEngine extends TileEntitySolidFueled implements
 	//Do metadata things to our block, changing its textures based on if the engine is on or off.
 	private void TurnBlockOn() {
 		if (wasRunningLastBurn == false) {
-			Block block = Block.blocksList[worldObj.getBlockId(xCoord, yCoord,
-					zCoord)];
+			Block block = worldObj.getBlock(xCoord, yCoord, zCoord);
 			if (block instanceof IBlockMetaPower) {
 				((IBlockMetaPower) block).recievePowerOn(worldObj, xCoord,
 						yCoord, zCoord);
 			}
 		}
 		wasRunningLastBurn = true;
+	}
+
+	@Override
+	public void closeInventory() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getInventoryName() {
+		// TODO Auto-generated method stub
+		return "engineGunpowder";
+	}
+
+	@Override
+	public boolean hasCustomInventoryName() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void openInventory() {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	//A route to 

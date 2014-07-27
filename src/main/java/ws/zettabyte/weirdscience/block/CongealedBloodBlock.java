@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.StepSound;
 import net.minecraft.block.material.Material;
-import net.minecraftforge.common.Configuration;
+import net.minecraft.init.Blocks;
+import net.minecraftforge.common.config.Configuration;
 import ws.zettabyte.weirdscience.WeirdScience;
-import ws.zettabyte.zettalib.WeirdStepSound;
-import ws.zettabyte.zettalib.baseclasses.BlockBase;
-import ws.zettabyte.zettalib.interfaces.ISoundProvider;
+import ws.zettabyte.weirdscience.core.baseclasses.BlockBase;
+import ws.zettabyte.weirdscience.core.interfaces.ISoundProvider;
 
 public class CongealedBloodBlock extends BlockBase implements ISoundProvider {
 	private static String unlocalizedName = "congealedBloodBlock";
@@ -58,11 +57,11 @@ public class CongealedBloodBlock extends BlockBase implements ISoundProvider {
 		//Done by the game registry.
 		//BlockBase returns true from isInCreativeTab by default.
 		//setCreativeTab(WeirdScience.tabWeirdScience);
-		setUnlocalizedName("congealedBloodBlock");
-		setHardness(Block.dirt.blockHardness);
-		setResistance(Block.dirt.blockResistance);
+		setBlockName("congealedBloodBlock");
+		setHardness(1); //TODO: Proper value for this.
+		setResistance(1);
 		
-		setStepSound((StepSound) new WeirdStepSound(placeSoundName, placeSoundName, stepSoundName, 1.0f, 1.0f));
+		//setStepSound((StepSound) new WeirdStepSound(placeSoundName, placeSoundName, stepSoundName, 1.0f, 1.0f));
 	}
 	/*
 	@SideOnly(Side.CLIENT)

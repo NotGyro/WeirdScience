@@ -2,10 +2,8 @@ package ws.zettabyte.weirdscience.tileentity;
 
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.Packet132TileEntityData;
-import net.minecraftforge.common.Configuration;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidEvent;
 import net.minecraftforge.fluids.FluidStack;
@@ -13,10 +11,10 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fluids.IFluidTank;
 import ws.zettabyte.weirdscience.block.BlockMetaTank;
-import ws.zettabyte.zettalib.ContentRegistry;
-import ws.zettabyte.zettalib.baseclasses.TileEntityBase;
-import ws.zettabyte.zettalib.interfaces.IConfiggable;
-import ws.zettabyte.zettalib.interfaces.IRegistrable;
+import ws.zettabyte.weirdscience.core.ContentRegistry;
+import ws.zettabyte.weirdscience.core.baseclasses.TileEntityBase;
+import ws.zettabyte.weirdscience.core.interfaces.IConfiggable;
+import ws.zettabyte.weirdscience.core.interfaces.IRegistrable;
 
 public class TileEntityBloodDonation extends TileEntityBase implements IFluidHandler, IFluidTank, IConfiggable, IRegistrable {
 	
@@ -51,12 +49,12 @@ public class TileEntityBloodDonation extends TileEntityBase implements IFluidHan
         	tag.setString("Empty", "");
         }
     }
-    @Override
-	public Packet getDescriptionPacket() {
-	    NBTTagCompound nbt = new NBTTagCompound();
-	    writeToNBT(nbt);
-	    return new Packet132TileEntityData(xCoord, yCoord, zCoord, 1, nbt);
-	}
+    //@Override
+	//public Packet getDescriptionPacket() {
+	//    NBTTagCompound nbt = new NBTTagCompound();
+	//    writeToNBT(nbt);
+	//    return new PacketTileEntityData(xCoord, yCoord, zCoord, 1, nbt);
+	//}
 
 	private static Fluid bloodFluid;
 	
@@ -263,8 +261,8 @@ public class TileEntityBloodDonation extends TileEntityBase implements IFluidHan
 	
 	public void updateTank() { 
 		if(!worldObj.isRemote) {
-			if(Block.blocksList[worldObj.getBlockId(xCoord, yCoord, zCoord)] instanceof BlockMetaTank) {
-				BlockMetaTank bmt = (BlockMetaTank)(Block.blocksList[worldObj.getBlockId(xCoord, yCoord, zCoord)]);
+			if(worldObj.getBlock(xCoord, yCoord, zCoord) instanceof BlockMetaTank) {
+				BlockMetaTank bmt = (BlockMetaTank) worldObj.getBlock(xCoord, yCoord, zCoord);
 				if(fluidTank == null) {
 					bmt.setMetaByFillPercent(worldObj, xCoord, yCoord, zCoord, 0);
 				} 

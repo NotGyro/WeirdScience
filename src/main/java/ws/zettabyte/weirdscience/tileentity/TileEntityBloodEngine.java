@@ -2,19 +2,19 @@ package ws.zettabyte.weirdscience.tileentity;
 
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.Configuration;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 import ws.zettabyte.weirdscience.block.BlockMetaTank;
-import ws.zettabyte.zettalib.ContentRegistry;
-import ws.zettabyte.zettalib.interfaces.IConfiggable;
-import ws.zettabyte.zettalib.interfaces.IDeferredInit;
-import ws.zettabyte.zettalib.interfaces.IRegistrable;
-import ws.zettabyte.zettalib.tileentity.TileEntityGenerator;
+import ws.zettabyte.weirdscience.core.ContentRegistry;
+import ws.zettabyte.weirdscience.core.interfaces.IConfiggable;
+import ws.zettabyte.weirdscience.core.interfaces.IDeferredInit;
+import ws.zettabyte.weirdscience.core.interfaces.IRegistrable;
+import ws.zettabyte.weirdscience.core.tileentity.TileEntityGenerator;
 
 public class TileEntityBloodEngine extends TileEntityGenerator implements
 		IFluidHandler, IConfiggable, IDeferredInit, IRegistrable {
@@ -224,8 +224,8 @@ public class TileEntityBloodEngine extends TileEntityGenerator implements
 	
 	public void updateTank() { 
 		if(!worldObj.isRemote) {
-			if(Block.blocksList[worldObj.getBlockId(xCoord, yCoord, zCoord)] instanceof BlockMetaTank) {
-				BlockMetaTank bmt = (BlockMetaTank)(Block.blocksList[worldObj.getBlockId(xCoord, yCoord, zCoord)]);
+			if(worldObj.getBlock(xCoord, yCoord, zCoord) instanceof BlockMetaTank) {
+				BlockMetaTank bmt = (BlockMetaTank)(worldObj.getBlock(xCoord, yCoord, zCoord));
 				if(tank == null) {
 					bmt.setMetaByFillPercent(worldObj, xCoord, yCoord, zCoord, 0);
 				} 

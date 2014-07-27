@@ -10,37 +10,19 @@ import net.minecraft.item.ItemBucket;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import net.minecraftforge.common.Configuration;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidBlock;
 import ws.zettabyte.weirdscience.tileentity.TileEntityBloodEngine;
-import ws.zettabyte.zettalib.baseclasses.ItemBucketWS;
+import ws.zettabyte.weirdscience.core.baseclasses.ItemBucketWS;
 
 public class BlockBloodEngine extends BlockMetaTank {
 	
 	protected static final String fuelName= "blood";
-
-	public BlockBloodEngine(Configuration config, String name,
-			int defaultID, Material material) {
-		super(config, name, defaultID, material);
-	}
-
-	public BlockBloodEngine(Configuration config, String name, int defaultID) {
-		super(config, name, defaultID);
-	}
-
-	public BlockBloodEngine(Configuration config, String name,
-			Material material) {
-		super(config, name, material);
-	}
-
-	public BlockBloodEngine(Configuration config, String name) {
-		super(config, name);
-	}
 
 	@Override
 	public TileEntity createNewTileEntity(World world) {
@@ -49,8 +31,8 @@ public class BlockBloodEngine extends BlockMetaTank {
 	
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int metadata, float par1, float par2, float par3) {
 		TileEntityBloodEngine tileEntity = null;
-		if(world.getBlockTileEntity(x, y, z) instanceof TileEntityBloodEngine) {
-			tileEntity = (TileEntityBloodEngine)world.getBlockTileEntity(x, y, z);
+		if(world.getTileEntity(x, y, z) instanceof TileEntityBloodEngine) {
+			tileEntity = (TileEntityBloodEngine)world.getTileEntity(x, y, z);
 		}
 	    if (tileEntity == null || player.isSneaking()) {
 	            return false;
@@ -77,17 +59,17 @@ public class BlockBloodEngine extends BlockMetaTank {
 				//Do deep black Worst Practices hoodoo because Notch didn't design anything to be extended or generalized
 				//Lucky for us the performance impact of reflection is negligable in this case since there won't be 
 				//instances of right clicking on an engine with a bucket very often.
-				int dumpedBlockID = 0;
+				Block dumpedBlock = null;
 				try {
 					Field f = ItemBucket.class.getDeclaredField("isFull"); //NoSuchFieldException if there is no isFull
 					f.setAccessible(true);
-					dumpedBlockID = (Integer) f.get(bucket);
+					dumpedBlock = (Block) f.get(bucket);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 				//Does this bucket contain a fluid block?
-				if(blocksList[dumpedBlockID] instanceof IFluidBlock) {
-					Fluid fluidTry = ((IFluidBlock)blocksList[dumpedBlockID]).getFluid();
+				if(dumpedBlock instanceof IFluidBlock) {
+					Fluid fluidTry = ((IFluidBlock)dumpedBlock).getFluid();
 					//Is it blood?
 					if(fluidTry.getName().contentEquals(fuelName)) {
 						if(FillTank(fluidTry, tileEntity) && !player.capabilities.isCreativeMode) {
@@ -136,4 +118,20 @@ public class BlockBloodEngine extends BlockMetaTank {
 		return false;
 	}
 
+	public BlockBloodEngine(Configuration config, String name, Material material) {
+		super(config, name, material);
+		// TODO Auto-generated constructor stub
+	}
+
+	public BlockBloodEngine(Configuration config, String name) {
+		super(config, name);
+		// TODO Auto-generated constructor stub
+	}
+
+	public BlockBloodEngine(Material material) {
+		super(material);
+		// TODO Auto-generated constructor stub
+	}
+
+	
 }

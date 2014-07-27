@@ -2,15 +2,11 @@ package ws.zettabyte.weirdscience.network;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.INetworkManager;
-import net.minecraft.network.packet.Packet250CustomPayload;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.network.IPacketHandler;
-import cpw.mods.fml.common.network.Player;
 import cpw.mods.fml.relauncher.Side;
 
-public class WeirdPacketHandler implements IPacketHandler {
-
+public class WeirdPacketHandler /*implements IPacketHandler*/ {
+/*
 	public WeirdPacketHandler() {
 		// TODO Auto-generated constructor stub
 	}
@@ -37,5 +33,5 @@ public class WeirdPacketHandler implements IPacketHandler {
 
     void handlePacketServer (Packet250CustomPayload packet, EntityPlayerMP player) {
         //As of now this is a dummy.
-    }
+    }*/
 }

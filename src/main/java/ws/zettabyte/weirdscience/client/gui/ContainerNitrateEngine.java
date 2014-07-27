@@ -6,7 +6,7 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import ws.zettabyte.weirdscience.tileentity.TileEntityNitrateEngine;
-import cofh.gui.slot.SlotOutput;
+//import cofh.gui.slot.SlotOutput;
 
 public class ContainerNitrateEngine extends Container {
 
@@ -18,7 +18,7 @@ public class ContainerNitrateEngine extends Container {
 
 		addSlotToContainer(new Slot(te, 0, 80, 17)); // Add the fuel slot.
 										// (slot 0)
-		addSlotToContainer(new SlotOutput(te, 1, 80, 53)); // Slot 1 is output.
+		addSlotToContainer(new Slot(te, 1, 80, 53)); // Slot 1 is output.
 
 		// Display the player's inventory.
 		for (int i = 0; i < 3; ++i) {

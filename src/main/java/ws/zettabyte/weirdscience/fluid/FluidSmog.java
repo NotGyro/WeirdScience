@@ -4,8 +4,8 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.fluids.Fluid;
-import ws.zettabyte.zettalib.chemistry.IBioactive;
-import ws.zettabyte.zettalib.interfaces.IRegistrable;
+import ws.zettabyte.weirdscience.core.chemistry.IBioactive;
+import ws.zettabyte.weirdscience.core.interfaces.IRegistrable;
 
 public class FluidSmog extends Fluid implements IBioactive, IRegistrable {
 

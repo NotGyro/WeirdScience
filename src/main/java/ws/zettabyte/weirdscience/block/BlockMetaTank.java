@@ -3,12 +3,12 @@ package ws.zettabyte.weirdscience.block;
 import java.util.ArrayList;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IconRegister;
-import net.minecraft.util.Icon;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.Configuration;
-import ws.zettabyte.zettalib.baseclasses.BlockContainerBase;
+import net.minecraftforge.common.config.Configuration;
+import ws.zettabyte.weirdscience.core.baseclasses.BlockContainerBase;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -20,9 +20,9 @@ public abstract class BlockMetaTank extends BlockContainerBase {
 	protected ArrayList<String> tankTexNames = new ArrayList<String>(8);
     protected ArrayList<String> topTexNames = new ArrayList<String>(2);
     @SideOnly(Side.CLIENT)
-	protected ArrayList<Icon> tankIcons;
+	protected ArrayList<IIcon> tankIcons;
     @SideOnly(Side.CLIENT)
-	protected ArrayList<Icon> topIcons;
+	protected ArrayList<IIcon> topIcons;
 
 	public void addSidesTextureName(String str) {
 		tankTexNames.add(str);
@@ -32,45 +32,39 @@ public abstract class BlockMetaTank extends BlockContainerBase {
 	}
     @SideOnly(Side.CLIENT)
     @Override
-    public void registerIcons(IconRegister iconRegister)
+    public void registerBlockIcons(IIconRegister IIconRegister)
     {
-    	super.registerIcons(iconRegister);
-        //this.blockIcon = iconRegister.registerIcon(this.getTextureName()); //Equal to the line above.
+    	super.registerBlockIcons(IIconRegister);
+        //this.blockIcon = IIconRegister.registerIIcon(this.getTextureName()); //Equal to the line above.
     	
-        //Register tank icons.
-        tankIcons = new ArrayList<Icon>(tankTexNames.size());
+        //Register tank IIcons.
+        tankIcons = new ArrayList<IIcon>(tankTexNames.size());
         for(int i = 0; (i < tankTexNames.size()) && (i < 16); ++i) {
-        	tankIcons.add(iconRegister.registerIcon(tankTexNames.get(i)));
+        	tankIcons.add(IIconRegister.registerIcon(tankTexNames.get(i)));
         }
-        //Register top icons.
-        topIcons = new ArrayList<Icon>(topTexNames.size());
+        //Register top IIcons.
+        topIcons = new ArrayList<IIcon>(topTexNames.size());
         for(int i = 0; (i < topTexNames.size()) && (i < 16); ++i) {
-        	topIcons.add(iconRegister.registerIcon(topTexNames.get(i)));
+        	topIcons.add(IIconRegister.registerIcon(topTexNames.get(i)));
         }
         //Fill in the blanks
         if(topIcons.size() < tankIcons.size()) {
-        	Icon last = topIcons.get(topIcons.size() - 1);
+        	IIcon last = topIcons.get(topIcons.size() - 1);
         	while(topIcons.size() < tankIcons.size()) {
         		topIcons.add(last);
         	}
         }
         //Fill in the blanks
         else if(topIcons.size() > tankIcons.size()) {
-        	Icon last = tankIcons.get(tankIcons.size() - 1);
+        	IIcon last = tankIcons.get(tankIcons.size() - 1);
         	while(topIcons.size() > tankIcons.size()) {
         		tankIcons.add(last);
         	}
         }
     }
-
     @SideOnly(Side.CLIENT)
     @Override
-    public Icon getBlockTexture(IBlockAccess world, int x, int y, int z, int side) {
-        return this.getIcon(side, world.getBlockMetadata(x, y, z));
-    }
-    @SideOnly(Side.CLIENT)
-    @Override
-    public Icon getIcon(int side, int metadata) {
+    public IIcon getIcon(int side, int metadata) {
     	//Top
     	if(side == 1) {
     		return topIcons.get(metadata);
@@ -90,33 +84,20 @@ public abstract class BlockMetaTank extends BlockContainerBase {
     			(fillPercent * (tankTexNames.size()-1))/100, 
     			1|2);
     }
-    
-    //A bunch of empty constructors.
-	public BlockMetaTank(Configuration config, String name, int defaultID,
-			Material material) {
-		super(config, name, defaultID, material);
-		// TODO Auto-generated constructor stub
-	}
-
-	public BlockMetaTank(Configuration config, String name, int defaultID) {
-		super(config, name, defaultID);
-		// TODO Auto-generated constructor stub
-	}
-
 	public BlockMetaTank(Configuration config, String name, Material material) {
 		super(config, name, material);
 		// TODO Auto-generated constructor stub
 	}
-
 	public BlockMetaTank(Configuration config, String name) {
 		super(config, name);
 		// TODO Auto-generated constructor stub
 	}
-
-	public BlockMetaTank(int id, Material material) {
-		super(id, material);
+	public BlockMetaTank(Material material) {
+		super(material);
 		// TODO Auto-generated constructor stub
 	}
-
+    
+    
+    
 
 }

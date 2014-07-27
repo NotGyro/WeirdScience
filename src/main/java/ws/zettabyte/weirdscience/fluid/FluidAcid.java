@@ -3,8 +3,8 @@ package ws.zettabyte.weirdscience.fluid;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.fluids.Fluid;
-import ws.zettabyte.zettalib.chemistry.IBioactive;
-import ws.zettabyte.zettalib.interfaces.IRegistrable;
+import ws.zettabyte.weirdscience.core.chemistry.IBioactive;
+import ws.zettabyte.weirdscience.core.interfaces.IRegistrable;
 
 public class FluidAcid extends Fluid implements IBioactive, IRegistrable {
 

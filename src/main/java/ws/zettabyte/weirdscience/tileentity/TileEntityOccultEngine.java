@@ -5,11 +5,13 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.boss.EntityWither;
-import net.minecraftforge.common.Configuration;
-import net.minecraftforge.common.ForgeDirection;
-import ws.zettabyte.zettalib.ContentRegistry;
-import ws.zettabyte.zettalib.interfaces.IConfiggable;
-import ws.zettabyte.zettalib.interfaces.IRegistrable;
+import net.minecraft.init.Blocks;
+import net.minecraft.world.EnumDifficulty;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.util.ForgeDirection;
+import ws.zettabyte.weirdscience.core.ContentRegistry;
+import ws.zettabyte.weirdscience.core.interfaces.IConfiggable;
+import ws.zettabyte.weirdscience.core.interfaces.IRegistrable;
 
 public class TileEntityOccultEngine extends TileEntityBloodEngine implements IConfiggable, IRegistrable {
 	
@@ -68,11 +70,11 @@ public class TileEntityOccultEngine extends TileEntityBloodEngine implements ICo
 		//Dragon egg
 		IdolData eggData = new IdolData();
 		eggData.fuelMultiplier = 96;
-		eggData.engineTo = Block.lavaStill;
+		eggData.engineTo = Blocks.lava;
 		eggData.explPower = 4.0f;
 		eggData.evilHunger = staticMbPerBurn;
 		eggData.evilRF = staticRfPerTick * 2;
-		idols.put(Block.dragonEgg.getUnlocalizedName(), eggData);
+		idols.put(Blocks.dragon_egg.getUnlocalizedName(), eggData);
 		
 		//wither skull
 		IdolData skullData = new IdolData();
@@ -82,7 +84,7 @@ public class TileEntityOccultEngine extends TileEntityBloodEngine implements ICo
 		skullData.evilRF = staticRfPerTick * 2;
 		skullData.spawnWitherOnFail = true;
 		skullData.anihilationRange = 2;
-		idols.put(Block.skull.getUnlocalizedName(), skullData);
+		idols.put(Blocks.skull.getUnlocalizedName(), skullData);
 		
 		
 		
@@ -207,11 +209,11 @@ public class TileEntityOccultEngine extends TileEntityBloodEngine implements ICo
 						for(int yr = -aRange; yr <= aRange; ++yr) {
 							for(int zr = -aRange; zr <= aRange; ++zr) {
 								///...clearing a space.
-								if(Block.blocksList[worldObj.getBlockId(xCoord + xr, yCoord + yr, zCoord + zr)] != null) {
-									if(Block.blocksList[worldObj.getBlockId(xCoord + xr, yCoord + yr, zCoord + zr)]
+								if(worldObj.getBlock(xCoord + xr, yCoord + yr, zCoord + zr) != null) {
+									if(worldObj.getBlock(xCoord + xr, yCoord + yr, zCoord + zr)
 											.canEntityDestroy(worldObj, xCoord + xr, yCoord + yr, zCoord + zr, null)
-											&& !Block.blocksList[worldObj.getBlockId(xCoord + xr, yCoord + yr, zCoord + zr)]
-													.getUnlocalizedName().contentEquals(Block.bedrock.getUnlocalizedName())) {
+											&& !worldObj.getBlock(xCoord + xr, yCoord + yr, zCoord + zr)
+													.getUnlocalizedName().contentEquals(Blocks.bedrock.getUnlocalizedName())) {
 										worldObj.setBlockToAir(xCoord + xr, yCoord + yr, zCoord + zr);
 									}
 								}
@@ -224,7 +226,7 @@ public class TileEntityOccultEngine extends TileEntityBloodEngine implements ICo
 					worldObj.createExplosion(null, xCoord, yCoord, zCoord, currentIdol.explPower, true);
 				}
 				//Do we have an entity to spawn?
-				if((currentIdol.spawnWitherOnFail == true) && (worldObj.difficultySetting > 0)) {
+				if((currentIdol.spawnWitherOnFail == true) && (worldObj.difficultySetting != EnumDifficulty.PEACEFUL)) {
 					EntityWither entitywither = new EntityWither(worldObj);
 	                entitywither.setLocationAndAngles((double)xCoord + 0.5D, (double)yCoord + 0.5D, (double)zCoord + 0.5D, 0.0F, 0.0F);
 	                entitywither.func_82206_m();
@@ -232,7 +234,7 @@ public class TileEntityOccultEngine extends TileEntityBloodEngine implements ICo
 				}
 				//Do we have something special to switch this block to?
 				if(currentIdol.engineTo != null) {
-					worldObj.setBlock(xCoord, yCoord, zCoord, currentIdol.engineTo.blockID);
+					worldObj.setBlock(xCoord, yCoord, zCoord, currentIdol.engineTo);
 				}
 				//...otherwise, set it to air.
 				else {

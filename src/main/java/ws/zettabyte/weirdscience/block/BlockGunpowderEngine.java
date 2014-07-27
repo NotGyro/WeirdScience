@@ -4,23 +4,24 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.Configuration;
-import net.minecraftforge.common.ForgeDirection;
-import net.minecraftforge.common.RotationHelper;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.common.util.RotationHelper;
 import ws.zettabyte.weirdscience.tileentity.TileEntityGunpowderEngine;
 import ws.zettabyte.weirdscience.tileentity.TileEntityNitrateEngine;
-import ws.zettabyte.zettalib.baseclasses.BlockContainerBase;
+import ws.zettabyte.weirdscience.core.baseclasses.BlockContainerBase;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -31,6 +32,22 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class BlockGunpowderEngine extends BlockContainerBase implements
 		IBlockMetaPower {
 
+	public BlockGunpowderEngine(Configuration config, String name,
+			Material material) {
+		super(config, name, material);
+		// TODO Auto-generated constructor stub
+	}
+
+	public BlockGunpowderEngine(Configuration config, String name) {
+		super(config, name);
+		// TODO Auto-generated constructor stub
+	}
+
+	public BlockGunpowderEngine(Material material) {
+		super(material);
+		// TODO Auto-generated constructor stub
+	}
+
 	int teCapacity = 0;
 	int tePerTick = 0;
 	int tePerDirt = 0;
@@ -39,20 +56,20 @@ public class BlockGunpowderEngine extends BlockContainerBase implements
 														// direction.
 
 	@SideOnly(Side.CLIENT)
-	public Icon frontIcon;
+	public IIcon frontIcon;
 	@SideOnly(Side.CLIENT)
-	public Icon frontIconPowered;
+	public IIcon frontIconPowered;
 	@SideOnly(Side.CLIENT)
-	public Icon topIcon;
+	public IIcon topIcon;
 	@SideOnly(Side.CLIENT)
-	public Icon sidesIcon;
+	public IIcon sidesIcon;
 
 	/**
 	 * Args: side, metadata
 	 */
     @SideOnly(Side.CLIENT)
 	@Override
-	public Icon getIcon(int side, int meta) {
+	public IIcon getIcon(int side, int meta) {
 		if (side == 1) {
 			return topIcon;
 		} else if (side == 0) {
@@ -78,7 +95,7 @@ public class BlockGunpowderEngine extends BlockContainerBase implements
 			int z) {
 		// Dumb hacks ahoy. Should really find a better (but still non-verbose)
 		// way to do this.
-		return RotationHelper.getValidVanillaBlockRotations(Block.furnaceIdle);
+		return RotationHelper.getValidVanillaBlockRotations(Blocks.furnace);
 	}
 
 	@Override
@@ -86,30 +103,8 @@ public class BlockGunpowderEngine extends BlockContainerBase implements
 			ForgeDirection axis) {
 		// Dumb hacks ahoy. Should really find a better (but still non-verbose)
 		// way to do this.
-		return RotationHelper.rotateVanillaBlock(Block.furnaceIdle, worldObj,
+		return RotationHelper.rotateVanillaBlock(Blocks.furnace, worldObj,
 				x, y, z, axis);
-	}
-
-	public BlockGunpowderEngine(Configuration config, String name, int defaultID,
-			Material material) {
-		super(config, name, defaultID, material);
-		initRotate(this);
-	}
-
-	public BlockGunpowderEngine(Configuration config, String name, int defaultID) {
-		super(config, name, defaultID);
-		initRotate(this);
-	}
-
-	public BlockGunpowderEngine(Configuration config, String name,
-			Material material) {
-		super(config, name, material);
-		initRotate(this);
-	}
-
-	public BlockGunpowderEngine(Configuration config, String name) {
-		super(config, name);
-		initRotate(this);
 	}
 
 	public boolean hasComparatorInputOverride() {
@@ -118,14 +113,14 @@ public class BlockGunpowderEngine extends BlockContainerBase implements
 
     @SideOnly(Side.CLIENT)
 	@Override
-	public Icon getBlockTexture(IBlockAccess world, int x, int y, int z,
+	public IIcon getIcon(IBlockAccess world, int x, int y, int z,
 			int side) {
 		return this.getIcon(side, world.getBlockMetadata(x, y, z));
 	}
 
     @SideOnly(Side.CLIENT)
 	@Override
-	public void registerIcons(IconRegister iconRegister) {
+	public void registerBlockIcons(IIconRegister iconRegister) {
 		//TODO: Visually differentiate this from the Nitrate Engine.
 		frontIcon = iconRegister.registerIcon("weirdscience:genericmachine5");
 		sidesIcon = iconRegister.registerIcon("weirdscience:genericmachine");
@@ -181,12 +176,14 @@ public class BlockGunpowderEngine extends BlockContainerBase implements
 	public int getComparatorInputOverride(World world, int x, int y, int z,
 			int par5) {
 		return Container.calcRedstoneFromInventory((IInventory) world
-				.getBlockTileEntity(x, y, z));
+				.getTileEntity(x, y, z));
 	}
 
 	//Toss away all item stacks on block break.
-	public void breakBlock(World world, int x, int y, int z, int par5, int par6) {
-		TileEntity te = world.getBlockTileEntity(x, y, z);
+	
+	@Override
+	public void onBlockDestroyedByPlayer(World world, int x, int y, int z, int par5) {
+		TileEntity te = world.getTileEntity(x, y, z);
 		if (te != null) {
 			if (te instanceof TileEntityNitrateEngine) {
 				TileEntityNitrateEngine tileentity = (TileEntityNitrateEngine) te;
@@ -205,13 +202,13 @@ public class BlockGunpowderEngine extends BlockContainerBase implements
 				}
 			}
 		}
-		super.breakBlock(world, x, y, z, par5, par6);
+		super.onBlockDestroyedByPlayer(world, x, y, z, par5);
 	}
 
 	public boolean onBlockActivated(World world, int x, int y, int z,
 			EntityPlayer player, int metadata, float par1, float par2,
 			float par3) {
-		TileEntity tileEntity = world.getBlockTileEntity(x, y, z);
+		TileEntity tileEntity = world.getTileEntity(x, y, z);
 		if (tileEntity == null || player.isSneaking()) {
 			return false;
 		}
