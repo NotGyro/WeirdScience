@@ -1,4 +1,4 @@
-package ws.zettabyte.weirdscience.core;
+package ws.zettabyte.weirdscience.thermal;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -9,8 +9,6 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import ws.zettabyte.weirdscience.block.BlockSkullOverride;
-import ws.zettabyte.weirdscience.client.gui.WeirdScienceGUIHandler;
-import ws.zettabyte.weirdscience.core.ContentRegistry;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -19,15 +17,16 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-//import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
 //Packet handler is just a dummy as of this point.
-@Mod(modid = WeirdScience.modid, name = "Weird Science", version = "0.0.0")
-//@NetworkMod(channels = {"WS"}, clientSideRequired = true, serverSideRequired = false, packetHandler = ws.zettabyte.weirdscience.network.WeirdPacketHandler.class)
+@Mod(modid = WeirdScience.modid, name = WeirdScience.name, version = WeirdScience.version, dependencies = WeirdScience.dependencies)
 public class WeirdScience {
-	public static final String modid = "weirdscience";
+	public static final String modid = "WeirdScience";
+	public static final String name = "Weird Science";
+	public static final String version = "Weird Science";
+	public static final String dependencies = "";
 	
     @Instance("WeirdScience")
     public static WeirdScience instance;
@@ -44,9 +43,6 @@ public class WeirdScience {
     
     public static Configuration config;
     
-    public static ContentRegistry weirdRegistry;
-    
-	
 	//Important things to note: Values read from config and passed around don't reach their destination serverside unless
 	//they are null. Weird.
 	
@@ -68,9 +64,6 @@ public class WeirdScience {
     	//Get on with things.
     	config = new Configuration(event.getSuggestedConfigurationFile());
         config.load();
-        weirdRegistry = new ContentRegistry(config, logger, tabWeirdScience);
-        MinecraftForge.EVENT_BUS.register(weirdRegistry.bucketMan);
-        WeirdScienceContent.RegisterContent(config, weirdRegistry, event);
     	//logger.info("Testing.");
     	LanguageRegistry.instance().addStringLocalization("itemGroup.tabWeirdScience", "en_US", "Weird Science");    	
     	//NetworkRegistry.registerGuiHandler(this, new WeirdScienceGUIHandler());
@@ -78,16 +71,14 @@ public class WeirdScience {
    
     @EventHandler
     public void load(FMLInitializationEvent event) {
-    	weirdRegistry.FinalizeContent(); //Do Forge Registry things.
         config.save();
         
         proxy.registerRenderers();
-        this.sounds = weirdRegistry.soundNames; //This line MUST come before proxy.registerSound().
+        
         proxy.registerSound();
     }
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-    	weirdRegistry.DeferredInit();
     }
 }

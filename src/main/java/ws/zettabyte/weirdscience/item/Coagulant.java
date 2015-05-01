@@ -11,9 +11,8 @@ import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fluids.IFluidBlock;
-import ws.zettabyte.weirdscience.core.baseclasses.ItemBase;
 
-public class Coagulant extends ItemBase {
+public class Coagulant extends Item { //Base {
 
 	public static Block congealedBlock = null;
 	
@@ -34,7 +33,12 @@ public class Coagulant extends ItemBase {
 	}*/
 	
 	public Coagulant(Configuration config, String name) {
-		super(config, name);
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public Coagulant() {
+		super();
 		// TODO Auto-generated constructor stub
 	}
 

@@ -3,16 +3,14 @@ package ws.zettabyte.weirdscience.fluid;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.fluids.Fluid;
-import ws.zettabyte.weirdscience.core.chemistry.IBioactive;
-import ws.zettabyte.weirdscience.core.interfaces.IRegistrable;
 
-public class FluidAcid extends Fluid implements IBioactive, IRegistrable {
+public class FluidAcid extends Fluid {//implements IBioactive, IRegistrable {
 
 	public int damage = 4;
 	public FluidAcid(String fluidName) {
 		super(fluidName);
 	}
-
+/*
 	@Override
 	public boolean contactAffectCreature(EntityLivingBase affected) {
 		affected.attackEntityFrom(DamageSource.magic, (float)damage);
@@ -40,7 +38,6 @@ public class FluidAcid extends Fluid implements IBioactive, IRegistrable {
 		//oxygen tank, we should start laying the foundations for that now.
 		return bloodstreamAffectCreature(affected);
 	}
-
 	@Override
 	public boolean canContactAffectCreature() {
 		return true;
@@ -75,4 +72,5 @@ public class FluidAcid extends Fluid implements IBioactive, IRegistrable {
 	public boolean isEnabled() {
 		return true;
 	}
+*/
 }

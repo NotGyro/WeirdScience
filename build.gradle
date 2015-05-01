@@ -23,25 +23,29 @@ repositories {
 	maven { url = "http://dvs1.progwml6.com/files/maven/" } // TCon and Mantle. Not a hard dep for the mod, but we are developing against it.
 
 	ivy {
-	name "MineTweaker3"
-	artifactPattern "http://minetweaker3.powerofbytes.com/download/[module]-[revision].[ext]"
+		name "MineTweaker3"
+		artifactPattern "http://minetweaker3.powerofbytes.com/download/[module]-[revision].[ext]"
 	}
 }
 
 dependencies {
 
+	//None of these are hard deps, incidentally.
+
+	//TODO: Get OpenModsLib in here somehow rather than just into the libs/ directory.
+
 	compile "tconstruct:TConstruct:1.7.10-1.8.2.build857:deobf"
 
-	compile "mcp.mobius.waila:Waila:1.5.8a_1.7.10" //Primary purpose of WAILA is for easier testing in my dev env, hah.
-	compile "codechicken:CodeChickenCore:1.7.10-1.0.4.29:dev"
+	//compile "mcp.mobius.waila:Waila:1.5.8a_1.7.10"
+	//compile "codechicken:CodeChickenCore:1.7.10-1.1.3.136:dev"
 	compile name: 'MineTweaker3', version: "Dev-1.7.10-3.0.9B", ext: 'jar'
 
 	compile fileTree(dir: 'libs', include: '*.jar')
 }
 
-version = "0.0.1"
-group= "ws.zettabyte.oldowanobsidian"
-archivesBaseName = "oldowanObsidian"
+version = mcVersion + "-" + modVersion
+group= "ws.zettabyte.weirdscience"
+archivesBaseName = "WeirdScience"
 
 minecraft {
     version = "1.7.10-10.13.2.1343-1.7.10"
@@ -50,26 +54,8 @@ minecraft {
 
 processResources
 {
-    // Get a build number, increment it. Thank you 
-    // http://stackoverflow.com/questions/21405457/autoincrement-versioncode-with-gradle-extra-properties
-    // for this code, which I have adapted.
-    def buildnum = 0
-    def versionPropsFile = file('version.properties')
-
-    if (versionPropsFile.canRead()) {
-    	def Properties versionProps = new Properties()
-    	versionProps.load(new FileInputStream(versionPropsFile))
-
-    	buildnum = versionProps['BUILD_NUMBER'].toInteger() + 1
-    	versionProps['BUILD_NUMBER']=buildnum.toString()
-    	versionProps.store(versionPropsFile.newWriter(), null)
-    }
-    else {
-    	throw new GradleException("Could not read version.properties!")
-    } 
-
     // this will ensure that this task is redone when the versions change.
-    inputs.property "version", project.version + "." + buildnum.toString()
+    inputs.property "version", project.version
     inputs.property "mcversion", project.minecraft.version
 
     // replace stuff in mcmod.info, nothing else
