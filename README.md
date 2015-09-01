@@ -3,6 +3,8 @@ Weird Science
 
 A Minecraft mod intended to add more Space Station 13 style, Dwarf Fortress-style 'fun' to the tech mod experience. This is to say, you can get creative with your technology, and it can go horribly, horribly wrong.
 
+To have a working development environment, as of 8/18/2015, you will need a deobfuscated copy of OpenModsLib in ./libs/
+
 Behold, a blatant copy&paste of my jumbled notes on the subject:
 
 Weird Science ideas

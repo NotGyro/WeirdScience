@@ -4,6 +4,7 @@ version.properties
 .gradle/
 build/
 bin/
+out/
 #Minecraft game data
 eclipse/
 #Some weird metadata.

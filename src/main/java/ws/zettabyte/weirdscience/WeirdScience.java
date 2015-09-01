@@ -5,10 +5,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.util.IIcon;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import ws.zettabyte.weirdscience.block.BlockSkullOverride;
+import ws.zettabyte.weirdscience.fluid.FluidSmog;
+import ws.zettabyte.weirdscience.gas.BlockGas;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -18,7 +22,10 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 //Packet handler is just a dummy as of this point.
 @Mod(modid = WeirdScience.modid, name = WeirdScience.name, version = WeirdScience.version, dependencies = WeirdScience.dependencies)
@@ -42,6 +49,9 @@ public class WeirdScience {
     public static ArrayList<String> sounds;// = CongealedBloodBlock.sounds;
     
     public static Configuration config;
+
+    public static FluidSmog fluidSmog;
+    public static BlockGas blockSmog;    
     
 	//Important things to note: Values read from config and passed around don't reach their destination serverside unless
 	//they are null. Weird.
@@ -68,17 +78,43 @@ public class WeirdScience {
     	LanguageRegistry.instance().addStringLocalization("itemGroup.tabWeirdScience", "en_US", "Weird Science");    	
     	//NetworkRegistry.registerGuiHandler(this, new WeirdScienceGUIHandler());
     }
-   
-    @EventHandler
-    public void load(FMLInitializationEvent event) {
+
+    @Mod.EventHandler
+    public void init(FMLInitializationEvent event) {
+    	fluidSmog = (FluidSmog) new FluidSmog("Smog");
+    	blockSmog = (BlockGas) new BlockGas(fluidSmog) {
+            @SideOnly(Side.CLIENT)
+            @Override
+            public void registerBlockIcons(IIconRegister register) {
+            	this.blockIcon = register.registerIcon("weirdscience:smog");
+                
+                fluidSmog.setIcons(this.blockIcon);
+            }
+    	};
+    	
+    	blockSmog.setBlockTextureName("WeirdScience:smog");
+    	
+    	//blockSmog.setEntitiesInteract(true);
+    	//TODO: Add actual acid.
+    	//gasSmogBlock.setBlockAcid(fluidAcidBlock);
+    	
+    	//gasSmogBlock.setExplosionThreshhold(8);
+    	
+    	blockSmog.setHardness(0.5f);
+        
+        blockSmog.setBlockName("blockSmog");
+        fluidSmog.setUnlocalizedName("smog");
+	    GameRegistry.registerBlock(blockSmog, "blockSmog");
+    	
+    	
         config.save();
         
         proxy.registerRenderers();
-        
         proxy.registerSound();
     }
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
+    	blockSmog.setCreativeTab(tabWeirdScience);
     }
 }
