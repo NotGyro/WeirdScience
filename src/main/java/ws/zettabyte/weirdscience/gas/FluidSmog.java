@@ -1,4 +1,4 @@
-package ws.zettabyte.weirdscience.fluid;
+package ws.zettabyte.weirdscience.gas;
 
 import ws.zettabyte.weirdscience.chemistry.IBioactive;
 import net.minecraft.entity.EntityLivingBase;

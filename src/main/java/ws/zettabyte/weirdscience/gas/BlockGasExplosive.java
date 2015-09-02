@@ -52,8 +52,7 @@ public class BlockGasExplosive extends BlockGas {
     
     //Check to see if the new neighbor is a block that should cause us to explode.
     @Override
-	public void tryReaction(World world, int x, int y, int z, int xO, int yO, int zO) {
-    	Block b = world.getBlock(xO, yO, zO);
+	public void tryReaction(World world, int x, int y, int z, int xO, int yO, int zO, Block b) {
     	if(((b == Blocks.fire || b == Blocks.torch) || b == Blocks.lava)){
         	if(canExplode(world, x, y, z)) {
                 world.createExplosion(null, x, y, z, explosionStrength, true);

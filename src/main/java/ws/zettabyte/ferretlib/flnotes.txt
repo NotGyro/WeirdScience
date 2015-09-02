@@ -1,0 +1,14 @@
+Note: in order to avoid being an architecture astronaut, I'm gonna go all library-ish with this one rather than framework-ish.
+And so, we should end up with a lot of annotations and very few big ol' black box classes that just consume our rigid,
+hierarchical class structures.
+
+Big ol' inheritance trees are a no-no here in general.
+
+Annotations are a good thing. Inline classes, too.
+
+Parts of item and block init to do declaratively:
+Config (of all things) 
+Name, unlocalized name
+**Game registry shit**
+Creative tab-eroonies 
+Feature divisions

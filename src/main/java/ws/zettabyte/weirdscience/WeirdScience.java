@@ -5,15 +5,30 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBucket;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.oredict.OreDictionary;
+import ws.zettabyte.ferretlib.BucketEventManager;
+import ws.zettabyte.ferretlib.block.BlockGeneric;
+import ws.zettabyte.ferretlib.initutils.Conf;
+import ws.zettabyte.ferretlib.initutils.ConfAnnotationParser;
+import ws.zettabyte.ferretlib.initutils.Configgable;
 import ws.zettabyte.weirdscience.block.BlockSkullOverride;
-import ws.zettabyte.weirdscience.fluid.FluidSmog;
+import ws.zettabyte.weirdscience.fluid.BlockAcid;
+import ws.zettabyte.weirdscience.fluid.FluidAcid;
 import ws.zettabyte.weirdscience.gas.BlockGas;
 import ws.zettabyte.weirdscience.gas.BlockGasExplosive;
+import ws.zettabyte.weirdscience.gas.FluidSmog;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -29,12 +44,13 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 //Packet handler is just a dummy as of this point.
+@Configgable(section="test")
 @Mod(modid = WeirdScience.modid, name = WeirdScience.name, version = WeirdScience.version, dependencies = WeirdScience.dependencies)
 public class WeirdScience {
 	public static final String modid = "WeirdScience";
 	public static final String name = "Weird Science";
 	public static final String version = "Weird Science";
-	public static final String dependencies = "";
+	public static final String dependencies = "required-after:FerretLib;";
 	
     @Instance("WeirdScience")
     public static WeirdScience instance;
@@ -52,8 +68,18 @@ public class WeirdScience {
     public static Configuration config;
 
     public static FluidSmog fluidSmog;
-    public static BlockGasExplosive blockSmog;    
+    public static BlockGasExplosive blockSmog;
     
+    public static FluidAcid fluidAcid;
+    public static BlockAcid blockAcid;
+    
+    public static ItemBucket itemAcidBucket; //TODO: Eat through iron buckets, need non-reactive gold buckets.
+    
+
+    public static BlockGeneric blockRust;
+    
+    @Conf(name="test", comment="Beep boop.", def="9")
+    public static int testConf = 0;
 	//Important things to note: Values read from config and passed around don't reach their destination serverside unless
 	//they are null. Weird.
 	
@@ -62,7 +88,7 @@ public class WeirdScience {
         //logger.setParent((Logger) FMLLog.getLogger());
 		logger.setLevel(Level.ALL);
 	}
-	
+	BucketEventManager bucketMan = new BucketEventManager(); //My favorite superhero
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
     	//Do strange hacks.
@@ -75,14 +101,34 @@ public class WeirdScience {
     	//Get on with things.
     	config = new Configuration(event.getSuggestedConfigurationFile());
         config.load();
+        
+        ConfAnnotationParser anno = new ConfAnnotationParser(config);
+        try {
+			anno.parse(this.getClass());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        logger.warning("Important news: " + Integer.toString(this.testConf));
     	//logger.info("Testing.");
     	LanguageRegistry.instance().addStringLocalization("itemGroup.tabWeirdScience", "en_US", "Weird Science");    	
     	//NetworkRegistry.registerGuiHandler(this, new WeirdScienceGUIHandler());
+    	
+    	MinecraftForge.EVENT_BUS.register(bucketMan);
     }
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-    	fluidSmog = (FluidSmog) new FluidSmog("Smog");
+    	fluidSmog = (FluidSmog) new FluidSmog("smog");
+        fluidSmog.setUnlocalizedName("smog");
+        FluidRegistry.registerFluid(fluidSmog);
+        
+	    fluidAcid = new FluidAcid("acid");
+	    fluidAcid.setUnlocalizedName("acid");
+        FluidRegistry.registerFluid(fluidAcid);
+	    
+	    
     	blockSmog = (BlockGasExplosive) new BlockGasExplosive(fluidSmog) {
             @SideOnly(Side.CLIENT)
             @Override
@@ -97,21 +143,80 @@ public class WeirdScience {
     	blockSmog.isReactive = true;
     	blockSmog.explosionThreshhold = 6;
     	
-    	blockSmog.setBlockTextureName("WeirdScience:smog");
-    	
-    	//blockSmog.setEntitiesInteract(true);
-    	//TODO: Add actual acid.
-    	//gasSmogBlock.setBlockAcid(fluidAcidBlock);
-    	
-    	//gasSmogBlock.setExplosionThreshhold(8);
-    	
+    	blockSmog.setBlockTextureName("weirdscience:smog");
     	blockSmog.setHardness(0.5f);
+    	
+    	fluidSmog.setBlock(blockSmog);
         
         blockSmog.setBlockName("blockSmog");
-        fluidSmog.setUnlocalizedName("smog");
 	    GameRegistry.registerBlock(blockSmog, "blockSmog");
+	    
+	    blockAcid = new BlockAcid(fluidAcid) {
+            @SideOnly(Side.CLIENT)
+            @Override
+            public void registerBlockIcons(IIconRegister register) {
+            	this.blockIcon = register.registerIcon("weirdscience:placeholderacid");
+                
+            	fluidAcid.setIcons(this.blockIcon);
+            }
+    	};
     	
+    	blockAcid.entitiesInteract = true;
+    	blockAcid.isReactive = true;
+
+    	fluidAcid.setBlock(blockAcid);
     	
+	    blockAcid.setBlockTextureName("weirdscience:placeholderacid");
+	    GameRegistry.registerBlock(blockAcid, "blockAcid");
+	    
+	    itemAcidBucket = new ItemBucket(blockAcid);
+	    itemAcidBucket.setUnlocalizedName("acidBucket");
+	    itemAcidBucket.setCreativeTab(tabWeirdScience);
+	    itemAcidBucket.setTextureName("weirdscience:acidbucket");
+	    FluidContainerRegistry.registerFluidContainer(fluidAcid, new ItemStack(itemAcidBucket), new ItemStack(Items.bucket));
+	    GameRegistry.registerItem(itemAcidBucket, "acidBucket");
+
+        blockRust = new BlockGeneric(Material.iron);
+        blockRust.setBlockTextureName("weirdscience:rustblock");
+        blockRust.setHarvestLevel("pickaxe",0);
+        blockRust.setHardness(0.6F);
+        blockRust.setBlockName("blockRust");
+	    GameRegistry.registerBlock(blockRust, "blockRust");
+	    blockRust.setCreativeTab(tabWeirdScience);
+        
+        Item ingotAluminum = new Item();
+        ingotAluminum.setTextureName("weirdscience:aluminumingot");
+        OreDictionary.registerOre("ingotAluminum", ingotAluminum);
+        ingotAluminum.setUnlocalizedName("ingotAluminum");
+        GameRegistry.registerItem(ingotAluminum, "ingotAluminum");
+        ingotAluminum.setCreativeTab(tabWeirdScience);
+        
+
+        Item dustAluminum = new Item();
+        dustAluminum.setTextureName("weirdscience:aluminumdust");
+        OreDictionary.registerOre("dustAluminum", dustAluminum);
+        dustAluminum.setUnlocalizedName("dustAluminum");
+        GameRegistry.registerItem(dustAluminum, "dustAluminum");
+        dustAluminum.setCreativeTab(tabWeirdScience);
+
+        Item itemAshes = new Item();
+        itemAshes.setTextureName("weirdscience:ashes");
+        OreDictionary.registerOre("ashes", itemAshes);
+        itemAshes.setUnlocalizedName("itemAshes");
+	    GameRegistry.registerItem(itemAshes, "itemAshes");
+	    itemAshes.setCreativeTab(tabWeirdScience);
+
+        Item itemRust = new Item();
+        itemRust.setTextureName("weirdscience:rustpile");
+        itemRust.setUnlocalizedName("itemRust");
+        GameRegistry.registerItem(itemRust, "itemRust");
+        itemRust.setCreativeTab(tabWeirdScience);
+
+        blockRust.setItemDropped(new ItemStack(itemRust, 6, 0));
+        blockRust.setDroppedRandomBonus(3);
+        
+	    
+	    
         config.save();
         
         proxy.registerRenderers();
@@ -121,5 +226,7 @@ public class WeirdScience {
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
     	blockSmog.setCreativeTab(tabWeirdScience);
+    	itemAcidBucket.setCreativeTab(tabWeirdScience);
+    	bucketMan.addRecipe(blockAcid, new ItemStack(itemAcidBucket));
     }
 }

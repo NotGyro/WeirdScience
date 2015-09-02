@@ -258,12 +258,12 @@ public class BlockGas extends Block implements IGasBlock {
 			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 				adjBlock = world.getBlock(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
 				if(adjBlock != null) {
-					tryReaction(world, x, y, z, x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
+					tryReaction(world, x, y, z, x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ, adjBlock);
 				}
 			}
 		}
 	}
-	public void tryReaction(World world, int x, int y, int z, int xO, int yO, int zO) { }
+	public void tryReaction(World world, int x, int y, int z, int xO, int yO, int zO, Block b) { }
 	
 	//---- Most fluid behavior: ----
 	@Override
