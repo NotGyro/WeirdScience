@@ -1,16 +1,17 @@
 package ws.zettabyte.weirdscience.fluid;
 
+import ws.zettabyte.weirdscience.chemistry.IBioactive;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.fluids.Fluid;
 
-public class FluidAcid extends Fluid {//implements IBioactive, IRegistrable {
+public class FluidAcid extends Fluid implements IBioactive {
 
 	public int damage = 4;
 	public FluidAcid(String fluidName) {
 		super(fluidName);
 	}
-/*
+	
 	@Override
 	public boolean contactAffectCreature(EntityLivingBase affected) {
 		affected.attackEntityFrom(DamageSource.magic, (float)damage);
@@ -57,20 +58,4 @@ public class FluidAcid extends Fluid {//implements IBioactive, IRegistrable {
 	public boolean canBreatheAffectCreature() {
 		return true;
 	}
-
-	@Override
-	public String getEnglishName() {
-		return this.getLocalizedName();
-	}
-
-	@Override
-	public String getGameRegistryName() {
-		return this.getUnlocalizedName();
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return true;
-	}
-*/
 }

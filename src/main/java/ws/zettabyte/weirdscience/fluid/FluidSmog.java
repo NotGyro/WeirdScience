@@ -1,16 +1,17 @@
 package ws.zettabyte.weirdscience.fluid;
 
+import ws.zettabyte.weirdscience.chemistry.IBioactive;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.fluids.Fluid;
 
-public class FluidSmog extends Fluid { // implements IBioactive, IRegistrable {
+public class FluidSmog extends Fluid implements IBioactive {
 
 	public FluidSmog(String fluidName) {
 		super(fluidName);
 	}
-/*
+
 	@Override
 	public boolean contactAffectCreature(EntityLivingBase affected) {
 		return false;
@@ -55,19 +56,5 @@ public class FluidSmog extends Fluid { // implements IBioactive, IRegistrable {
 	public boolean canBreatheAffectCreature() {
 		return true;
 	}
-	@Override
-	public String getEnglishName() {
-		return this.getLocalizedName();
-	}
 
-	@Override
-	public String getGameRegistryName() {
-		return this.getUnlocalizedName();
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return true;
-	}
-*/
 }

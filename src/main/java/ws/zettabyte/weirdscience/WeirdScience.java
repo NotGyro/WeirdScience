@@ -13,6 +13,7 @@ import net.minecraftforge.common.MinecraftForge;
 import ws.zettabyte.weirdscience.block.BlockSkullOverride;
 import ws.zettabyte.weirdscience.fluid.FluidSmog;
 import ws.zettabyte.weirdscience.gas.BlockGas;
+import ws.zettabyte.weirdscience.gas.BlockGasExplosive;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -51,7 +52,7 @@ public class WeirdScience {
     public static Configuration config;
 
     public static FluidSmog fluidSmog;
-    public static BlockGas blockSmog;    
+    public static BlockGasExplosive blockSmog;    
     
 	//Important things to note: Values read from config and passed around don't reach their destination serverside unless
 	//they are null. Weird.
@@ -82,7 +83,7 @@ public class WeirdScience {
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
     	fluidSmog = (FluidSmog) new FluidSmog("Smog");
-    	blockSmog = (BlockGas) new BlockGas(fluidSmog) {
+    	blockSmog = (BlockGasExplosive) new BlockGasExplosive(fluidSmog) {
             @SideOnly(Side.CLIENT)
             @Override
             public void registerBlockIcons(IIconRegister register) {
@@ -91,6 +92,10 @@ public class WeirdScience {
                 fluidSmog.setIcons(this.blockIcon);
             }
     	};
+    	
+    	blockSmog.entitiesInteract = true;
+    	blockSmog.isReactive = true;
+    	blockSmog.explosionThreshhold = 6;
     	
     	blockSmog.setBlockTextureName("WeirdScience:smog");
     	

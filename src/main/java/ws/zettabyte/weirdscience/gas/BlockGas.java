@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
+import ws.zettabyte.weirdscience.chemistry.IBioactive;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.IBlockAccess;
@@ -24,19 +26,21 @@ public class BlockGas extends Block implements IGasBlock {
 	//If a block's concentration is lower than or equal to this, there is a chance to dissipate.
 	public int dissipationConcentration = 2;
 	
-	public GasWeight weight = GasWeight.LIGHTER;
+	public GasWeight weight = GasWeight.NEUTRAL;
 	
 	public boolean doesConcentrationMatter = false; //Do changes in Concentration incur block updates?
 	
-	protected boolean entitiesInteract = false;
+	public boolean entitiesInteract = false;
+	public boolean isReactive = false;
 	
 	protected Fluid fluid;
+
 	
 	//int flowRate
 	
 	public BlockGas(Fluid f) {
 		//TODO: "Gas" material.
-		super(Material.clay);
+		super(MaterialGas.instance);
 		this.fluid = f;
 		// TODO Auto-generated constructor stub
 	}
@@ -224,7 +228,44 @@ public class BlockGas extends Block implements IGasBlock {
 			int mbuckets) {
 		this.setConcentration(world, x, y, z, this.getConcentrationFromMB(mbuckets));		
 	}
-
+	
+	//---- Chemistry: ----
+	@Override
+    public void onEntityCollidedWithBlock(World world, int x, int y, int z, Entity entity)
+    {
+		if(fluid == null) return;
+        if(entitiesInteract & (fluid instanceof IBioactive)) {
+        	IBioactive bioFluid = (IBioactive)fluid;
+        	if(entity == null) return;
+        	if(entity instanceof EntityLivingBase) {
+        		bioFluid.breatheAffectCreature((EntityLivingBase)entity);
+        	}
+        }
+    }
+	
+	
+	@Override
+	public void onNeighborBlockChange(World world, int x,
+			int y, int z, Block other) {
+		// TODO Auto-generated method stub
+		super.onNeighborBlockChange(world, x, y, z, other);
+		updateReaction(world, x, y, z);
+	}
+	
+	public void updateReaction(World world, int x, int y, int z) {
+		if(isReactive ) {
+			Block adjBlock;
+			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+				adjBlock = world.getBlock(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
+				if(adjBlock != null) {
+					tryReaction(world, x, y, z, x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
+				}
+			}
+		}
+	}
+	public void tryReaction(World world, int x, int y, int z, int xO, int yO, int zO) { }
+	
+	//---- Most fluid behavior: ----
 	@Override
 	public int pushIntoBlock(World world, int x, int y, int z, int amount) {
 		// TODO Auto-generated method stub
@@ -301,6 +342,7 @@ public class BlockGas extends Block implements IGasBlock {
 				//Otherwise, try to equalize into the direction of least concentration.
 				doFlowToKnown(world, x, y, z, rand, ourConcentration, amtLeastConc, dirLeastConc);
 			}
+			updateReaction(world, x, y, z);
 		}
 		tryDissipate(world, x, y, z, ourConcentration, rand);
 	}
@@ -362,6 +404,7 @@ public class BlockGas extends Block implements IGasBlock {
     public void onBlockAdded(World world, int x, int y, int z) {
     	super.onBlockAdded(world, x, y, z);
 		world.scheduleBlockUpdateWithPriority(x, y, z, this, 20, 0);
+		updateReaction(world, x, y, z);
     }
     //Placed via itemblock (for creative mode & testing).
 	@Override
