@@ -23,6 +23,7 @@ import ws.zettabyte.ferretlib.block.BlockGeneric;
 import ws.zettabyte.ferretlib.initutils.Conf;
 import ws.zettabyte.ferretlib.initutils.ConfAnnotationParser;
 import ws.zettabyte.ferretlib.initutils.Configgable;
+import ws.zettabyte.ferretlib.initutils.InitUtils;
 import ws.zettabyte.weirdscience.block.BlockSkullOverride;
 import ws.zettabyte.weirdscience.fluid.BlockAcid;
 import ws.zettabyte.weirdscience.fluid.FluidAcid;
@@ -57,6 +58,8 @@ public class WeirdScience {
     
     @SidedProxy(clientSide="ws.zettabyte.weirdscience.client.ClientProxy", serverSide="ws.zettabyte.weirdscience.CommonProxy")
     public static CommonProxy proxy;
+    
+    protected static InitUtils iu;
     
     //The logger for the mod. Should this not be static? Since it's Minecraft, it's unlikely that there will be threading issues.
     public static final Logger logger = Logger.getLogger("WeirdScience");
@@ -102,6 +105,12 @@ public class WeirdScience {
     	config = new Configuration(event.getSuggestedConfigurationFile());
         config.load();
         
+        iu = new InitUtils();
+        iu.config = config;
+        iu.log = logger;
+        iu.tab = tabWeirdScience;
+        iu.modid = "weirdscience";
+        
         ConfAnnotationParser anno = new ConfAnnotationParser(config);
         try {
 			anno.parse(this.getClass());
@@ -127,90 +136,49 @@ public class WeirdScience {
 	    fluidAcid = new FluidAcid("acid");
 	    fluidAcid.setUnlocalizedName("acid");
         FluidRegistry.registerFluid(fluidAcid);
-	    
-	    
-    	blockSmog = (BlockGasExplosive) new BlockGasExplosive(fluidSmog) {
-            @SideOnly(Side.CLIENT)
-            @Override
-            public void registerBlockIcons(IIconRegister register) {
-            	this.blockIcon = register.registerIcon("weirdscience:smog");
-                
-                fluidSmog.setIcons(this.blockIcon);
-            }
-    	};
-    	
+	   
+        
+    	blockSmog = (BlockGasExplosive) new BlockGasExplosive(fluidSmog);
     	blockSmog.entitiesInteract = true;
     	blockSmog.isReactive = true;
     	blockSmog.explosionThreshhold = 6;
-    	
-    	blockSmog.setBlockTextureName("weirdscience:smog");
-    	blockSmog.setHardness(0.5f);
-    	
-    	fluidSmog.setBlock(blockSmog);
+        iu.initBlockConfig(blockSmog, "Smog").setHardness(0.5f);
         
-        blockSmog.setBlockName("blockSmog");
-	    GameRegistry.registerBlock(blockSmog, "blockSmog");
+    	fluidSmog.setBlock(blockSmog);
 	    
-	    blockAcid = new BlockAcid(fluidAcid) {
-            @SideOnly(Side.CLIENT)
-            @Override
-            public void registerBlockIcons(IIconRegister register) {
-            	this.blockIcon = register.registerIcon("weirdscience:placeholderacid");
-                
-            	fluidAcid.setIcons(this.blockIcon);
-            }
-    	};
     	
+	    blockAcid = new BlockAcid(fluidAcid);
     	blockAcid.entitiesInteract = true;
     	blockAcid.isReactive = true;
-
+        iu.initBlockConfig(blockAcid, "Acid").setBlockTextureName("weirdscience:placeholderacid");
+        
     	fluidAcid.setBlock(blockAcid);
-    	
-	    blockAcid.setBlockTextureName("weirdscience:placeholderacid");
-	    GameRegistry.registerBlock(blockAcid, "blockAcid");
-	    
-	    itemAcidBucket = new ItemBucket(blockAcid);
-	    itemAcidBucket.setUnlocalizedName("acidBucket");
-	    itemAcidBucket.setCreativeTab(tabWeirdScience);
-	    itemAcidBucket.setTextureName("weirdscience:acidbucket");
-	    FluidContainerRegistry.registerFluidContainer(fluidAcid, new ItemStack(itemAcidBucket), new ItemStack(Items.bucket));
-	    GameRegistry.registerItem(itemAcidBucket, "acidBucket");
 
         blockRust = new BlockGeneric(Material.iron);
-        blockRust.setBlockTextureName("weirdscience:rustblock");
-        blockRust.setHarvestLevel("pickaxe",0);
+        iu.initBlockConfig(blockRust, "Rust").setHarvestLevel("pickaxe",0);
         blockRust.setHardness(0.6F);
-        blockRust.setBlockName("blockRust");
-	    GameRegistry.registerBlock(blockRust, "blockRust");
-	    blockRust.setCreativeTab(tabWeirdScience);
+    	
+	    itemAcidBucket = new ItemBucket(blockAcid);
+	    FluidContainerRegistry.registerFluidContainer(fluidAcid, new ItemStack(itemAcidBucket), new ItemStack(Items.bucket));
+	    iu.initItemConfig(itemAcidBucket, "Acid Bucket");
         
         Item ingotAluminum = new Item();
-        ingotAluminum.setTextureName("weirdscience:aluminumingot");
         OreDictionary.registerOre("ingotAluminum", ingotAluminum);
-        ingotAluminum.setUnlocalizedName("ingotAluminum");
-        GameRegistry.registerItem(ingotAluminum, "ingotAluminum");
-        ingotAluminum.setCreativeTab(tabWeirdScience);
+        OreDictionary.registerOre("ingotAluminium", ingotAluminum);
+        iu.initItemConfig(ingotAluminum, "Aluminum Ingot");
         
 
         Item dustAluminum = new Item();
-        dustAluminum.setTextureName("weirdscience:aluminumdust");
         OreDictionary.registerOre("dustAluminum", dustAluminum);
-        dustAluminum.setUnlocalizedName("dustAluminum");
-        GameRegistry.registerItem(dustAluminum, "dustAluminum");
-        dustAluminum.setCreativeTab(tabWeirdScience);
+        OreDictionary.registerOre("dustAluminium", dustAluminum);
+        iu.initItemConfig(dustAluminum, "Aluminum Dust");
 
         Item itemAshes = new Item();
-        itemAshes.setTextureName("weirdscience:ashes");
         OreDictionary.registerOre("ashes", itemAshes);
-        itemAshes.setUnlocalizedName("itemAshes");
-	    GameRegistry.registerItem(itemAshes, "itemAshes");
-	    itemAshes.setCreativeTab(tabWeirdScience);
+        iu.initItemConfig(itemAshes, "Ashes");
 
         Item itemRust = new Item();
-        itemRust.setTextureName("weirdscience:rustpile");
-        itemRust.setUnlocalizedName("itemRust");
-        GameRegistry.registerItem(itemRust, "itemRust");
-        itemRust.setCreativeTab(tabWeirdScience);
+        iu.initItemConfig(itemRust, "Rust").setTextureName("weirdscience:RustPile");
 
         blockRust.setItemDropped(new ItemStack(itemRust, 6, 0));
         blockRust.setDroppedRandomBonus(3);
@@ -225,8 +193,15 @@ public class WeirdScience {
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-    	blockSmog.setCreativeTab(tabWeirdScience);
     	itemAcidBucket.setCreativeTab(tabWeirdScience);
     	bucketMan.addRecipe(blockAcid, new ItemStack(itemAcidBucket));
+    	postInitClient();
+    }
+    
+
+    @SideOnly(Side.CLIENT)
+    public void postInitClient() {
+        fluidSmog.setIcons(blockSmog.getIcon(0, 0));
+        fluidAcid.setIcons(blockAcid.getIcon(0, 0));
     }
 }

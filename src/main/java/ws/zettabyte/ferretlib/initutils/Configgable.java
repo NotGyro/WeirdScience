@@ -5,7 +5,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.annotation.RetentionPolicy;
 
-//Used on classes whose fields may have @Conf on them. Recursion, here, is a thing.
+/**
+ * An annotation parsed to set static fields from values in a config file.
+ * Used on classes whose fields may have @Conf on them. Recursion, here, is a thing.
+ * @author Samuel "Gyro" Cutlip 
+ */
 @Target({ElementType.FIELD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Configgable {
