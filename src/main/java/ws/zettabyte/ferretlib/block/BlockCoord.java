@@ -1,8 +1,8 @@
 package ws.zettabyte.ferretlib.block;
 
+//The immutable version.
 public final class BlockCoord {
-	public int x = 0, y = 0, z = 0;
-	public BlockCoord() {};
+	public final int x, y, z;
 	public BlockCoord(int X, int Y, int Z) {
 		x = X; y = Y; z = Z;
 	}
