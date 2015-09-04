@@ -20,7 +20,7 @@ public class ConfAnnotationParser {
 	public void setContext(Configuration c) {
 		context = c;
 	}
-	public void parse(Class<?> clazz) throws Exception {
+	public void parse(Object instance, Class<?> clazz) throws Exception {
 		String section = "";
 		if(clazz.isAnnotationPresent(Configgable.class)) {
 			Configgable confi = clazz.getAnnotation(Configgable.class);
@@ -51,48 +51,48 @@ public class ConfAnnotationParser {
 				//Also, be on the lookout for copy-paste errors right here.
 		        if(field.getType().equals(int.class)) {
 					if(conf.comment() == "") {
-			        	field.setInt(null, 
+			        	field.setInt(instance, 
 			        			context.get(sectionUse, conf.name(), Integer.parseInt(conf.def()))
 			        			.getInt(Integer.parseInt(conf.def())));
 					}
 					else {
-			        	field.setInt(null, 
+			        	field.setInt(instance, 
 			        			context.get(sectionUse, conf.name(), Integer.parseInt(conf.def()), conf.comment())
 			        			.getInt(Integer.parseInt(conf.def())));
 					}
 		        }
 		        else if(field.getType().equals(boolean.class)) {
 					if(conf.comment() == "") {
-			        	field.setBoolean(null, 
+			        	field.setBoolean(instance, 
 			        			context.get(sectionUse, conf.name(), Boolean.parseBoolean(conf.def()))
 			        			.getBoolean(Boolean.parseBoolean(conf.def())));
 					}
 					else {
-			        	field.setBoolean(null, 
+			        	field.setBoolean(instance, 
 			        			context.get(sectionUse, conf.name(), Boolean.parseBoolean(conf.def()), conf.comment())
 			        			.getBoolean(Boolean.parseBoolean(conf.def())));
 					}
 		        }
 		        else if(field.getType().equals(double.class)) {
 					if(conf.comment() == "") {
-			        	field.setDouble(null, 
+			        	field.setDouble(instance, 
 			        			context.get(sectionUse, conf.name(), Double.parseDouble(conf.def()))
 			        			.getDouble(Double.parseDouble(conf.def())));
 					}
 					else {
-			        	field.setDouble(null, 
+			        	field.setDouble(instance, 
 			        			context.get(sectionUse, conf.name(), Double.parseDouble(conf.def()), conf.comment())
 			        			.getDouble(Double.parseDouble(conf.def())));
 					}
 		        }
 		        else if(field.getType().equals(String.class)) {
 					if(conf.comment() == "") {
-			        	field.set(null, 
+			        	field.set(instance, 
 			        			context.get(sectionUse, conf.name(), conf.def())
 			        			.getString());
 					}
 					else {
-			        	field.set(null, 
+			        	field.set(instance, 
 			        			context.get(sectionUse, conf.name(), conf.def(), conf.comment())
 			        			.getString());
 					}
@@ -102,5 +102,11 @@ public class ConfAnnotationParser {
 		        }
 			}
 		}
+	}
+	public void parse(Class<?> clazz) throws Exception {
+		this.parse(null, clazz);
+	}
+	public void parse(Object instance) throws Exception {
+		this.parse(instance, instance.getClass());
 	}
 }

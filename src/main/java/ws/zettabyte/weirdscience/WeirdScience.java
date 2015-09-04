@@ -178,7 +178,7 @@ public class WeirdScience {
         iu.initItemConfig(itemAshes, "Ashes");
 
         Item itemRust = new Item();
-        iu.initItemConfig(itemRust, "Rust").setTextureName("weirdscience:RustPile");
+        iu.initItemConfig(itemRust, "Rust").setTextureName("weirdscience:rustPile");
 
         blockRust.setItemDropped(new ItemStack(itemRust, 6, 0));
         blockRust.setDroppedRandomBonus(3);

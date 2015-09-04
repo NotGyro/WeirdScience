@@ -23,6 +23,38 @@ public final class InitUtils {
 	public Configuration config;
     public CreativeTabs tab;
 
+    //How very appropriate.
+    protected static String processName(String in) {
+    	if(in.contains(" ")) {
+        	String[] parts = in.split(" ");
+        	String out = "";
+	    	for(int i = 0; i < parts.length; ++i) {
+	    		if(i == 0) {
+	    			out += parts[i].toLowerCase();
+	    		}
+	    		else {
+	    			out += parts[i];
+	    		}
+	    	}
+	    	return out;    	
+    	}
+    	else {
+    		return in.toLowerCase();
+    	}
+    }
+    protected static String deSpaceName(String in) {
+    	if(in.contains(" ")) {
+        	String[] parts = in.split(" ");
+        	String out = "";
+	    	for(int i = 0; i < parts.length; ++i) {
+	    		out += parts[i];
+	    	}
+	    	return out;    	
+    	}
+    	else {
+    		return in;
+    	}
+    }
     /**
 	 * Registers a block with GameRegistry, sets its unlocalized name, calls .setBlockTextureName()
 	 * with a default value derived from our name.
@@ -33,11 +65,10 @@ public final class InitUtils {
 	 * an exception will be thrown instead.
 	 */
 	public Block initBlock(Block block, String name) {
-		String simpleName = name.replace(" ", "");
 		//A default unlocalized name.
-		block.setBlockName("block" + simpleName);
-		block.setBlockTextureName(modid + ":" + simpleName);
-	    GameRegistry.registerBlock(block, "block" + simpleName);
+		block.setBlockName("block" + deSpaceName(name));
+		block.setBlockTextureName(modid + ":" + processName(name));
+	    GameRegistry.registerBlock(block, "block" + deSpaceName(name));
 	    if(tab != null) {
 	    	if(block instanceof ICreativeTabInfo) {
 	    		if(((ICreativeTabInfo)block).isInCreativeTab()) {
@@ -88,11 +119,10 @@ public final class InitUtils {
 	 * an exception will be thrown instead.
 	 */
 	public Item initItem(Item item, String name) {
-		String simpleName = name.replace(" ", "");
 		//A default unlocalized name.
-		item.setUnlocalizedName("item" + simpleName);
-		item.setTextureName(modid + ":" + simpleName);
-	    GameRegistry.registerItem(item, "item" + simpleName);
+		item.setUnlocalizedName("item" + deSpaceName(name));
+		item.setTextureName(modid + ":" + processName(name));
+	    GameRegistry.registerItem(item, "item" + deSpaceName(name));
 	    if(tab != null) {
 	    	if(item instanceof ICreativeTabInfo) {
 	    		if(((ICreativeTabInfo)item).isInCreativeTab()) {
