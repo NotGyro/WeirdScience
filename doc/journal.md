@@ -25,4 +25,10 @@ Initially wanted an INamed interface, but then that's totally unnecessary inheri
 
 As of now, InitUtils has two variables of required state, String modid; and Logger log;, and two variables of optional state, Configuration config; and public CreativeTabs tab;.
 
-Rethinking: Should do lowerCamelCase and no prepended "item" or "block".
+Rethinking: Should do lowerCamelCase [s]and no prepended "item" or "block".[/s]
+
+Day 4
+=====
+Yeah, so prepending item and block was a good idea in the first place since items and blocks of the same name can cause a conflict.
+
+"Aluminum Ingot" becomes "itemAluminumIngot" with a texture of "aluminumIngot". a block named "Rust" becomes "blockRust" with a texture of "rust". Textures are lower-camel-case, unlocalized names are "item" or "block" prepended to the name sans spaces.
