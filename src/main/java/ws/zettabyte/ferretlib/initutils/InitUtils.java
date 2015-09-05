@@ -8,6 +8,7 @@ import net.minecraftforge.common.config.Configuration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import ws.zettabyte.ferretlib.block.IInfoTileEntity;
 import ws.zettabyte.weirdscience.CreativeTabWeirdScience;
 import cpw.mods.fml.common.registry.GameRegistry;
 
@@ -79,6 +80,9 @@ public final class InitUtils {
 	    		block.setCreativeTab(tab);
 		    }
 	    }
+		if(block instanceof IInfoTileEntity) {
+			GameRegistry.registerTileEntity(((IInfoTileEntity)block).getTileEntityType(), deSpaceName(name));
+		}
 		return block;
 	}
 	
@@ -99,10 +103,18 @@ public final class InitUtils {
 		if(config == null) return initBlock(block, name);
 		//Otherwise...
 		try {
-			(new ConfAnnotationParser(config)).parse(block.getClass());
+			(new ConfAnnotationParser(config)).parse(block);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		if(block instanceof IInfoTileEntity) {
+			try {
+				(new ConfAnnotationParser(config)).parse(((IInfoTileEntity)block).getTileEntityType());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		initBlock(block, name);
 		return block;
@@ -153,7 +165,7 @@ public final class InitUtils {
 		if(config == null) return initItem(item, name);
 		//Otherwise...
 		try {
-			(new ConfAnnotationParser(config)).parse(item.getClass());
+			(new ConfAnnotationParser(config)).parse(item);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -32,3 +32,11 @@ Day 4
 Yeah, so prepending item and block was a good idea in the first place since items and blocks of the same name can cause a conflict.
 
 "Aluminum Ingot" becomes "itemAluminumIngot" with a texture of "aluminumIngot". a block named "Rust" becomes "blockRust" with a texture of "rust". Textures are lower-camel-case, unlocalized names are "item" or "block" prepended to the name sans spaces.
+
+Day 6
+=========
+Yesterday I made config annotation processing work on instances, rather than just classes (although you can still provide just a class if you so desire.) Forgot to write it down. Whoops
+
+TODO: Gasses should be difficult to use as simple Forge Fluids. So, gas-containing tile entities will not extend IFluidContainer, gas blocks will not be possible to pick up as Forge fluids from in-world, etc... Need different machinery. Then, you can use a condenser - they're still technically forge fluids - to put them in other mods' storage systems.
+
+Config annotations on TileEntities provided by blocks implementing IInfoTileEntity will now be processed - however, this only supports static fields. Tile Entity instances will not have any @Confs processed. 

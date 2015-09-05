@@ -1,5 +1,6 @@
 package ws.zettabyte.ferretlib.block;
 
+import ws.zettabyte.ferretlib.IDebugInfo;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -12,17 +13,10 @@ import net.minecraftforge.common.util.ForgeDirection;
  * @author gyro
  *
  */
-public class BlockContainerBase extends BlockContainer {
+public abstract class BlockContainerBase extends BlockContainer implements IDebuggableBlock {
 
 	public BlockContainerBase(Material material) {
 		super(material);
-		// TODO Auto-generated constructor stub
-	}
-
-	@Override
-	public TileEntity createNewTileEntity(World world, int metadata) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
     /**
@@ -71,5 +65,16 @@ public class BlockContainerBase extends BlockContainer {
             }
         }
     }
+    
+	@Override
+	public String getDebugInfo(IBlockAccess world, int x, int y, int z,
+			int metadata) {
+		TileEntity TE = world.getTileEntity(x, y, z);
+		if(TE == null) {
+			return "Tile Entity is null!";
+		}
+		if(TE instanceof IDebugInfo) return ((IDebugInfo)TE).getDebugInfo();
+		return "";
+	}
 
 }

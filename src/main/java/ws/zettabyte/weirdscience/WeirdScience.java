@@ -30,6 +30,7 @@ import ws.zettabyte.weirdscience.fluid.FluidAcid;
 import ws.zettabyte.weirdscience.gas.BlockGas;
 import ws.zettabyte.weirdscience.gas.BlockGasExplosive;
 import ws.zettabyte.weirdscience.gas.FluidSmog;
+import ws.zettabyte.weirdscience.machine.BlockCatalyticEngine;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -78,8 +79,9 @@ public class WeirdScience {
     
     public static ItemBucket itemAcidBucket; //TODO: Eat through iron buckets, need non-reactive gold buckets.
     
-
     public static BlockGeneric blockRust;
+    
+    public static BlockCatalyticEngine blockCEngine;
     
     @Conf(name="test", comment="Beep boop.", def="9")
     public static int testConf = 0;
@@ -182,8 +184,10 @@ public class WeirdScience {
 
         blockRust.setItemDropped(new ItemStack(itemRust, 6, 0));
         blockRust.setDroppedRandomBonus(3);
+
+        blockCEngine = new BlockCatalyticEngine(Material.iron);
+        iu.initBlockConfig(blockCEngine, "Catalytic Engine");
         
-	    
 	    
         config.save();
         

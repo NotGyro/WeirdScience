@@ -18,6 +18,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.oredict.OreDictionary;
+import ws.zettabyte.ferretlib.initutils.ICreativeTabInfo;
 import ws.zettabyte.weirdscience.block.BlockSkullOverride;
 import ws.zettabyte.weirdscience.fluid.BlockAcid;
 import ws.zettabyte.weirdscience.fluid.FluidAcid;
@@ -66,6 +67,11 @@ public class FerretLib {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
+    	ItemDebugStick stick = new ItemDebugStick();
+    	stick.setUnlocalizedName("itemDebugStick");
+    	stick.setTextureName("stick");
+	    GameRegistry.registerItem(stick, "itemDebugStick");
+	    stick.setCreativeTab(CreativeTabs.tabMisc);
     }
 
     @EventHandler
