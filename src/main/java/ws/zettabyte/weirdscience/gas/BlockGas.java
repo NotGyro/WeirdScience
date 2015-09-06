@@ -56,7 +56,7 @@ public class BlockGas extends Block implements IGasBlock {
     	return ((float)getBlockMB(world, x, y, z) / (float)getMaxMB()) * 100.0F;
     }
 
-	private float getMaxMB() {
+	private int getMaxMB() {
 		return getMaxConcentration() * mbPerConcentration;
 	}
 	
@@ -203,6 +203,9 @@ public class BlockGas extends Block implements IGasBlock {
 			world.setBlock(x, y, z, Blocks.air, 0, 1|2);
 		}
 		else {
+			if(world.getBlock(x, y, z).isAir(world, x, y, z)) {
+				world.setBlock(x, y, z, this);
+			}
 			//if(concen >= getMaxConcentration()) {
 			//	world.setBlockMetadataWithNotify(x, y, z, 15, 1|2);
 				//Todo: spillover code
@@ -268,8 +271,38 @@ public class BlockGas extends Block implements IGasBlock {
 	//---- Most fluid behavior: ----
 	@Override
 	public int pushIntoBlock(World world, int x, int y, int z, int amount) {
-		// TODO Auto-generated method stub
-		return 0;
+		if(getConcentrationFromMB(amount) >= 1) {
+			Block block = world.getBlock(x, y, z);
+			if(block == null || block.isAir(world, x , y, z)) {
+				//Is this air?
+				setConcentration(world, x, y, z, getConcentrationFromMB(amount));
+				
+				if(amount > getMaxMB()) {
+					return amount - getMaxMB();
+				}
+				return 0;
+			}
+			else if(equivalent(block)) {
+				int blockGas = getBlockMB(world, x, y, z);
+				if((blockGas + amount) > getMaxMB()) {
+					setConcentrationByMB(world, x, y, z, getMaxConcentration()); //Set it to max.
+					return (blockGas + amount) - getMaxMB(); //Return leftovers.
+				}
+				else {
+					setConcentrationByMB(world, x, y, z, blockGas + amount); //Add amount to block.
+					return 0;
+				}
+			}
+			else {
+				//Cannot push gas into block, all of it is left over. 
+				return amount;
+			}
+		}
+		else {
+			//Less than minimum mB for a gas block.
+			//Just fizzle it.
+			return 0;
+		}
 	}
 
 	@Override

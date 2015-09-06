@@ -27,13 +27,13 @@ public class BlockCatalyticEngine extends BlockContainerBase implements
 	@Override
 	public TileEntity createNewTileEntity(World world, int meta) {
 		// TODO Auto-generated method stub
-		return new TileEntityCatalyticEngine();
+		return new TECatalyticEngine();
 	}
 
 	@Override
 	public Class getTileEntityType() {
 		// TODO Auto-generated method stub
-		return TileEntityCatalyticEngine.class;
+		return TECatalyticEngine.class;
 	}
 	
     @SideOnly(Side.CLIENT)

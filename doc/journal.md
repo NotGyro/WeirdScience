@@ -39,4 +39,22 @@ Yesterday I made config annotation processing work on instances, rather than jus
 
 TODO: Gasses should be difficult to use as simple Forge Fluids. So, gas-containing tile entities will not extend IFluidContainer, gas blocks will not be possible to pick up as Forge fluids from in-world, etc... Need different machinery. Then, you can use a condenser - they're still technically forge fluids - to put them in other mods' storage systems.
 
-Config annotations on TileEntities provided by blocks implementing IInfoTileEntity will now be processed - however, this only supports static fields. Tile Entity instances will not have any @Confs processed. 
+Config annotations on TileEntities provided by blocks implementing IInfoTileEntity will now be processed by InitUtils - however, this only supports static fields.
+
+IDebugInfo's function can return any string. It's not picky. 
+
+IInfoTileEntity is only a valid interface for blocks associated with a single TE: If TE varies by metadata, I'll write another interface for that.
+
+Also, with modded Tile Entities, it turns out that you really, really, really do need getDescriptionPacket() and onDataPacket().
+
+ItemSlot is going to change utterly (most likely including the name) but I think it's safe to say that it'll still have a public ItemStack field named "stack".
+
+Note: The extremely, extremely obvious thing to do with slots on the Tile Entity end and slots on the GUI end is to have a class of slots on the TE end with a name, and a class of slots on the GUI end with a name, and slots with the same name connect by default. Similar system for fluid tanks and energy meters, perhaps? 
+
+TODO: Some sort of hierarchical config or some way to fake hierarchical config, such that you really can get away with non-static configgable classes. Or, do we really need that much power here? I'm not sure.
+
+
+Day 7
+======
+Naming convention: Tile Entity classes are prepended with TE, rather than TileEntity, for berevity. 
+

@@ -32,7 +32,7 @@ public class ConfAnnotationParser {
 			if ((field.isAnnotationPresent(Configgable.class)) 
 					|| (field.getClass().isAnnotationPresent(Configgable.class))) {
 				//Recurse:
-				this.parse(field.getClass());				
+				this.parse(instance, field.getClass());				
 			}
 			//Conf annotation.
 			if (field.isAnnotationPresent(Conf.class)) {
