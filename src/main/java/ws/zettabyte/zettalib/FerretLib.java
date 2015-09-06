@@ -1,4 +1,4 @@
-package ws.zettabyte.ferretlib;
+package ws.zettabyte.zettalib;
 
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -18,13 +18,13 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.oredict.OreDictionary;
-import ws.zettabyte.ferretlib.initutils.ICreativeTabInfo;
 import ws.zettabyte.weirdscience.block.BlockSkullOverride;
 import ws.zettabyte.weirdscience.fluid.BlockAcid;
 import ws.zettabyte.weirdscience.fluid.FluidAcid;
 import ws.zettabyte.weirdscience.gas.BlockGas;
 import ws.zettabyte.weirdscience.gas.BlockGasExplosive;
 import ws.zettabyte.weirdscience.gas.FluidSmog;
+import ws.zettabyte.zettalib.initutils.ICreativeTabInfo;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;

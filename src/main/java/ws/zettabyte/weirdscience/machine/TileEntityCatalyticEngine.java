@@ -20,13 +20,13 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraftforge.fluids.Fluid;
-import ws.zettabyte.ferretlib.IDebugInfo;
-import ws.zettabyte.ferretlib.ItemSlot;
-import ws.zettabyte.ferretlib.block.TileEntityBase;
-import ws.zettabyte.ferretlib.initutils.Conf;
-import ws.zettabyte.ferretlib.initutils.Configgable;
 import ws.zettabyte.weirdscience.WeirdScience;
 import ws.zettabyte.weirdscience.gas.BlockGas;
+import ws.zettabyte.zettalib.IDebugInfo;
+import ws.zettabyte.zettalib.ItemSlot;
+import ws.zettabyte.zettalib.block.TileEntityBase;
+import ws.zettabyte.zettalib.initutils.Conf;
+import ws.zettabyte.zettalib.initutils.Configgable;
 
 @Configgable(section="Machine")
 public class TileEntityCatalyticEngine extends TileEntityBase implements

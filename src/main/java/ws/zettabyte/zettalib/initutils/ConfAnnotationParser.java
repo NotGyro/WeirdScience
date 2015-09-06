@@ -1,4 +1,4 @@
-package ws.zettabyte.ferretlib.initutils;
+package ws.zettabyte.zettalib.initutils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

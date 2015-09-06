@@ -1,4 +1,4 @@
-package ws.zettabyte.ferretlib.block;
+package ws.zettabyte.zettalib.block;
 
 import net.minecraft.world.IBlockAccess;
 

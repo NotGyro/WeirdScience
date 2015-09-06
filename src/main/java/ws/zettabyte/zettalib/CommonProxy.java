@@ -1,4 +1,4 @@
-package ws.zettabyte.ferretlib;
+package ws.zettabyte.zettalib;
 
 public class CommonProxy {
 

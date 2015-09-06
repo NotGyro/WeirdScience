@@ -1,4 +1,4 @@
-package ws.zettabyte.ferretlib.initutils;
+package ws.zettabyte.zettalib.initutils;
 
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -8,8 +8,8 @@ import net.minecraftforge.common.config.Configuration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import ws.zettabyte.ferretlib.block.IInfoTileEntity;
 import ws.zettabyte.weirdscience.CreativeTabWeirdScience;
+import ws.zettabyte.zettalib.block.IInfoTileEntity;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 /**

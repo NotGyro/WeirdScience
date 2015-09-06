@@ -1,4 +1,4 @@
-package ws.zettabyte.ferretlib.block;
+package ws.zettabyte.zettalib.block;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;

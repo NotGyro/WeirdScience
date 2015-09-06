@@ -1,4 +1,4 @@
-package ws.zettabyte.ferretlib.initutils;
+package ws.zettabyte.zettalib.initutils;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

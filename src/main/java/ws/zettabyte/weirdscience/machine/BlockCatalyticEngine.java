@@ -13,9 +13,9 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.common.util.RotationHelper;
-import ws.zettabyte.ferretlib.block.BlockContainerBase;
-import ws.zettabyte.ferretlib.block.IInfoTileEntity;
-import ws.zettabyte.ferretlib.initutils.ICreativeTabInfo;
+import ws.zettabyte.zettalib.block.BlockContainerBase;
+import ws.zettabyte.zettalib.block.IInfoTileEntity;
+import ws.zettabyte.zettalib.initutils.ICreativeTabInfo;
 
 public class BlockCatalyticEngine extends BlockContainerBase implements
 		ICreativeTabInfo, IInfoTileEntity {

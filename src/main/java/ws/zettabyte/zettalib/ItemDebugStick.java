@@ -1,4 +1,4 @@
-package ws.zettabyte.ferretlib;
+package ws.zettabyte.zettalib;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
@@ -7,8 +7,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.world.World;
-import ws.zettabyte.ferretlib.block.IDebuggableBlock;
-import ws.zettabyte.ferretlib.initutils.ICreativeTabInfo;
+import ws.zettabyte.zettalib.block.IDebuggableBlock;
+import ws.zettabyte.zettalib.initutils.ICreativeTabInfo;
 
 public class ItemDebugStick extends Item implements ICreativeTabInfo {
 

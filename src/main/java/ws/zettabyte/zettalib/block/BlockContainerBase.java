@@ -1,6 +1,6 @@
-package ws.zettabyte.ferretlib.block;
+package ws.zettabyte.zettalib.block;
 
-import ws.zettabyte.ferretlib.IDebugInfo;
+import ws.zettabyte.zettalib.IDebugInfo;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;

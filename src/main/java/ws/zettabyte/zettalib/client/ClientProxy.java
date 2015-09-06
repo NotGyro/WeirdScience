@@ -1,7 +1,7 @@
-package ws.zettabyte.ferretlib.client;
-import ws.zettabyte.ferretlib.CommonProxy;
+package ws.zettabyte.zettalib.client;
 import ws.zettabyte.weirdscience.EventSounds;
 import ws.zettabyte.weirdscience.WeirdScience;
+import ws.zettabyte.zettalib.CommonProxy;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
 

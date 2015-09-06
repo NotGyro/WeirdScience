@@ -1,4 +1,4 @@
-package ws.zettabyte.ferretlib;
+package ws.zettabyte.zettalib;
 
 import net.minecraft.item.ItemStack;
 
