@@ -58,3 +58,15 @@ Day 7
 ======
 Naming convention: Tile Entity classes are prepended with TE, rather than TileEntity, for berevity. 
 
+ResourceLocation("weirdscience", "textures/blocks/smog.png") is indeed the right format.
+
+Okay, I've got a bunch of shit to write here about the GUI system, but it's so in-flux I doubt I'll ever use these notes, so I'll start with the basics:
+
+GUI Widgets are hierarchical. Moving a parent GUI widget moves all child GUI widgets. Drawing a parent GUI widget draws all child widgets. 
+IGUIArt might be totally unnecessary
+A ZettaGUIScreen should be able to handle being given arbitrary widgets and run with them.
+Tooltips should be implemented by onMouseOver and access to the GUIContext's mouseX and mouseY variables.
+
+The player's inventory will be one big widget.
+
+Minecraft GUI Screens haet depth testing, and so the screen will sort the widgets in a list by layer.

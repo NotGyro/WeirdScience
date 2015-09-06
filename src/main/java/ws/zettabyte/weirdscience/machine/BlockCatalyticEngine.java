@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -13,9 +14,10 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.common.util.RotationHelper;
-import ws.zettabyte.ferretlib.block.BlockContainerBase;
-import ws.zettabyte.ferretlib.block.IInfoTileEntity;
-import ws.zettabyte.ferretlib.initutils.ICreativeTabInfo;
+import ws.zettabyte.weirdscience.WeirdScience;
+import ws.zettabyte.zettalib.block.BlockContainerBase;
+import ws.zettabyte.zettalib.block.IInfoTileEntity;
+import ws.zettabyte.zettalib.initutils.ICreativeTabInfo;
 
 public class BlockCatalyticEngine extends BlockContainerBase implements
 		ICreativeTabInfo, IInfoTileEntity {
@@ -140,5 +142,15 @@ public class BlockCatalyticEngine extends BlockContainerBase implements
 		else if (quadrant == 3) {
 			world.setBlockMetadataWithNotify(x, y, z, 4, 2);
 		}
+	}
+	public boolean onBlockActivated(World world, int x, int y, int z,
+			EntityPlayer player, int metadata, float par1, float par2,
+			float par3) {
+		TileEntity tileEntity = world.getTileEntity(x, y, z);
+		if (tileEntity == null || player.isSneaking()) {
+			return false;
+		}
+		player.openGui(WeirdScience.instance, 234, world, x, y, z);
+		return true;
 	}
 }

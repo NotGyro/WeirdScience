@@ -18,12 +18,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.oredict.OreDictionary;
-import ws.zettabyte.ferretlib.BucketEventManager;
-import ws.zettabyte.ferretlib.block.BlockGeneric;
-import ws.zettabyte.ferretlib.initutils.Conf;
-import ws.zettabyte.ferretlib.initutils.ConfAnnotationParser;
-import ws.zettabyte.ferretlib.initutils.Configgable;
-import ws.zettabyte.ferretlib.initutils.InitUtils;
 import ws.zettabyte.weirdscience.block.BlockSkullOverride;
 import ws.zettabyte.weirdscience.fluid.BlockAcid;
 import ws.zettabyte.weirdscience.fluid.FluidAcid;
@@ -31,6 +25,12 @@ import ws.zettabyte.weirdscience.gas.BlockGas;
 import ws.zettabyte.weirdscience.gas.BlockGasExplosive;
 import ws.zettabyte.weirdscience.gas.FluidSmog;
 import ws.zettabyte.weirdscience.machine.BlockCatalyticEngine;
+import ws.zettabyte.zettalib.BucketEventManager;
+import ws.zettabyte.zettalib.block.BlockGeneric;
+import ws.zettabyte.zettalib.initutils.Conf;
+import ws.zettabyte.zettalib.initutils.ConfAnnotationParser;
+import ws.zettabyte.zettalib.initutils.Configgable;
+import ws.zettabyte.zettalib.initutils.InitUtils;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -52,7 +52,7 @@ public class WeirdScience {
 	public static final String modid = "WeirdScience";
 	public static final String name = "Weird Science";
 	public static final String version = "Weird Science";
-	public static final String dependencies = "required-after:FerretLib;";
+	public static final String dependencies = "required-after:ZettaLib;";
 	
     @Instance("WeirdScience")
     public static WeirdScience instance;
@@ -193,6 +193,8 @@ public class WeirdScience {
         
         proxy.registerRenderers();
         proxy.registerSound();
+        
+        NetworkRegistry.INSTANCE.registerGuiHandler(this, instance.proxy);
     }
 
     @EventHandler
