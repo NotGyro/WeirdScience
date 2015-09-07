@@ -24,10 +24,12 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import ws.zettabyte.zettalib.IDebugInfo;
-import ws.zettabyte.zettalib.ItemSlot;
 import ws.zettabyte.zettalib.block.TileEntityBase;
 import ws.zettabyte.zettalib.initutils.Conf;
 import ws.zettabyte.zettalib.initutils.Configgable;
+import ws.zettabyte.zettalib.inventory.ItemSlot;
+import ws.zettabyte.zettalib.inventory.SlotInput;
+import ws.zettabyte.zettalib.inventory.SlotOutput;
 import ws.zettabyte.weirdscience.WeirdScience;
 import ws.zettabyte.weirdscience.gas.BlockGas;
 
@@ -35,9 +37,9 @@ import ws.zettabyte.weirdscience.gas.BlockGas;
 public class TECatalyticEngine extends TileEntityBase implements
 		IDebugInfo, ISidedInventory, IInventory {
 	//---- Inventory ----
-	private ItemSlot slotInput = new ItemSlot();
-	private ItemSlot slotOutput1 = new ItemSlot();
-	private ItemSlot slotOutput2 = new ItemSlot();
+	private ItemSlot slotInput = new SlotInput(0, "fuel");
+	private ItemSlot slotOutput1 = new SlotOutput(1, "out1");
+	private ItemSlot slotOutput2 = new SlotOutput(2, "out2");
 
 	private final ItemSlot[] slots = {slotInput, slotOutput1, slotOutput2};
 	private final ItemSlot[] slotsOut = {slotOutput1, slotOutput2};
@@ -115,7 +117,7 @@ public class TECatalyticEngine extends TileEntityBase implements
 	@Override
 	public ItemStack getStackInSlot(int s) {
 		if(s < slots.length) {
-			return slots[s].stack;
+			return slots[s].getStack();
 		}
 		return null;
 	}
@@ -124,29 +126,29 @@ public class TECatalyticEngine extends TileEntityBase implements
 	public ItemStack decrStackSize(int s, int amount) {
 		//Attempts to remove amount from slot # slotID. Returns a usable
 		//itemstack taken out of the slot: Split or just yanked.
-		if (this.slots[s] != null) {
+		return this.slots[s].splitStack(amount);
+		/*if (this.slots[s] != null) {
             ItemStack itemstack;
-            if (this.slots[s].stack.stackSize <= amount) {
-                itemstack = this.slots[s].stack;
-                this.slots[s].stack = null;
+            if (this.slots[s].getStack().stackSize <= amount) {
+                itemstack = this.slots[s].getStack();
+                this.slots[s].getStack() = null;
                 return itemstack;
             }
             else {
-                itemstack = this.slots[s].stack.splitStack(amount);
+                itemstack = this.slots[s]..getStack().splitStack(amount);
                 return itemstack;
             }
-		}
-		return null;
+		}*/
 	}
 
 	@Override
 	public ItemStack getStackInSlotOnClosing(int s) {
-        return this.slots[s].stack;
+        return this.slots[s].getStack();
 	}
 
 	@Override
 	public void setInventorySlotContents(int s, ItemStack stack) {
-        this.slots[s].stack = stack;
+        this.slots[s].setStackForce(stack);
 
         if (stack != null && stack.stackSize > this.getInventoryStackLimit()) {
         	stack.stackSize = this.getInventoryStackLimit();
@@ -230,7 +232,7 @@ public class TECatalyticEngine extends TileEntityBase implements
                 //If we are not waiting, update the entity.
                 int toBurn = 0;
                 //Make sure we have fuel, somewhere to put waste products, and energy storage capacity.
-                ItemStack fuelStack = this.slots[0].stack;
+                ItemStack fuelStack = this.slots[0].getStack();
                 if (fuelStack != null) {
                     if ((fuelStack.stackSize >= 1) 
                     		&& isItemFuel(fuelStack.getItem())) {
@@ -242,7 +244,11 @@ public class TECatalyticEngine extends TileEntityBase implements
                         	if(doExhaust) receiveExhaust(inf.fluidExhaust);
                             //Null the stack if there's nothing in it.
                             if (fuelStack.stackSize <= 0) {
-                            	this.slots[0].stack = null;
+                            	this.slots[0].setStackForce(null);
+                            	/*
+                            	 * TODO: Refactor this tile entity to be smarter about using helpful functions from
+                            	 * slot classes.
+                            	 */
                             }
                         	for(int i = 0; i < inf.byproducts.size(); ++i) {
                         		recieveByproduct(inf.byproducts.get(i).copy());
@@ -260,18 +266,18 @@ public class TECatalyticEngine extends TileEntityBase implements
     public void recieveByproduct(ItemStack stack) {
     	for(int i = 0; i < slotsOut.length; ++i) {
     		ItemSlot s = slotsOut[i];
-    		if(s.stack == null) {
-    			s.stack = stack;
+    		if(s.getStack() == null) {
+    			s.setStackForce(stack);
     			return;
     		}
-    		else if(s.stack.isItemEqual(stack)) {
-    			int total = s.stack.stackSize + stack.stackSize;
-    			s.stack.stackSize = total;
+    		else if(s.getStack().isItemEqual(stack)) {
+    			int total = s.getStack().stackSize + stack.stackSize;
+    			s.getStack().stackSize = total;
     			if(total > getInventoryStackLimit()) {
     				//Keep the new ItemStack.
-    				s.stack.stackSize = total - getInventoryStackLimit();
-    				if(s.stack.stackSize <= 0) {
-    					s.stack = null;
+    				s.getStack() .stackSize = total - getInventoryStackLimit();
+    				if(s.getStack() .stackSize <= 0) {
+    	    			s.setStackForce(null);
     				}
     				
     				stack.stackSize = getInventoryStackLimit();
@@ -355,7 +361,7 @@ public class TECatalyticEngine extends TileEntityBase implements
             byte b0 = nbttagcompound1.getByte("Slot");
 
             if (b0 >= 0 && b0 < this.slots.length) {
-                slots[b0].stack = ItemStack.loadItemStackFromNBT(nbttagcompound1);
+                slots[b0].setStackForce(ItemStack.loadItemStackFromNBT(nbttagcompound1));
             }
         }
         //Read how far we are from doing another engine tick.
@@ -379,10 +385,10 @@ public class TECatalyticEngine extends TileEntityBase implements
         //Write item stacks.
         NBTTagList nbttaglist = new NBTTagList();
         for (int i = 0; i < slots.length; ++i) {
-            if (slots[i].stack != null) {
+            if (slots[i].getStack() != null) {
                 NBTTagCompound nbttagcompound1 = new NBTTagCompound();
                 nbttagcompound1.setByte("Slot", (byte)i);
-                this.slots[i].stack.writeToNBT(nbttagcompound1);
+                this.slots[i].getStack().writeToNBT(nbttagcompound1);
                 nbttaglist.appendTag(nbttagcompound1);
             }
         }
@@ -411,16 +417,16 @@ public class TECatalyticEngine extends TileEntityBase implements
 	@Override
 	public String getDebugInfo() {
 		String inf1 = "nothing";
-		if(slotInput.stack != null) {
-			inf1 = slotInput.stack.getUnlocalizedName() + " x" + slotInput.stack.stackSize;
+		if(slotInput.getStack() != null) {
+			inf1 = slotInput.getStack().getUnlocalizedName() + " x" + slotInput.getStack().stackSize;
 		}
 		String inf2 = "nothing";
-		if(slotOutput1.stack != null) {
-			inf2 = slotOutput1.stack.getUnlocalizedName() + " x" + slotOutput1.stack.stackSize;
+		if(slotOutput1.getStack() != null) {
+			inf2 = slotOutput1.getStack().getUnlocalizedName() + " x" + slotOutput1.getStack().stackSize;
 		}
 		String inf3 = "nothing";
-		if(slotOutput2.stack != null) {
-			inf3 = slotOutput2.stack.getUnlocalizedName() + " x" + slotOutput2.stack.stackSize;
+		if(slotOutput2.getStack() != null) {
+			inf3 = slotOutput2.getStack().getUnlocalizedName() + " x" + slotOutput2.getStack().stackSize;
 		}
 		String finalinf = "Input slot contains " + inf1 + ".\n";
 		//finalinf += "Output slot contains " + inf2 + ".\n";
