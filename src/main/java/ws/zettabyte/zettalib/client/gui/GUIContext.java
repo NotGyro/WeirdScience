@@ -2,11 +2,12 @@ package ws.zettabyte.zettalib.client.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiContainer;
 
 public class GUIContext {
-	public ZettaScreen screen;
+	public SmartScreenBase screen;
 	//public final Rect2D screenRect;
-	GUIContext(ZettaScreen scr) {screen = scr;};
+	GUIContext(SmartScreenBase scr) {screen = scr;};
 	
 	public int mouseX = 0;
 	public int mouseY = 0;

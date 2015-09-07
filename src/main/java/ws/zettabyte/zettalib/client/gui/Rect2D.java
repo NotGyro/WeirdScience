@@ -31,7 +31,7 @@ public class Rect2D {
 	public void setWidth(int W) { size.setX(W); };
 	public void setHeight(int H) { size.setY(H); };
 
-	public int getCenterX() { 
+	public int getCenterX() {
 		return getPos().getX() + (getWidth() / 2);
 	};
 	public int getCenterY() { 
@@ -41,4 +41,8 @@ public class Rect2D {
 	public Vert2D getCenter() { 
 		return new Vert2D(getCenterX(), getCenterY());
 	};
+	
+	public Rect2D copy() {
+		return new Rect2D(pos.copy(), size.copy());
+	}
 }

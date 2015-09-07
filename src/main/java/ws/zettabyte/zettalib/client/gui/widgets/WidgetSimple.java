@@ -58,6 +58,17 @@ public class WidgetSimple extends WidgetContainer {
 		tintB = B; 
 		tintA = A;
 	}
+	@Override
+	public IGUIWidget newThis() {
+		return new WidgetSimple();
+	}
 	
-	
+	@Override
+	public IGUIWidget copy() {
+		IGUIWidget clone = super.copy();
+		clone.setTint(tintR, tintG, tintB, tintA);
+		((WidgetSimple)clone).setArt(tex);
+		
+		return clone;
+	}
 }

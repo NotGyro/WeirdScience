@@ -1,15 +1,19 @@
 package ws.zettabyte.zettalib.inventory;
 
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 
 public class SlotInput extends ItemSlot {
 
-	public SlotInput(int num) {
-		super(num);
+	public SlotInput(IInventory inv, int slotnum, String name) {
+		super(inv, slotnum, name);
+		// TODO Auto-generated constructor stub
 	}
-	public SlotInput(int num, String n) {
-		super(num, n);
+	public SlotInput(IInventory inv, int slotnum) {
+		super(inv, slotnum);
+		// TODO Auto-generated constructor stub
 	}
+	
 	@Override
 	public boolean canOutput() {
 		return false;
@@ -23,7 +27,7 @@ public class SlotInput extends ItemSlot {
 		return null;
 	}
 	@Override
-	public ItemStack splitStack(int amt) {
+	public ItemStack decrStackSize(int amt) {
 		return null;
 	}
 	

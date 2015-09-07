@@ -150,7 +150,7 @@ public class BlockCatalyticEngine extends BlockContainerBase implements
 		if (tileEntity == null || player.isSneaking()) {
 			return false;
 		}
-		player.openGui(WeirdScience.instance, 234, world, x, y, z);
+		player.openGui(WeirdScience.instance, 0, world, x, y, z);
 		return true;
 	}
 }

@@ -32,7 +32,7 @@ public interface IGUIWidget {
 	default void setWidth(int W) { getSize().setX(W); };
 	default void setHeight(int H) { getSize().setY(H); };
 	
-	void setTint(float R, float G, float B, float A);
+	default void setTint(float R, float G, float B, float A) {};
 	
 	/**
 	 * 
@@ -52,4 +52,6 @@ public interface IGUIWidget {
 	
 	boolean isVisible();
 	void setVisible(boolean v);
+	
+	IGUIWidget copy();
 }

@@ -3,6 +3,7 @@ package ws.zettabyte.zettalib.inventory;
 import java.util.HashMap;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -22,13 +23,12 @@ public class ContainerPlayerInv extends Container {
 	protected int beginHotbarRange = 27;
 	protected int endHotbarRange = 36;
 	
-	public ContainerPlayerInv(IDescriptiveInventory i) {
-		inv = i;
-		Iterable<ItemSlot> slots = i.getSlots();
+	public ContainerPlayerInv(IDescriptiveInventory ourInv, InventoryPlayer inventoryPlayer) {
+		inv = ourInv;
+		Iterable<ItemSlot> slots = ourInv.getSlots();
 		for(ItemSlot slot : slots) {
-			
-			SlotWrapper s = new SlotWrapper(inv, slot.slotNumber, 0, 0, slot); //Ignore positions from MC's system.
-			addSlotToContainer(s);
+			//TODO: Reposition.
+			addSlotToContainer(slot);
 			
 			if(slot.name != null) {
 				namedSlots.put(slot.name, slot);
@@ -36,6 +36,23 @@ public class ContainerPlayerInv extends Container {
 			
 			++beginPlayerInvRange;
 			++endPlayerInvRange;
+			
+			++beginHotbarRange;
+			++endHotbarRange;
+		}
+		
+
+		// Display the player's inventory.
+		for (int i = 0; i < 3; ++i) {
+			for (int j = 0; j < 9; ++j) {
+				this.addSlotToContainer(new Slot(inventoryPlayer,
+						(j + i * 9 + 9), 8 + j * 18, 84 + i * 18));
+			}
+		}
+
+		for (int i = 0; i < 9; ++i) {
+			this.addSlotToContainer(new Slot(inventoryPlayer, i, 8 + i * 18,
+					142));
 		}
 	}
 
@@ -63,8 +80,8 @@ public class ContainerPlayerInv extends Container {
 			//We are shift-clicking in the machine.
 			if(slot.slotNumber < this.beginPlayerInvRange) {
 				//Do clever checks n' stuff
-				if(slot instanceof SlotWrapper) {
-					if(((SlotWrapper)slot).slotSpec.canOutput()) {
+				if(slot instanceof ItemSlot) {
+					if(((ItemSlot)slot).canOutput()) {
 						if(putToPlayerInventory(stackCurrent) == null) {
 							return null;
 						}
@@ -84,7 +101,7 @@ public class ContainerPlayerInv extends Container {
 			}
 			else {
 				for(ItemSlot e : inv.getSlots()) {
-					if(e.canInput(stackCurrent)) {
+					if(e.isItemValid(stackCurrent)) {
 						if (!mergeItemStack(stackCurrent, e.slotNumber, e.slotNumber, false)) {
 							return null;
 						}

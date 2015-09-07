@@ -1,19 +1,20 @@
 package ws.zettabyte.zettalib.inventory;
 
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 
 public class SlotGhost extends ItemSlot {
 
-	public SlotGhost(int num, String nom) {
-		super(num, nom);
+	public SlotGhost(IInventory inv, int slotnum, String name) {
+		super(inv, slotnum, name);
 	}
 
-	public SlotGhost(int num) {
-		super(num);
+	public SlotGhost(IInventory inv, int slotnum) {
+		super(inv, slotnum);
 	}
 
 	@Override
-	public boolean canInput(ItemStack s) {
+	public boolean isItemValid(ItemStack s) {
 		return true;
 	}
 
@@ -42,7 +43,7 @@ public class SlotGhost extends ItemSlot {
 	}
 
 	@Override
-	public ItemStack splitStack(int amt) {
+	public ItemStack decrStackSize(int amt) {
 		return null;
 	}
 

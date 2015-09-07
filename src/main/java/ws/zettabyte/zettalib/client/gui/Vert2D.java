@@ -9,4 +9,8 @@ public class Vert2D {
 	public void setX(int X) { x = X; };
 	public void setY(int Y) { y = Y; };
 	public void set(int X, int Y) { setX(X); setY(Y); };
+	
+	public Vert2D copy() {
+		return new Vert2D(x, y);
+	}
 }

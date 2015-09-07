@@ -31,4 +31,9 @@ public class OffsetVert2D extends Vert2D {
 
 	public int getXRelative() { return x; }
 	public int getYRelative() { return y; }
+	
+	@Override
+	public Vert2D copy() {
+		return new OffsetVert2D(this.x, this.y);
+	}
 }

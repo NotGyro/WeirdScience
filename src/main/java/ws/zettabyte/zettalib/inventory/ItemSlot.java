@@ -1,5 +1,9 @@
 package ws.zettabyte.zettalib.inventory;
 
+import ws.zettabyte.zettalib.client.gui.IGUIWidget;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
 
@@ -11,26 +15,35 @@ import net.minecraft.item.ItemStack;
 // * Whitelisted, blacklisted slots.
 
 //I know this is a reimplementation of package net.minecraft.inventory.Slot, but it's worth it in this case.
-public class ItemSlot {
+public class ItemSlot extends Slot {
 	protected ItemStack stack = null;
 	public int maxSize = 64;
 	
 	public final int slotNumber;
-	public final String name;
+	public String name;
+	public final IInventory inventory;
+	
+	public IGUIWidget guiInfo = null;
+	
+	public ItemSlot(IInventory inv, int slotnum) {
+		super(inv, slotnum, 0, 0);
+		inventory = inv;
+		slotNumber = slotnum;
+		name = null;
+	}
 
-	public ItemSlot(int num, String nom) {
-		slotNumber = num;
-		name = nom;
+	public ItemSlot(IInventory inv, int slotnum, String name) {
+		this(inv, slotnum);
+		this.name = name;
 	}
-	public ItemSlot(int num) {
-		this(num, null);
-	}
+
 	/**
 	 * 
 	 * @param s Input stack.
-	 * @return If we called acceptInput, would it do anything>
+	 * @return If we called acceptInput, would it do anything?
 	 */
-	public boolean canInput(ItemStack s) { return true; }
+	@Override
+	public boolean isItemValid(ItemStack stack) { return true; }
 	
 	/**
 	 * 
@@ -47,6 +60,7 @@ public class ItemSlot {
 			//Nothing in the slot
 			stack = s;
 			s = null;
+	        this.onSlotChanged();
 		}
 		else if(s.isItemEqual(stack)) {
 			int total = s.stackSize + stack.stackSize;
@@ -58,6 +72,7 @@ public class ItemSlot {
 				stack.stackSize = total;
 				s = null;
 			}
+	        this.onSlotChanged();
 		}
 		return s;
 	}
@@ -67,20 +82,26 @@ public class ItemSlot {
 	}
 	
 	public ItemStack takeStack() {
+		ItemStack ret = stack;
 		stack = null;
-		return stack;
+        this.onSlotChanged();
+		return ret;
 	}
-	
-	public ItemStack splitStack(int amt) {
+
+
+	@Override
+	public ItemStack decrStackSize(int amt) {
+		ItemStack ret = null;
 		if(amt >= stack.stackSize) {
-			return takeStack();
+	        ret = takeStack();
 		}
 		else {
-			ItemStack newStack = stack.copy();
-			newStack.stackSize = amt;
+			ret = stack.copy();
+			ret.stackSize = amt;
 			stack.stackSize -= amt;
-			return newStack;
+	        this.onSlotChanged();
 		}
+		return ret;
 	}
 	
 	public ItemStack getStackForRender() {
@@ -91,6 +112,32 @@ public class ItemSlot {
 	 */
 	public void setStackForce(ItemStack s) {
 		this.stack = s;
+	}
+
+	@Override
+	public boolean getHasStack() {
+		return (stack != null);
+	}
+
+	//TODO: Make this not stupid
+	@Override
+	public void putStack(ItemStack stack) {
+		super.putStack(stack);
+	}
+
+	@Override
+	public boolean isSlotInInventory(IInventory inv, int num) {
+		return ((inv == inventory) && (slotNumber == num));
+	}
+
+	@Override
+	public boolean canTakeStack(EntityPlayer p) {
+		return super.canTakeStack(p) && canOutput();
+	}
+
+	@Override
+	public int getSlotIndex() {
+		return slotNumber;
 	}
 	
 	//TODO: Run item-stack NBT saving through this, so that ghost slots can save properly.

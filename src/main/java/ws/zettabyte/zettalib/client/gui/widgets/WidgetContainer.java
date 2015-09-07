@@ -78,11 +78,14 @@ public class WidgetContainer implements IGUIWidget {
 	public IGUIWidget getParent() { return parent; }
 
 	@Override
-	// TODO Auto-generated method stub
-
 	public void setParent(IGUIWidget p) {
 		parent = p;
-		bounds.setParent(p.getPos());
+		if(p != null) {
+			bounds.setParent(p.getPos());
+		}
+		else {
+			bounds.setParent(null);
+		}
 	}
 
 	@Override
@@ -100,4 +103,32 @@ public class WidgetContainer implements IGUIWidget {
 	@Override
 	public void setTint(float R, float G, float B, float A) { }
 
+	//A hack on language limitations aw yeah~
+	protected IGUIWidget newThis() {
+		return (IGUIWidget) new WidgetContainer();
+	}
+	
+	@Override 
+	public IGUIWidget copy() {
+		IGUIWidget clone = newThis();
+		
+		clone.setParent(null);
+		
+		clone.getBounds().setX(bounds.getXRelative());
+		clone.getBounds().setY(bounds.getYRelative());
+		clone.getBounds().setWidth(bounds.getWidth());
+		clone.getBounds().setHeight(bounds.getHeight());
+		
+		clone.setLayer(layer);
+		clone.setVisible(isVisible());
+		
+		//Do recursion
+		for(IGUIWidget e : children) {
+			IGUIWidget c = e.copy();
+			clone.addChild(c);
+			c.setParent(clone);
+		}
+		
+		return clone;
+	}
 }

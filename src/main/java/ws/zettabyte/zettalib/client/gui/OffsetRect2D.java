@@ -27,4 +27,26 @@ public class OffsetRect2D extends Rect2D {
 		}
 	}
 	public Vert2D getParent() { return parent; };
+	
+	@Override
+	public Rect2D copy() {
+		return new OffsetRect2D(pos.copy(), size.copy());
+	}
+
+	public int getXRelative() {
+		if(this.pos instanceof OffsetVert2D) {
+			return ((OffsetVert2D)this.pos).getXRelative();
+		}
+		else {
+			return super.getX();
+		}
+	}
+	public int getYRelative() {
+		if(this.pos instanceof OffsetVert2D) {
+			return ((OffsetVert2D)this.pos).getYRelative();
+		}
+		else {
+			return super.getY();
+		}
+	}
 }
