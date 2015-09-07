@@ -7,6 +7,7 @@ bin/
 out/
 #Minecraft game data
 eclipse/
+.eclipse/
 #Some weird metadata.
 .classpath
 .project

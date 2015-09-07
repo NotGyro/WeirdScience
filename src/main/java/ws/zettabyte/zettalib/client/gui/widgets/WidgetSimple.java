@@ -8,7 +8,6 @@ import org.lwjgl.opengl.GL11;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import ws.zettabyte.zettalib.client.gui.GUIContext;
-import ws.zettabyte.zettalib.client.gui.IGUIArt;
 import ws.zettabyte.zettalib.client.gui.IGUIWidget;
 
 /**
@@ -23,7 +22,7 @@ public class WidgetSimple extends WidgetContainer {
 	float tintB = 1.0F; 
 	float tintA = 1.0F;
 
-	protected ResourceLocation tex = new ResourceLocation("weirdscience", "textures/blocks/rust.png");
+	protected ResourceLocation tex;
 	public WidgetSimple() {
 	}
 
@@ -46,10 +45,8 @@ public class WidgetSimple extends WidgetContainer {
         context.screen.drawWholeTexturedRect(getX(), getY(), getWidth(), getHeight());
 	}
 
-	@Override
-	public void setArt(IGUIArt art) {
-		// TODO Auto-generated method stub
-		super.setArt(art);
+	public void setArt(ResourceLocation art) {
+		this.tex = art;
 	}
 
 	@Override

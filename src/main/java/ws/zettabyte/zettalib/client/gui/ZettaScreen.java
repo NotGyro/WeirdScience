@@ -17,10 +17,13 @@ import net.minecraft.util.IIcon;
 
 @SideOnly(Side.CLIENT)
 public class ZettaScreen extends GuiScreen {
+	
 	public int GUI_ID;
 	protected IGUIWidget rootWidget;
 	protected IGUIWidget currentMouseOver = null;
 	protected GUIContext ctx;
+	
+	Rect2D guiArea;
     
 	protected ArrayList<IGUIWidget> drawList = new ArrayList<IGUIWidget>(128);
 	
@@ -35,12 +38,21 @@ public class ZettaScreen extends GuiScreen {
 	public ZettaScreen() {
     	ctx = new GUIContext(this);
     	rootWidget = new WidgetContainer();
-    	Rect2D screenArea = new Rect2D(0, 0, 176, 166);
-    	rootWidget.setBounds(screenArea);
+    	guiArea = new Rect2D(0, 0, 176, 166);
+    	rootWidget.setBounds(guiArea);
+	}
+	public void center(){
+		//NOTE: Width and height refer to the screen in this context. As in, the whole screen.
+        int k = (this.width - this.guiArea.getWidth()) / 2;
+        int l = (this.height - this.guiArea.getHeight()) / 2;
+
+        rootWidget.setX(k);
+        rootWidget.setY(l);
 	}
 	
     @Override
     public void drawScreen(int par1, int par2, float par3) {
+    	this.center();
         this.drawDefaultBackground();
         drawList.clear();
         addChildrenToDrawList(rootWidget);

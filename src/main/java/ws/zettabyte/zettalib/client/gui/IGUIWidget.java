@@ -32,8 +32,6 @@ public interface IGUIWidget {
 	default void setWidth(int W) { getSize().setX(W); };
 	default void setHeight(int H) { getSize().setY(H); };
 	
-	void setArt(IGUIArt art);
-	
 	void setTint(float R, float G, float B, float A);
 	
 	/**

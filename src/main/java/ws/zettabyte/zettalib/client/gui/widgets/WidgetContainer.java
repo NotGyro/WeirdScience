@@ -3,7 +3,6 @@ package ws.zettabyte.zettalib.client.gui.widgets;
 import java.util.ArrayList;
 
 import ws.zettabyte.zettalib.client.gui.GUIContext;
-import ws.zettabyte.zettalib.client.gui.IGUIArt;
 import ws.zettabyte.zettalib.client.gui.IGUIWidget;
 import ws.zettabyte.zettalib.client.gui.OffsetRect2D;
 import ws.zettabyte.zettalib.client.gui.Rect2D;
@@ -61,11 +60,6 @@ public class WidgetContainer implements IGUIWidget {
 		bounds.setY(b.getY());
 		bounds.setWidth(b.getWidth());
 		bounds.setHeight(b.getHeight());
-	}
-
-	@Override
-	public void setArt(IGUIArt art) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
