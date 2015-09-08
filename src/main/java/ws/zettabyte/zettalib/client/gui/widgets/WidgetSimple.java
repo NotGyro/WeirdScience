@@ -32,8 +32,6 @@ public class WidgetSimple extends WidgetContainer {
 
 	@Override
 	public void draw(GUIContext context) {
-		// TODO Auto-generated method stub
-		super.draw(context);
 		//Setup layer
 		context.screen.setZLevel(context.screen.getZLevel() 
 				+ (getLayer() * context.zLevelPerLayer));

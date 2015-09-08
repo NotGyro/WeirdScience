@@ -4,7 +4,9 @@ import java.util.HashMap;
 
 import ws.zettabyte.zettalib.client.gui.GUIDescription;
 import ws.zettabyte.zettalib.client.gui.OffsetRect2D;
+import ws.zettabyte.zettalib.client.gui.widgets.WidgetAmountBar;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetContainer;
+import ws.zettabyte.zettalib.client.gui.widgets.WidgetFluidBar;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetSimple;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetSlot;
 import ws.zettabyte.zettalib.inventory.IDescriptiveInventory;
@@ -26,7 +28,7 @@ public class CommonProxy implements IGuiHandler {
 		inventoryPanel.setHeight(100);
 		testInv.addWidget(inventoryPanel);
 		inventoryPanel.centerX();
-		inventoryPanel.centerY();
+		inventoryPanel.setY(10);
 
 		WidgetSlot slotTest1 = new WidgetSlot(inventoryPanel, "fuel");
 		slotTest1.setLayer(3);
@@ -56,6 +58,15 @@ public class CommonProxy implements IGuiHandler {
 		slotTest3.setX(realX + 10);
 		slotTest3.setY(currentHeight);
 		slotTest3.setLayer(3);
+		
+		WidgetFluidBar tank = new WidgetFluidBar("exhaust");
+		tank.setDirection(WidgetAmountBar.EXPAND_DIR.UP);
+		tank.setHeight(65);
+		tank.setWidth(25);
+		tank.setLayer(4);
+		tank.setX(8);
+		tank.setY(8);
+		testInv.addWidget(tank);
 	}
 	// Client stuff
 	public void registerRenderers() {
@@ -70,7 +81,7 @@ public class CommonProxy implements IGuiHandler {
 		if(ID == 0) {
 			TileEntity tileEntity = world.getTileEntity(x, y, z);
 			if(tileEntity instanceof IDescriptiveInventory) {
-				return testInv.constructContainer(((IDescriptiveInventory)tileEntity), player.inventory);
+				return testInv.constructContainer(tileEntity, player.inventory);
 			}
 		}
 		return null;
@@ -81,7 +92,7 @@ public class CommonProxy implements IGuiHandler {
 		if(ID == 0) {
 			TileEntity tileEntity = world.getTileEntity(x, y, z);
 			if(tileEntity instanceof IDescriptiveInventory) {
-				return testInv.constructScreen(((IDescriptiveInventory)tileEntity), player.inventory);
+				return testInv.constructScreen(tileEntity, player.inventory);
 			}
 		}
 		return null;

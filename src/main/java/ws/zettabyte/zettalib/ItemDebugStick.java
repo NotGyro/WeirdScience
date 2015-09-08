@@ -42,6 +42,7 @@ public class ItemDebugStick extends Item implements ICreativeTabInfo {
 				if (b instanceof IDebuggableBlock) {
 					System.out.println(((IDebuggableBlock)b).getDebugInfo(world, x, y, z, meta));
 				}
+				System.out.println("We are clientside? " + world.isRemote);
 				return heldStack;
 			}
 			else {

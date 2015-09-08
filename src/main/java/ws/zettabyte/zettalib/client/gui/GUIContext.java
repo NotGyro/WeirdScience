@@ -16,5 +16,5 @@ public class GUIContext {
 	
     public float zLevelPerLayer = 0.2F;
     
-    public IMessageMiddleman messenger = new MiddlemanTransparent();
+    //public IMessageMiddleman messenger = new MiddlemanTransparent();
 }

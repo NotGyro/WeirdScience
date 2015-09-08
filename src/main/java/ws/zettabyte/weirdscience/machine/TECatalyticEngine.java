@@ -27,7 +27,9 @@ import ws.zettabyte.zettalib.IDebugInfo;
 import ws.zettabyte.zettalib.block.TileEntityBase;
 import ws.zettabyte.zettalib.initutils.Conf;
 import ws.zettabyte.zettalib.initutils.Configgable;
+import ws.zettabyte.zettalib.inventory.FluidTankNamed;
 import ws.zettabyte.zettalib.inventory.IDescriptiveInventory;
+import ws.zettabyte.zettalib.inventory.INamedTankInfo;
 import ws.zettabyte.zettalib.inventory.ItemSlot;
 import ws.zettabyte.zettalib.inventory.SlotInput;
 import ws.zettabyte.zettalib.inventory.SlotOutput;
@@ -36,7 +38,7 @@ import ws.zettabyte.weirdscience.gas.BlockGas;
 
 @Configgable(section="Machine")
 public class TECatalyticEngine extends TileEntityBase implements
-		IDebugInfo, ISidedInventory, IDescriptiveInventory {
+		IDebugInfo, ISidedInventory, IDescriptiveInventory, INamedTankInfo {
 	//---- Inventory ----
 	private ItemSlot slotInput = new ItemSlot(this, 0, "fuel");
 	private ItemSlot slotOutput1 = new SlotOutput(this, 1, "out1");
@@ -65,7 +67,7 @@ public class TECatalyticEngine extends TileEntityBase implements
     //@Conf(name="Catalytic Engine: Max dirt burned per cycle", def="16")
     //public static int quantityPerBurn; //Amount of dirt to attempt to consume at once.
 
-    @Conf(name="Catalytic Engine: Ticks between cycles", def="5")
+    @Conf(name="Catalytic Engine: Ticks between cycles", def="2")
     public static int ticksPerBurn; //Time between ticks where we burn dirt. To reduce lag.
 
     @Conf(name="Catalytic Engine: Ticks between exhaust attempts", def="20")
@@ -73,7 +75,7 @@ public class TECatalyticEngine extends TileEntityBase implements
 
     @Conf(name="Catalytic Engine: do exhaust", def="true")
     public static boolean doExhaust;
-    @Conf(name="Catalytic Engine: internal tank size", def="2400", comment="How much exhaust the engine can store before it gets vented.")
+    @Conf(name="Catalytic Engine: internal tank size", def="4000", comment="How much exhaust the engine can store before it gets vented.")
     public static int wasteCapacity;
     
     @Conf(name="Catalytic Engine: Explosion strength", def="4.0")
@@ -81,14 +83,15 @@ public class TECatalyticEngine extends TileEntityBase implements
     
     public static FuelInfo dirtFuel = new FuelInfo();
     static {
-    	dirtFuel.fuel = new ItemStack(Blocks.dirt, 8);
+    	dirtFuel.fuel = new ItemStack(Blocks.dirt, 1);
     	dirtFuel.rfPerStack = 4;
-    	//dirtFuel.exhaustPerItem = 80;
+
     	dirtFuel.metadataSensitive = false;
-    	//dirtFuel.blockExhaust = WeirdScience.blockSmog;
-    	//dirtFuel.fluidExhaust = WeirdScience.fluidSmog;
-    	dirtFuel.byproducts.add(new ItemStack(Blocks.sand, 2));
-    	dirtFuel.byproducts.add(new ItemStack(Blocks.gravel, 1));
+    	
+    	dirtFuel.byproducts.add(new ItemStack(Blocks.sand, 1));
+    	//dirtFuel.byproducts.add(new ItemStack(Blocks.gravel, 1));
+    	dirtFuel.fluidExhaust = new FluidStack(WeirdScience.fluidSmog, 64);
+    	
     	addFuel(dirtFuel);
     };
     
@@ -98,7 +101,8 @@ public class TECatalyticEngine extends TileEntityBase implements
     private boolean wasRunningLastBurn = false;
 	protected Random itemDropRand = new Random();
 
-    protected FluidStack fluidTank;
+    protected FluidTankNamed fluidTank;
+    protected ArrayList<FluidTankNamed> tanks = new ArrayList<FluidTankNamed>(1);
     
     
 	public TECatalyticEngine() {
@@ -107,7 +111,11 @@ public class TECatalyticEngine extends TileEntityBase implements
 		slots.add(slotOutput2);
 		slotsOut.add(slotOutput1);
 		slotsOut.add(slotOutput2);
-		// TODO Auto-generated constructor stub
+		
+		fluidTank = new FluidTankNamed(wasteCapacity);
+		fluidTank.setName("exhaust");
+		fluidTank.setTile(this);
+		tanks.add(fluidTank);
 	}
 	
 	public static void addFuel(FuelInfo f) {
@@ -255,7 +263,7 @@ public class TECatalyticEngine extends TileEntityBase implements
                         if(inf.fuel.stackSize <= fuelStack.stackSize) {
                         	flagInvChanged = true;
                         	fuelStack.stackSize -= inf.fuel.stackSize;
-                        	if(doExhaust) receiveExhaust(inf.fluidExhaust);
+                        	if(doExhaust) receiveExhaust(inf.fluidExhaust.copy());
                             //Null the stack if there's nothing in it.
                             if (fuelStack.stackSize <= 0) {
                             	slotInput.setStackForce(null);
@@ -272,9 +280,10 @@ public class TECatalyticEngine extends TileEntityBase implements
                     }
                 }
             }
-            if(flagInvChanged) {
-                this.markDirty();
-            }
+        }
+        if(flagInvChanged) {
+            worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+            markDirty();
         }
     }
     public void recieveByproduct(ItemStack stack) {
@@ -323,26 +332,16 @@ public class TECatalyticEngine extends TileEntityBase implements
             return;
         }
         else {
-            int smogProduced = exhaustStack.amount;
-            if (fluidTank == null) {
-                fluidTank = exhaustStack.copy();
-                fluidTank.amount = 0;
-            }
-            //Stash some smog in the fluid tank.
-            if (fluidTank.amount < wasteCapacity) {
-                int amountToStore = Math.min((wasteCapacity - fluidTank.amount), smogProduced);
-                fluidTank.amount += amountToStore;
-                smogProduced -= amountToStore;
-            }
+        	exhaustStack.amount -= fluidTank.fill(exhaustStack, true);
             //Is there still smog left over? If so, we could not fit it into the tank. Exhaust into the adjacent air.
-            if (smogProduced > 0) {
+            if (exhaustStack.amount > 0) {
                 Block fBlock = exhaustStack.getFluid().getBlock();
                 if (fBlock instanceof BlockGas) {
                 	BlockGas ourWaste = (BlockGas)fBlock;
                     for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
                         if (dir != ForgeDirection.UP) {
-                            smogProduced = ourWaste.pushIntoBlock(worldObj, xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ, smogProduced);
-                            if (smogProduced <= 0) {
+                        	exhaustStack.amount = ourWaste.pushIntoBlock(worldObj, xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ, exhaustStack.amount);
+                            if (exhaustStack.amount <= 0) {
                                 break;
                             }
                         }
@@ -351,11 +350,11 @@ public class TECatalyticEngine extends TileEntityBase implements
                 //If this isn't a fluid we can handle sanely...
                 else {
                     //Don't punish the player for it.
-                    smogProduced = 0;
+                	return;
                 }
             }
             //Is there STILL smog left over? If so, explode violently.
-            if (smogProduced > 0) {
+            if (exhaustStack.amount > 0) {
                 if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) { //prevent general stupidity
                     worldObj.createExplosion(null, xCoord, yCoord, zCoord, (float)explosionStrength, true);
                 }
@@ -381,14 +380,7 @@ public class TECatalyticEngine extends TileEntityBase implements
         //Read how far we are from doing another engine tick.
         ticksUntilBurn = nbt.getShort("BurnTime");
 
-        //Read the internal fluid tank for smog storage
-        /*if (!nbt.hasKey("Empty")) {
-            FluidStack fluid = FluidStack.loadFluidStackFromNBT(nbt);
-
-            if (fluid != null) {
-            	fluidTank = fluid;
-            }
-        }*/
+        fluidTank.readFromNBT(nbt);
     }
 
 	@Override
@@ -408,12 +400,7 @@ public class TECatalyticEngine extends TileEntityBase implements
         }
         nbt.setTag("Items", nbttaglist);
         //Write our internal fluid tank (which stores smog)
-        /*if (fluidTank != null) {
-        	fluidTank.writeToNBT(nbt);
-        }
-        else {
-        	nbt.setString("Empty", "");
-        }*/
+        fluidTank.writeToNBT(nbt);
 	}
 
 	@Override
@@ -447,7 +434,7 @@ public class TECatalyticEngine extends TileEntityBase implements
 		finalinf += "Output slot 1 contains " + inf2 + ".\n";
 		finalinf += "Output slot 2 contains " + inf3 + ".\n";
 		String inf4 = "nothing";
-		if(fluidTank != null) inf4 = fluidTank.amount + " mb of " + fluidTank.getFluid().getName();
+		if(fluidTank.getFluidAmount() > 0) inf4 = fluidTank.getFluidAmount() + " mb of " + fluidTank.getFluid().getFluid().getName();
 		finalinf += "Exhaust buffer tank contains " + inf4 + ".\n";
 		return finalinf;
 	}
@@ -461,6 +448,11 @@ public class TECatalyticEngine extends TileEntityBase implements
 	public boolean canInteractWith(EntityPlayer player) {
 		// TODO Auto-generated method stub
 		return this.isUseableByPlayer(player);
+	}
+
+	@Override
+	public Iterable<FluidTankNamed> getTanks() {
+		return tanks;
 	}
 
 }
