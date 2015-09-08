@@ -54,4 +54,23 @@ public interface IGUIWidget {
 	void setVisible(boolean v);
 	
 	IGUIWidget copy();
+
+	//Centers this widget within the space of its parent widget.
+	default void center() {
+		centerX();
+		centerY();
+	}
+	//Centers this widget within the space of its parent widget.
+	default void centerX() {
+		if(this.getParent() == null) return;
+		
+        int k = Math.abs(this.getParent().getWidth() - this.getWidth()) / 2;
+        setX(k);
+	}
+	//Centers this widget within the space of its parent widget.
+	default void centerY() {
+		if(this.getParent() == null) return;
+        int l = Math.abs(this.getParent().getHeight() - this.getHeight()) / 2;
+        setY(l);
+	}
 }

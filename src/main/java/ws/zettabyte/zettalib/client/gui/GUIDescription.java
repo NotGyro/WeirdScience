@@ -30,7 +30,10 @@ public class GUIDescription {
 	
 	protected ArrayList<IGUIItemSlot> slotInfo = null;
 
-	public GUIDescription() {}
+	public GUIDescription() {
+	    rootWidget.setWidth(176);
+	    rootWidget.setHeight(166);
+	}
     
 	public void addWidget(IGUIWidget w) {
     	rootWidget.addChild(w);

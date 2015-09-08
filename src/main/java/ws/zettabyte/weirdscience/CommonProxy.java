@@ -3,6 +3,8 @@ package ws.zettabyte.weirdscience;
 import java.util.HashMap;
 
 import ws.zettabyte.zettalib.client.gui.GUIDescription;
+import ws.zettabyte.zettalib.client.gui.OffsetRect2D;
+import ws.zettabyte.zettalib.client.gui.widgets.WidgetContainer;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetSimple;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetSlot;
 import ws.zettabyte.zettalib.inventory.IDescriptiveInventory;
@@ -17,42 +19,43 @@ public class CommonProxy implements IGuiHandler {
 	public CommonProxy() {
 		testInv = new GUIDescription();
 		int margin = 1;
-		int top = 20;
-		int currentHeight = top;
+		int currentHeight = 0;
+		
+		WidgetContainer inventoryPanel = new WidgetContainer();
+		inventoryPanel.setWidth(100);
+		inventoryPanel.setHeight(100);
+		testInv.addWidget(inventoryPanel);
+		inventoryPanel.centerX();
+		inventoryPanel.centerY();
 
-		WidgetSlot slotTest1 = new WidgetSlot("fuel");
-		slotTest1.setX(91);
-		slotTest1.setY(currentHeight);
+		WidgetSlot slotTest1 = new WidgetSlot(inventoryPanel, "fuel");
 		slotTest1.setLayer(3);
-		testInv.addWidget(slotTest1);
+		slotTest1.centerX();
 		
-		currentHeight += slotTest1.getHeight();
-		currentHeight += margin;
+		currentHeight = slotTest1.getHeight() + margin;
 		
-		WidgetSimple slotAlart = new WidgetSimple();
+		WidgetSimple slotAlart = new WidgetSimple(inventoryPanel);
 		slotAlart.setHeight(16);
 		slotAlart.setWidth(22);
-		slotAlart.setX(89);
+		slotAlart.centerX();
 		slotAlart.setY(currentHeight);
 		slotAlart.setLayer(3);
 		slotAlart.setArt(new ResourceLocation("weirdscience", "textures/gui/iconDanger.png"));
-		testInv.addWidget(slotAlart);
 		
 		currentHeight += slotAlart.getHeight();
 		currentHeight += margin;
 		
+		int realX = ((OffsetRect2D)slotTest1.getBounds()).getXRelative();
 
-		WidgetSlot slotTest2 = new WidgetSlot("out1");
-		slotTest2.setX(81);
+		WidgetSlot slotTest2 = new WidgetSlot(inventoryPanel, "out1");
+		slotTest2.setX(realX - 10);
 		slotTest2.setY(currentHeight);
 		slotTest2.setLayer(3);
-		testInv.addWidget(slotTest2);
 		
-		WidgetSlot slotTest3 = new WidgetSlot("out2");
-		slotTest3.setX(101);
+		WidgetSlot slotTest3 = new WidgetSlot(inventoryPanel, "out2");
+		slotTest3.setX(realX + 10);
 		slotTest3.setY(currentHeight);
 		slotTest3.setLayer(3);
-		testInv.addWidget(slotTest3);
 	}
 	// Client stuff
 	public void registerRenderers() {
