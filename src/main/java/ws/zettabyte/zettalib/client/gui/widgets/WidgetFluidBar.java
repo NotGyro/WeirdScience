@@ -8,9 +8,13 @@ import ws.zettabyte.zettalib.client.gui.GUIContext;
 import ws.zettabyte.zettalib.client.gui.IGUITank;
 import ws.zettabyte.zettalib.client.gui.IGUIWidget;
 import ws.zettabyte.zettalib.inventory.FluidTankNamed;
-
+/**
+ * A widget that tracks a Forge FluidTank class, rendering the contained Fluid's icon in a rectangle whose 
+ * size is proportional to how full the tank is (tank.stack.getAmount() / tank.getCapacity()).
+ * @author Sam "Gyro" Cutlip
+ *
+ */
 public class WidgetFluidBar extends WidgetAmountBar implements IGUITank {
-
 	protected final String name;
 	protected FluidTankNamed currentTank = null;
 	private final ResourceLocation tex = new ResourceLocation("weirdscience", "textures/blocks/smog.png"); //TODO: Not this
@@ -26,7 +30,7 @@ public class WidgetFluidBar extends WidgetAmountBar implements IGUITank {
 	}
 
 	@Override
-	public String getName() {
+	public String getComponentName() {
 		// TODO Auto-generated method stub
 		return name;
 	}
@@ -54,12 +58,7 @@ public class WidgetFluidBar extends WidgetAmountBar implements IGUITank {
         context.screen.mc.renderEngine.bindTexture(tex);
         //int x = (width - xSize) / 2;
         //int y = (height - ySize) / 2;
-        int x = getDrawX();
-        int y = getDrawY();
-        int w = getDrawWidth();
-        int h = getDrawHeight();
-        float debugV = getValue();
-        context.screen.drawWholeTexturedRect(x, y, w, h);
+        context.screen.drawWholeTexturedRect(getDrawX(), getDrawY(), getDrawWidth(), getDrawHeight());
 	}
 
 	@Override

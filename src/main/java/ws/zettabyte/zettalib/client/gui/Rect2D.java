@@ -1,5 +1,12 @@
 package ws.zettabyte.zettalib.client.gui;
 
+/**
+ * A class for defining a 2D rectangle.
+ * The position (X and Y) represents the 
+ * upper-left-hand corner.
+ * 
+ * @author Sam "Gyro" Cutlip
+ */
 public class Rect2D {
 	protected Vert2D pos;
 	protected Vert2D size;

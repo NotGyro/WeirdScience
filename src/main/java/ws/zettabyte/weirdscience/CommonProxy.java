@@ -2,8 +2,7 @@ package ws.zettabyte.weirdscience;
 
 import java.util.HashMap;
 
-import ws.zettabyte.zettalib.client.gui.GUIDescription;
-import ws.zettabyte.zettalib.client.gui.OffsetRect2D;
+import ws.zettabyte.zettalib.client.gui.GUIBuilder;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetAmountBar;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetContainer;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetFluidBar;
@@ -17,9 +16,9 @@ import net.minecraft.world.World;
 import cpw.mods.fml.common.network.IGuiHandler;
 
 public class CommonProxy implements IGuiHandler {
-	GUIDescription testInv;
+	GUIBuilder testInv;
 	public CommonProxy() {
-		testInv = new GUIDescription();
+		testInv = new GUIBuilder();
 		int margin = 1;
 		int currentHeight = 0;
 		
@@ -47,7 +46,7 @@ public class CommonProxy implements IGuiHandler {
 		currentHeight += slotAlart.getHeight();
 		currentHeight += margin;
 		
-		int realX = ((OffsetRect2D)slotTest1.getBounds()).getXRelative();
+		int realX = slotTest1.getXRelative();
 
 		WidgetSlot slotTest2 = new WidgetSlot(inventoryPanel, "out1");
 		slotTest2.setX(realX - 10);
@@ -81,7 +80,7 @@ public class CommonProxy implements IGuiHandler {
 		if(ID == 0) {
 			TileEntity tileEntity = world.getTileEntity(x, y, z);
 			if(tileEntity instanceof IDescriptiveInventory) {
-				return testInv.constructContainer(tileEntity, player.inventory);
+				return testInv.buildContainer(tileEntity, player.inventory);
 			}
 		}
 		return null;
@@ -92,7 +91,7 @@ public class CommonProxy implements IGuiHandler {
 		if(ID == 0) {
 			TileEntity tileEntity = world.getTileEntity(x, y, z);
 			if(tileEntity instanceof IDescriptiveInventory) {
-				return testInv.constructScreen(tileEntity, player.inventory);
+				return testInv.buildScreen(tileEntity, player.inventory);
 			}
 		}
 		return null;

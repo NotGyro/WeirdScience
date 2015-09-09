@@ -7,7 +7,8 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * An annotation parsed to set static fields from values in a config file.
- * Used on classes whose fields may have @Conf on them. Recursion, here, is a thing.
+ * Used on classes whose fields may have @Conf on them, and also to recursively
+ * process fields with @Configgable.
  * @author Samuel "Gyro" Cutlip 
  */
 @Target({ElementType.FIELD, ElementType.TYPE})

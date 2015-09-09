@@ -3,6 +3,14 @@ package ws.zettabyte.zettalib.inventory;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 
+/**
+ * An Item slot which, when inserted to, stores the type of item that was supposed to be placed in it (without consuming the item), and
+ * upon any attempt to remove the item the slot clears itself without yielding anything. 
+ * 
+ * Intended for things like setting filters.
+ * 
+ * @author Sam "Gyro" Cutlip
+ */
 public class SlotGhost extends ItemSlot {
 
 	public SlotGhost(IInventory inv, int slotnum, String name) {

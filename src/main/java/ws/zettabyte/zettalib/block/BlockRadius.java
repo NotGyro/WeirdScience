@@ -1,5 +1,16 @@
 package ws.zettabyte.zettalib.block;
 
+
+/**
+ * A convenience class, mostly for use with foreach type stuff, which can be used to iterate
+ * over each block position in a sphere around an origin block.
+ * 
+ * The origin block is, by default, excluded from the query.
+ * 
+ * Importantly, it is inclusive on its upper bounds.
+ * @author Samuel "Gyro" Cutlip
+ *
+ */
 public class BlockRadius extends BlockRange {
 
 	protected int radius;

@@ -10,8 +10,10 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import ws.zettabyte.zettalib.client.gui.IGUIWidget;
 
-/*
- * I seriously implemented all of this before realizing Forge had a class of the same name for the same purpose. Oh well.
+/**
+ * Any Forge fluid tank with a component name. TODO: Refactor this with a unified component system.
+ * @author Sam "Gyro" Cutlip
+ *
  */
 public class FluidTankNamed extends FluidTank {
 
@@ -36,6 +38,9 @@ public class FluidTankNamed extends FluidTank {
 	public void setTile(TileEntity t) {
 		tile = t;
 	}
+	/*
+	 * I seriously implemented all of this before realizing Forge had a class of the same name for the same purpose. Oh well.
+	 */
 	/*
 	protected FluidStack content = null;
 	protected int capacity = 1000;

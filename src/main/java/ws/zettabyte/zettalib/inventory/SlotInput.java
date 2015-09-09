@@ -3,6 +3,10 @@ package ws.zettabyte.zettalib.inventory;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 
+/**
+ * An item slot you can put stacks into but not take them out of.
+ * @author Sam "Gyro" Cutlip
+ */
 public class SlotInput extends ItemSlot {
 
 	public SlotInput(IInventory inv, int slotnum, String name) {

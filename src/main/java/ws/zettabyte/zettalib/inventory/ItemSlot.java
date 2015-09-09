@@ -6,15 +6,13 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-
-//TODO: Where to begin...
-// * Figure out whether or not we're aliasing another type from the Container system -- We are, but
-// I'm fine with that since my model is easier to work with. I'll just wrap their model in mine.
-// * Figure out how to make this class useful for easing TileEnt <-> Container <-> GUI code.
-// * Produce an IItemSlot so we can do clever things.
-// * Whitelisted, blacklisted slots.
-
-//I know this is a reimplementation of package net.minecraft.inventory.Slot, but it's worth it in this case.
+/**
+ * An implementation of the Slot class which also encapsulates the ItemStack - not only
+ * is it a description of properties and a way of interacting with Inventories, now, but it's
+ * actually a part of the inventory.
+ * @author Sam "Gyro" Cutlip
+ *
+ */
 public class ItemSlot extends Slot {
 	protected ItemStack stack = null;
 	public int maxSize = 64;

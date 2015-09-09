@@ -18,7 +18,7 @@ public class TileEntityBase extends TileEntity implements ICachedTileEntity {
 
 	@Override
 	public void onKill() {
-		// TODO Auto-generated method stub
+		// TODO remove this Tile Entity from tables of adjacent Tile Entities.
 		
 	}
 

@@ -25,7 +25,12 @@ public abstract class WidgetAmountBar extends WidgetContainer {
 		LEFT,
 		DOWN
 	}
-	//Which direction is the bar meant to expand to?
+	
+	/**
+	 * Which direction scales proportionately with our input value?
+	 * In other words, if we have a fluid tank slowly filling up,
+	 * in which direction should our widget be getting larger?
+	 */
 	protected EXPAND_DIR direction = EXPAND_DIR.RIGHT;
 	
 	public EXPAND_DIR getDirection() {
@@ -46,32 +51,35 @@ public abstract class WidgetAmountBar extends WidgetContainer {
 	
 	/**
 	 * Get the value our bar's size is supposed to be tracking - should be from 0.0 to 1.0.
+	 * 
+	 * A value of 1.0 means that a bar expanding to the left will display as getWidth() units wide,
+	 * whereas a value of 0.2 means our bar will be getWidth()*0.2, etc...
 	 */
 	protected abstract float getValue();
 
-	protected int getDrawWidth() {
+	protected float getDrawWidth() {
 		if((direction == EXPAND_DIR.RIGHT) || (direction == EXPAND_DIR.LEFT)) {
-			return (int)(((float)getWidth()) * getValue());
+			return (float)getWidth() * getValue();
 		}
 		return this.getWidth();
 	}
-	protected int getDrawHeight() {
+	protected float getDrawHeight() {
 		if((direction == EXPAND_DIR.UP) || (direction == EXPAND_DIR.DOWN)) {
-			return (int)((float)getHeight() * getValue());
+			return (float)getHeight() * getValue();
 		}
 		return this.getHeight();
 	}
-	protected int getDrawX() {
+	protected float getDrawX() {
 		if(direction == EXPAND_DIR.LEFT) {
 			//X Pos plus how much empty space is in the bar. (which is available space minus current space)
-			return getX() + ( getWidth() - (int)((float)getWidth() * getValue()));
+			return (float)getX() + ( (float)getWidth() - (float)getWidth() * getValue());
 		}
 		return getX();
 	}
-	protected int getDrawY() {
+	protected float getDrawY() {
 		if(direction == EXPAND_DIR.UP) {
 			//Y Pos plus how much empty space is in the bar. (which is available space minus current space)
-			return getY() + ( getHeight() - (int)((float)getHeight() * getValue()));
+			return (float)getY() + ((float)getHeight() - (float)getHeight() * getValue());
 		}
 		return getY();
 	}

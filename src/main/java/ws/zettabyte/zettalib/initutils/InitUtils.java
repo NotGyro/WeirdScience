@@ -15,16 +15,21 @@ import cpw.mods.fml.common.registry.GameRegistry;
 /**
  * A number of convenience functions to do common bits of Minecraft object initialization.
  * Intended to reduce boilerplate and copy-and-paste errors.
- * @author Samuel "Gyro" Cutlip 
+ * @author Sam "Gyro" Cutlip 
  */
 public final class InitUtils {
 	
 	public String modid; //Where to grab textures and such from.
 	public Logger log;
+	/**
+	 * Leaving this as null just means no config annotations will be processed.
+	 */
 	public Configuration config;
+	/**
+	 * Leaving this as null just means no items will be added to a creative tab.
+	 */
     public CreativeTabs tab;
-
-    //How very appropriate.
+    
     protected static String processName(String in) {
     	if(in.contains(" ")) {
         	String[] parts = in.split(" ");
@@ -57,8 +62,11 @@ public final class InitUtils {
     	}
     }
     /**
-	 * Registers a block with GameRegistry, sets its unlocalized name, calls .setBlockTextureName()
-	 * with a default value derived from our name.
+	 * Registers a block with GameRegistry, sets its unlocalized name, adds it (potentially) to
+	 * the creative tab, (potentially) registers its associated Tile Entity, and calls 
+	 * setBlockTextureName() with a default value derived from our name.
+	 * 
+	 * The default texture value will be name converted to lower camel case.
 	 * 
 	 * @param block The block to initialize.
 	 * @param name An English or whatever your native language is name for the block.
@@ -90,8 +98,11 @@ public final class InitUtils {
 	 * The same as initBlock(Block block, String name), but attempts to run our block
 	 * through config annotation parsing.
 	 * 
-	 * Registers a block with GameRegistry, sets its unlocalized name, calls .setBlockTextureName()
-	 * with a default value derived from our name.
+	 * Registers a block with GameRegistry, sets its unlocalized name, adds it (potentially) to
+	 * the creative tab, (potentially) registers its associated Tile Entity, and calls 
+	 * setBlockTextureName() with a default value derived from our name.
+	 * 
+	 * The default texture value will be name converted to lower camel case.
 	 * 
 	 * @param block The block to initialize.
 	 * @param name An English or whatever your native language is name for the block.
@@ -120,14 +131,14 @@ public final class InitUtils {
 		return block;
 	}
     /**
-	 * Registers an item with GameRegistry, sets its unlocalized name, calls .setTextureName()
-	 * with a default value derived from our name.
+	 * Registers an item with GameRegistry, sets its unlocalized name, adds it (potentially) to
+	 * the creative tab, and calls setTextureName() with a default value derived from our name.
 	 * 
-	 * TODO 
+	 * The default texture value will be name converted to lower camel case.
 	 * 
-	 * @param block The block to initialize.
+	 * @param item The item to initialize.
 	 * @param name An English or whatever your native language is name for the block.
-	 * @return The block we're initializing. Guaranteed never to be null: If something went wrong,
+	 * @return The item we're initializing. Guaranteed never to be null: If something went wrong,
 	 * an exception will be thrown instead.
 	 */
 	public Item initItem(Item item, String name) {
@@ -149,13 +160,15 @@ public final class InitUtils {
 	}
 	
 	/**
-	 * The same as initBlock(Block block, String name), but attempts to run our block
+	 * The same as initItem(Item item, String name), but attempts to run our block
 	 * through config annotation parsing.
 	 * 
-	 * Registers a block with GameRegistry, sets its unlocalized name, calls .setBlockTextureName()
-	 * with a default value derived from our name (the word "block" is prepended, no spaces).
+	 * Registers an item with GameRegistry, sets its unlocalized name, adds it (potentially) to
+	 * the creative tab, and calls setTextureName() with a default value derived from our name.
 	 * 
-	 * @param block The block to initialize.
+	 * The default texture value will be name converted to lower camel case.
+	 * 
+	 * @param item The block to initialize.
 	 * @param name An English or whatever your native language is name for the block.
 	 * Used to derive a bunch of stuff like unlocalized names and a default texture.
 	 * @return The block we're initializing. Guaranteed never to be null: If something went wrong,
@@ -179,4 +192,6 @@ public final class InitUtils {
  * You have no idea how many times I've done something like 
  * GameRegistry.register(blockSmog, "blockSmog");
  * GameRegistry.register(blockAcid, "blockSmog");
+ * 
+ * This is totally necessary.
  */

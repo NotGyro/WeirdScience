@@ -1,5 +1,8 @@
 package ws.zettabyte.zettalib.client.gui;
 
+/**
+ * 2D Vertex class
+ */
 public class Vert2D {
 	protected int x, y;
 	public Vert2D () { };

@@ -3,6 +3,7 @@ package ws.zettabyte.zettalib.client.gui;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetContainer;
@@ -13,11 +14,15 @@ import ws.zettabyte.zettalib.inventory.INamedTankInfo;
 import ws.zettabyte.zettalib.inventory.ItemSlot;
 
 /**
- * One per TYPE OF GUI. Operates as a GUI factory, among other things.
+ * The standard method of producing ZettaLib GUIs. Add Widgets to it, 
+ * and then call its constructScreen and constructContainer methods as appropriate.
+ * 
+ * One GUIBuilder per GUI screen, not one per GUI screen instance or one per mod.
+ * 
  * @author Samuel "Gyro"
  *
  */
-public class GUIDescription {
+public class GUIBuilder {
     
 	//Not copied.
 	protected WidgetContainer rootWidget = new WidgetContainer();
@@ -33,17 +38,30 @@ public class GUIDescription {
 	protected ArrayList<IGUIItemSlot> slotInfo = new ArrayList<IGUIItemSlot>();
 	protected ArrayList<IGUITank> tankInfo = new ArrayList<IGUITank>();
 
-	public GUIDescription() {
+	public GUIBuilder() {
 	    rootWidget.setWidth(176);
 	    rootWidget.setHeight(166);
 	}
-    
-	public void addWidget(IGUIWidget w) {
-    	rootWidget.addChild(w);
-    	w.setParent(rootWidget);
-    	return;
+	
+	/**
+	 * Adds a widget to the root node of this GUIBuilder.
+	 * 
+	 * All added widgets and their children will be copied,
+	 * and their copies will be passed to a GUI Screen class.
+	 * 
+	 * @return Was the widget successfully added?
+	 */
+	public boolean addWidget(IGUIWidget w) {
+    	boolean ret = rootWidget.addChild(w);
+    	if (ret) w.setParent(rootWidget);
+    	return ret;
     }
 	
+	/**
+	 * Anything that the GUIBuilder does to every widget in its tree should happen here.
+	 * 
+	 * TODO: Refactor to use a component system rather than separate types of widgets to process.
+	 */
 	protected static void recurseProcess(IGUIWidget parent, ArrayList<IGUIItemSlot> slotInfo, ArrayList<IGUITank> tankInfo) {
 		if(parent.getChildren() == null) {
 			return;
@@ -58,6 +76,15 @@ public class GUIDescription {
 			recurseProcess(e, slotInfo, tankInfo);
 		}
 	}
+	/**
+	 * Process all GUI elements which need information from obj,
+	 * and re-position all of the Minecraft Slot objects such that they work properly
+	 * with the container.
+	 * 
+	 * TODO: Refactor to use component system, split up a bit.
+	 * 
+	 * @param obj Whatever's providng the game logic backing our GUI (typically a Tile Entity).
+	 */
 	protected void buildSlotPositions(Object obj) {
 		slotInfo.clear();
 		tankInfo.clear();
@@ -96,7 +123,7 @@ public class GUIDescription {
 			INamedTankInfo invTanks = (INamedTankInfo)obj;
 			for(IGUITank e : tankInfo) {
 				if(e == null) continue;
-				String name = e.getName();
+				String name = e.getComponentName();
 				//Does this GUITank have a name?
 				if(name != null) {
 					FluidTankNamed tank = invTanks.getTank(name);
@@ -108,21 +135,42 @@ public class GUIDescription {
 		}
 	}
 
-	public SmartScreenBase constructScreen(Object inv, InventoryPlayer inventoryPlayer) {
+	/**
+	 * Produces an instance of this GUI, with widgets from our widget tree
+	 * and with the appropriate properties in terms of things like Container
+	 * classes.
+	 * 
+	 * This function's output should be valid input for IGuiHandler.getClientGuiElement()
+	 * 
+	 * If obj is an IInventory, it will also call buildContainer().
+	 * 
+	 * @param obj Whatever's providing the game logic backing our GUI (typically a Tile Entity).
+	 * @param inventoryPlayer The player opening this GUI.
+	 */
+	public GuiScreen buildScreen(Object obj, InventoryPlayer inventoryPlayer) {
 		
 		//Todo: sensitive to inventory type.
-		SmartScreenBase result = (SmartScreenBase) new ZettaScreen(constructContainer(inv, inventoryPlayer));
+		SmartScreenBase result = (SmartScreenBase) new ZettaScreen(buildContainer(obj, inventoryPlayer));
 		
 		for(IGUIWidget e : rootWidget.getChildren()) {
 			result.addWidget(e.copy());
 		}
 		
-		return result;
+		return (GuiScreen)result;
 	}
-	public Container constructContainer(Object inv, InventoryPlayer inventoryPlayer) {
-		buildSlotPositions(inv);
+	
+	/**
+	 * Produces an instance of the server-side element for this GUI.
+	 * 
+	 * This function's output should be valid input for IGuiHandler.getServerGuiElement()
+	 * 
+	 * @param obj Whatever's providing the game logic backing our GUI (typically a Tile Entity).
+	 * @param inventoryPlayer The player opening this GUI.
+	 */
+	public Container buildContainer(Object obj, InventoryPlayer inventoryPlayer) {
+		buildSlotPositions(obj);
 		
 		//Todo: sensitive to inventory type.
-		return (Container) new ContainerPlayerInv((IDescriptiveInventory)inv, inventoryPlayer);
+		return (Container) new ContainerPlayerInv((IDescriptiveInventory)obj, inventoryPlayer);
 	}
 }

@@ -12,7 +12,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraftforge.event.entity.player.FillBucketEvent;
-
+/**
+ * A handler for Forge bucket events which also allows you to map fluid blocks
+ * to the resulting filled bucket item, rather than explicitly checking for each one.
+ * @author Sam "Gyro" Cutlip
+ *
+ */
 public class BucketEventManager {
 	protected Map<Block, ItemStack> fluidToBucket;
 	

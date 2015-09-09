@@ -9,7 +9,8 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
 /**
- * Class for any container which provides access to the player's inventory and hotbar to inherit from.
+ * A container object which provides access to the player's inventory and hotbar, and works with
+ * more dynamic ItemSlots and the Widget system.
  * @author gyro
  *
  */
@@ -66,8 +67,7 @@ public class ContainerPlayerInv extends Container {
 	 * 
 	 * SlotID is the slot we are shift-clicking on.
 	 * 
-	 * Beware: Here I am dealing with the most spaghetticoded system in Minecraft, and that's
-	 * one hell of a title.
+	 * Watch out: Shift-clicking is the most spaghetticoded system in Minecraft.
 	 */
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer player, int slotID) {

@@ -4,16 +4,22 @@ import java.util.ArrayList;
 
 import ws.zettabyte.zettalib.client.gui.GUIContext;
 import ws.zettabyte.zettalib.client.gui.IGUIWidget;
-import ws.zettabyte.zettalib.client.gui.OffsetRect2D;
 import ws.zettabyte.zettalib.client.gui.Rect2D;
 
 /**
- * Contains other GUI widgets, is not drawn.
+ * A simple base implementation of an IGUIWidget, which supports all of its methods.
+ * Also useful as a parent node for other widgets.
+ * 
+ * This Widget does not have any visual representation, and calling draw() on it
+ * does nothing.
  * @author Sam "Gyro" Cutlip
  *
  */
 public class WidgetContainer implements IGUIWidget {
-	protected OffsetRect2D bounds = new OffsetRect2D();
+	/**
+	 * Where is our widget, and how big is it?
+	 */
+	protected Rect2D bounds = new Rect2D();
 	protected IGUIWidget parent = null;
 	
 	protected ArrayList<IGUIWidget> children = new ArrayList<IGUIWidget>(4);
@@ -22,6 +28,7 @@ public class WidgetContainer implements IGUIWidget {
 	protected boolean visible = true;
 
 	public WidgetContainer() {}
+	
 	/**
 	 * Registers @param p as the parent widget of this one, and
 	 * also registers this widget as a child of p.
@@ -32,36 +39,29 @@ public class WidgetContainer implements IGUIWidget {
 	}
 
 	@Override
-	public void draw(GUIContext context) {
-		/*for(IGUIWidget e : children) {
-			e.draw(context);
-		}*/
-	}
-	/*
-	@Override
-	public void toDraw(GUIContext context, ArrayList<IGUIWidget> list) {
-		if(isVisible()) {
-			list.add(this);
-			for(IGUIWidget e : children) {
-				e.toDraw(context, list);
-			}
-		}
-	}*/
+	public void draw(GUIContext context) { }
 
+	/**
+	 * Where is our widget, and how big is it?
+	 */
 	@Override
-	public Rect2D getBounds() {
-		// TODO Auto-generated method stub
+	public Rect2D getRelativeBounds() {
 		return bounds;
 	}
 
+	/**
+	 * Provide our widget with a new position, width, and height.
+	 * NOTE: This sets values on an existing Rect2D object, and it can't
+	 * be used to do clever things with references.
+	 */
 	@Override
 	public void setBounds(Rect2D b) {
-		bounds.setX(b.getX());
-		bounds.setY(b.getY());
-		bounds.setWidth(b.getWidth());
-		bounds.setHeight(b.getHeight());
+		bounds = b.copy();
 	}
-
+	
+	/**
+	 * @return false if the widget already has this one as a child.
+	 */
 	@Override
 	public boolean addChild(IGUIWidget child) { 
 		if(children.contains(child)) {
@@ -73,51 +73,44 @@ public class WidgetContainer implements IGUIWidget {
 	
 	@Override
 	public ArrayList<IGUIWidget> getChildren() { return children; }
-
 	@Override
 	public IGUIWidget getParent() { return parent; }
-
 	@Override
-	public void setParent(IGUIWidget p) {
-		parent = p;
-		if(p != null) {
-			bounds.setParent(p.getPos());
-		}
-		else {
-			bounds.setParent(null);
-		}
-	}
-
+	public void setParent(IGUIWidget p) { parent = p; }
 	@Override
 	public int getLayer() { return layer; }
-
 	@Override
 	public void setLayer(int l) { layer = l; }
-
-	//Despite the fact that a container itself is not drawn, child elements are drawn recurisvely, so we need this.
 	@Override
 	public boolean isVisible() { return visible; }
-
 	@Override
 	public void setVisible(boolean v) { visible = v; }
 	@Override
 	public void setTint(float R, float G, float B, float A) { }
 
-	//A hack on language limitations aw yeah~
+	/**
+	 * Horrible hack on language limitations. MUST be implemented on every child of WidgetContainer. 
+	 * @return MUST be a new instance of the type of Widget the function is implemented on, otherwise copy() will break badly.
+	 */
 	protected IGUIWidget newThis() {
 		return (IGUIWidget) new WidgetContainer();
 	}
-	
+
+	/**
+	 * Create an exact duplicate of this widget.
+	 * Parent will not be set. We recursively call copy() on all children of this widget
+	 * and then add them to our copy, setting our copy to their parent.
+	 */
 	@Override 
 	public IGUIWidget copy() {
 		IGUIWidget clone = newThis();
 		
 		clone.setParent(null);
 		
-		clone.getBounds().setX(bounds.getXRelative());
-		clone.getBounds().setY(bounds.getYRelative());
-		clone.getBounds().setWidth(bounds.getWidth());
-		clone.getBounds().setHeight(bounds.getHeight());
+		clone.getRelativeBounds().setX(getXRelative());
+		clone.getRelativeBounds().setY(getYRelative());
+		clone.getRelativeBounds().setWidth(bounds.getWidth());
+		clone.getRelativeBounds().setHeight(bounds.getHeight());
 		
 		clone.setLayer(layer);
 		clone.setVisible(isVisible());
@@ -128,7 +121,6 @@ public class WidgetContainer implements IGUIWidget {
 			clone.addChild(c);
 			c.setParent(clone);
 		}
-		
 		return clone;
 	}
 }

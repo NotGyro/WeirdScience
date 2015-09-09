@@ -6,20 +6,19 @@ import java.lang.reflect.Method;
 import net.minecraftforge.common.config.Configuration;
 
 /**
- * Must be given a context before parsing.
- * Sets variables annotated with @Conf, in a given class, from a config file, 
+ * Sets variables annotated with @Conf, in a given class, from a given config file, 
  * and recursively does the same to variables annotated @Configgable.
  * @author Samuel "Gyro" Cutlip 
  */
 public class ConfAnnotationParser {
-	Configuration context;
-	public ConfAnnotationParser() {};
+	final Configuration context;
+	//public ConfAnnotationParser() {};
 	public ConfAnnotationParser(Configuration c) {
 		context = c;
 	}
-	public void setContext(Configuration c) {
+	/*public void setContext(Configuration c) {
 		context = c;
-	}
+	}*/
 	public void parse(Object instance, Class<?> clazz) throws Exception {
 		String section = "";
 		if(clazz.isAnnotationPresent(Configgable.class)) {

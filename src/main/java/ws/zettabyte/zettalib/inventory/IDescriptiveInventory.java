@@ -3,6 +3,11 @@ package ws.zettabyte.zettalib.inventory;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 
+/**
+ * TODO: Refactor this, make it work with components.
+ * @author Sam "Gyro" Cutlip
+ *
+ */
 public interface IDescriptiveInventory extends IInventory {
 	Iterable<ItemSlot> getSlots();
 	/**

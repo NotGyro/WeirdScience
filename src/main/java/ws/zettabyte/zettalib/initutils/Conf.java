@@ -6,9 +6,10 @@ import java.lang.annotation.Target;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * An annotation parsed to set static fields from values in a config file.
- * Valid datatypes are int, float, String, boolean
- * @author Samuel "Gyro" Cutlip 
+ * This annotation can be parsed to set fields on a class or instance 
+ * from values in a configuration file.
+ * Presently, valid datatypes are int, float, String, and boolean
+ * @author Sam "Gyro" Cutlip 
  */
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)

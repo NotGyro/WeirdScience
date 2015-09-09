@@ -2,11 +2,24 @@ package ws.zettabyte.zettalib.client.gui.widgets;
 
 import ws.zettabyte.zettalib.client.gui.CommonIcons;
 import ws.zettabyte.zettalib.client.gui.IGUIWidget;
-
+/**
+ * A widget that represents an inventory slot, with the default Minecraft inventory slot icon as
+ * its background, that automatically creates a WidgetDummySlot as its child to mesh with Minecraft's
+ * inventory logic.
+ * 
+ * Size defaults to (18, 18) and the offset of the dummy slot defaults to (1, 1). 
+ * @author Sam "Gyro" Cutlip
+ *
+ */
 public class WidgetSlot extends WidgetSimple {
 	
 	protected WidgetDummySlot innerSlot = null;
 
+	/** 
+	 * @param p A parent widget. null is a valid value.
+	 * 
+	 * For the other arguments, @see WidgetDummySlot(String n, int idx)
+	 */
 	public WidgetSlot(IGUIWidget p, String n, int idx) {
 		super();
 		
@@ -31,12 +44,15 @@ public class WidgetSlot extends WidgetSimple {
 			this.setParent(p);
 		}
 	}
+	/** @see WidgetDummySlot(String n, int idx) */
 	public WidgetSlot(String n, int idx) {
 		this(null, n, idx);
 	}
+	/** @see WidgetDummySlot(String n) */
 	public WidgetSlot(String n) {
 		this(n, -1);
 	}
+	/** @see WidgetDummySlot(int idx) */
 	public WidgetSlot(int idx) {
 		this(null, null, idx);
 	}

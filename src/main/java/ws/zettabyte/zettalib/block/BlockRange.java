@@ -3,13 +3,13 @@ package ws.zettabyte.zettalib.block;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-//TODO: BlockRadius
 
 /**
- * Convenience class entirely for use with foreach type stuff.
+ * A convenience class, mostly for use with foreach type stuff, which can be used to iterate
+ * over each block position in a cuboid area.
  * 
  * Importantly, it is inclusive on its upper bounds.
- * @author gyro
+ * @author Samuel "Gyro" Cutlip
  *
  */
 public class BlockRange implements Iterable<BlockCoord> {
@@ -60,12 +60,16 @@ public class BlockRange implements Iterable<BlockCoord> {
 		}
 	}
 	protected BlockRange() {};
+	
+	/**
+	 * A cuboid between the points (X0, Y0, Z0) and (X1, Y1, Z1).
+	 */
 	public BlockRange(int X0, int Y0, int Z0, int X1, int Y1, int Z1) {
 		setBounds(X0, Y0, Z0, X1, Y1, Z1);
 		buildList();
 	};
 	/**
-	 * A cube of side length (radius*2)+1 centered around x0, y0, z0. Excludes our origin pos.
+	 * A cube of side length (radius*2)+1 centered around x0, y0, z0. Excludes our origin position.
 	 */
 	public BlockRange(int X0, int Y0, int Z0, int r) {
 		setBounds(X0 - r, Y0 - r, Z0 - r, X0 + r, Y0 + r, Z0 + r);		

@@ -10,6 +10,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
+/**
+ * A simple little wrapper around a Minecraft block which allows the programmer to
+ * declaratively describe some things you'd normally have to produce imperatively.
+ * @author Sam "Gyro" Cutlip
+ *
+ */
 public class BlockGeneric extends Block {
 	
 	public String harvestType = "pickaxe";

@@ -11,9 +11,8 @@ import ws.zettabyte.zettalib.client.gui.GUIContext;
 import ws.zettabyte.zettalib.client.gui.IGUIWidget;
 
 /**
- * Just a static image which is drawn.
+ * A widget that draws an image, stretching it to fill its entire bounding box.
  * @author Sam "Gyro" Cutlip
- *
  */
 public class WidgetSimple extends WidgetContainer {
 	

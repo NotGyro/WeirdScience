@@ -12,6 +12,16 @@ import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 
+/**
+ * A basic Minecraft-friendly Screen class that can handle our more dynamic
+ * Widget system. 
+ * 
+ * TODO: Will probably refactor this entirely. I'll extract an interface,
+ * at the very least.
+ * 
+ * @author Sam "Gyro" Cutlip
+ *
+ */
 public abstract class SmartScreenBase extends GuiContainer {
 	protected IGUIWidget rootWidget;
 	protected IGUIWidget currentMouseOver = null;
@@ -19,6 +29,7 @@ public abstract class SmartScreenBase extends GuiContainer {
 	
 	protected Rect2D guiArea;
 	protected ArrayList<IGUIWidget> drawList = new ArrayList<IGUIWidget>(128);
+	
 	protected static Comparator<IGUIWidget> compareLayer = new Comparator<IGUIWidget>() {
 		@Override
 	    public int compare(IGUIWidget w1, IGUIWidget w2) {
@@ -27,6 +38,13 @@ public abstract class SmartScreenBase extends GuiContainer {
 	    }
 	};
 	
+	/**
+	 * Constructs a screen from the container given.
+	 * 
+	 * Also, the root widget's width and height are set to
+	 * w: 176 and h: 166 by default, which is the standard
+	 * size of GUI screens in Minecraft.
+	 */
     public SmartScreenBase(Container container) {
 		super(container);
 	    ctx = new GUIContext(this);
@@ -34,9 +52,12 @@ public abstract class SmartScreenBase extends GuiContainer {
 	    rootWidget.setWidth(176);
 	    rootWidget.setHeight(166);
 	    
-	    guiArea = rootWidget.getBounds();
+	    guiArea = rootWidget.getRelativeBounds();
 	}
-	public void center(){
+    /**
+     * Centers the GUI screen in the game window.
+     */
+	protected void center(){
 		//NOTE: Width and height refer to the screen in this context. As in, the whole screen.
         int k = (this.width - this.guiArea.getWidth()) / 2;
         int l = (this.height - this.guiArea.getHeight()) / 2;
@@ -44,7 +65,13 @@ public abstract class SmartScreenBase extends GuiContainer {
         rootWidget.setX(k);
         rootWidget.setY(l);
 	}
-
+	
+	/**
+	 * First, lists all widgets attached to the screen, by performing a recursive query
+	 * to get the children of the root widget.
+	 * Then, sorts all widgets in order of their layer. 
+	 * Lastly, calls widget.draw(); on each of them.
+	 */
     public void drawWidgets(int a, int b, float c) {
     	this.center();
         this.drawDefaultBackground();
@@ -55,19 +82,22 @@ public abstract class SmartScreenBase extends GuiContainer {
         	e.draw(ctx);
         }
     }
-	/*
-    @Override
-    public void drawScreen(int a, int b, float c) {
-		drawWidgets(a,b,c);		
-    	this.zLevel = 10;
-    	this.drawGuiContainerBackgroundLayer(c,b,a);
-    	this.drawGuiContainerForegroundLayer(a, b);
-    }*/
+    
+    /**
+     * A method invoked by our parent class' drawScreen() method. 
+     * 
+     * Inventory slots and items will be drawn on top of anything drawn here.
+     * 
+     * TODO: figure out what the arguments imply.
+     */
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float a, int b, int c) {
 		drawWidgets(c,b,a);
 	}
 	
+	/**
+	 * Used for recursively querying our widgets.
+	 */
     protected void addChildrenToDrawList(IGUIWidget w) {
     	if(w == null) return;
     	if(w.getChildren() == null) return;
@@ -79,19 +109,41 @@ public abstract class SmartScreenBase extends GuiContainer {
     	}
     }
     
-	public void addWidget(IGUIWidget w) {
-    	rootWidget.addChild(w);
-    	w.setParent(rootWidget);
+    /**
+     * Adds a widget to this screen's root widget,
+     * providing it as a child to our rootWidget and also
+     * calling setParent on w.
+     * 
+     * 
+     * @param w
+     * @return Were we able to add this widget (true), or is it a duplicate (false)?
+     */
+	public boolean addWidget(IGUIWidget w) {
+    	boolean ret = rootWidget.addChild(w);
+    	if(ret) w.setParent(rootWidget);
+    	return ret; 
     }
-	
+
+	/**
+	 * Sets the Z-level at which OpenGL should render our GUI.
+	 */
 	public void setZLevel(float z) {
     	this.zLevel = z;
     }
-	
+
+	/**
+	 * Gets the Z-level at which OpenGL should render our GUI.
+	 */
 	public float getZLevel() {
     	return this.zLevel;
     }
-    
+
+	/**
+	 * Gets the root widget, the parent farthest up the widget tree of this screen's
+	 * hierarchy. Recursively walking through all children of this object and all of
+	 * their children and etc... will touch on every single widget involved in this
+	 * screen.
+	 */
 	public IGUIWidget getRootWidget() { return rootWidget; }
     
     /**
@@ -99,28 +151,28 @@ public abstract class SmartScreenBase extends GuiContainer {
      * 
      * Overridden to prevent annoying "must be 256x256" things.
      */
-    public void drawTexturedRect(int x, int y, 
+    public void drawTexturedRect(double x, double y, 
     		double uStart, double vStart, double uWidth, double vHeight, 
-    		int width, int height) {
+    		double width, double height) {
         Tessellator tessellator = Tessellator.instance;
         tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV((double)(x + 0), 
-        		(double)(y + height), 
+        tessellator.addVertexWithUV((x + 0), 
+        		(y + height), 
         		(double)this.zLevel, 
         		uStart, 
         		vStart + vHeight );
-        tessellator.addVertexWithUV((double)(x + width), 
-        		(double)(y + height), 
+        tessellator.addVertexWithUV((x + width), 
+        		(y + height), 
         		(double)this.zLevel, 
         		uStart + uWidth, 
         		vStart + vHeight );
-        tessellator.addVertexWithUV((double)(x + width), 
-        		(double)(y + 0), 
+        tessellator.addVertexWithUV((x + width), 
+        		(y + 0), 
         		(double)this.zLevel, 
         		uStart + uWidth, 
         		vStart );
-        tessellator.addVertexWithUV((double)(x + 0), 
-        		(double)(y + 0), 
+        tessellator.addVertexWithUV((x + 0), 
+        		(y + 0), 
         		(double)this.zLevel, 
         		uStart + 0.0F,
         		vStart );
@@ -130,25 +182,14 @@ public abstract class SmartScreenBase extends GuiContainer {
     /**
      * Draws a textured rectangle at the stored z-value. Args: x, y, width, height.
      * 
-     * Draws the whole whole source image in the defined area.
+     * Draws the whole whole source image in the defined area. -
+     * from u 0, v 0 to u 1, v 1.
      */
-    public void drawWholeTexturedRect(int x, int y, int width, int height) {
+    public void drawWholeTexturedRect(double x, double y, double width, double height) {
     	this.drawTexturedRect(x, y, 0.0D,  0.0D, 1.0D, 1.0D, width, height);
-    }
-
-    @Override
-    public void drawTexturedModelRectFromIcon(int x, int y, IIcon icon, int width, int height) {
-        Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV((double)(x + 0), (double)(y + height), (double)this.zLevel, (double)icon.getMinU(), (double)icon.getMaxV());
-        tessellator.addVertexWithUV((double)(x + width), (double)(y + height), (double)this.zLevel, (double)icon.getMaxU(), (double)icon.getMaxV());
-        tessellator.addVertexWithUV((double)(x + width), (double)(y + 0), (double)this.zLevel, (double)icon.getMaxU(), (double)icon.getMinV());
-        tessellator.addVertexWithUV((double)(x + 0), (double)(y + 0), (double)this.zLevel, (double)icon.getMinU(), (double)icon.getMinV());
-        tessellator.draw();
     }
 
 	public Minecraft getMC() {
 		return this.mc;
 	}
-
 }

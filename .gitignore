@@ -1,3 +1,6 @@
+#Generated documentation
+doc/javadoc/
+
 #Gradle-related doodads.
 version.properties
 #Ignore cached files.
