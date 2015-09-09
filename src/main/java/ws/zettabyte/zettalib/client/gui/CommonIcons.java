@@ -22,4 +22,9 @@ public final class CommonIcons {
 	
 	public static final ResourceLocation backgroundBlank 
 	= new ResourceLocation("zettalib", "textures/gui/background_blank.png");
+
+	public static final ResourceLocation tank1Overlay 
+	= new ResourceLocation("zettalib", "textures/gui/tank1overlay.png");
+	public static final ResourceLocation tank1Background 
+	= new ResourceLocation("zettalib", "textures/gui/tank1background.png");
 }

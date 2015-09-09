@@ -201,12 +201,6 @@ public class WeirdScience {
     public void postInit(FMLPostInitializationEvent event) {
     	itemAcidBucket.setCreativeTab(tabWeirdScience);
     	bucketMan.addRecipe(blockAcid, new ItemStack(itemAcidBucket));
-    	postInitClient();
-    }
-    
-
-    @SideOnly(Side.CLIENT)
-    public void postInitClient() {
         fluidSmog.setIcons(blockSmog.getIcon(0, 0));
         fluidAcid.setIcons(blockAcid.getIcon(0, 0));
     }

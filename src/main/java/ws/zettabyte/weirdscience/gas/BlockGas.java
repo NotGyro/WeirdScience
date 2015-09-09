@@ -8,6 +8,7 @@ import java.util.Vector;
 import ws.zettabyte.weirdscience.chemistry.IBioactive;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
@@ -446,4 +447,13 @@ public class BlockGas extends Block implements IGasBlock {
     	setConcentration(world, x, y, z, getMaxConcentration());
 		return 15;
     }
+
+	@Override
+	public void registerBlockIcons(IIconRegister p_149651_1_) {
+		super.registerBlockIcons(p_149651_1_);
+		this.fluid.setIcons(blockIcon);
+		this.fluid.setIcons(blockIcon,blockIcon);
+	}
+	
+	
 }

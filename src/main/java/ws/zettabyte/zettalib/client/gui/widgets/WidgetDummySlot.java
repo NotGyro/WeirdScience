@@ -79,11 +79,10 @@ public class WidgetDummySlot implements IGUIItemSlot {
 	}
 
 	@Override
-	public int getLayer() {
-		// Most likely does nothing.
+	public int getLayerRelative() {
 		return layer;
 	}
-
+	
 	@Override
 	public void setLayer(int l) {
 		// Most likely does nothing.

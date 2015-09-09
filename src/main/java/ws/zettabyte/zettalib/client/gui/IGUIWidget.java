@@ -44,7 +44,7 @@ public interface IGUIWidget {
 	};
 	default int getX() {
 		if(getParent() == null) return getXRelative();
-		return getXRelative() + getParent().getX();
+		return (getXRelative() + getParent().getX());
 	};
 	default int getY() {
 		if(getParent() == null) return getYRelative();
@@ -54,15 +54,15 @@ public interface IGUIWidget {
 	default Vert2D getPosRelative() { return getRelativeBounds().getPos(); };
 	default Vert2D getSize() { return getRelativeBounds().getSize(); };
 	default int getXRelative() {return getRelativeBounds().getX(); };
-	default int getYRelative() {return getRelativeBounds().getX(); };
+	default int getYRelative() {return getRelativeBounds().getY(); };
 	default int getWidth() { return getSize().getX(); };
 	default int getHeight() { return getSize().getY(); };
 
 	void setBounds(Rect2D bounds);
 	default void setPos(Vert2D pos) { getRelativeBounds().setPos(pos); };
 	default void setSize(Vert2D size) { getRelativeBounds().setSize(size); };
-	default void setX(int X) { getPos().setX(X); };
-	default void setY(int Y) { getPos().setY(Y); };
+	default void setX(int X) { getRelativeBounds().setX(X); };
+	default void setY(int Y) { getRelativeBounds().setY(Y); };
 	default void setWidth(int W) { getSize().setX(W); };
 	default void setHeight(int H) { getSize().setY(H); };
 
@@ -92,8 +92,12 @@ public interface IGUIWidget {
 	IGUIWidget getParent();
 	
 	void setParent(IGUIWidget parent);
-	
-	int getLayer();
+
+	default int getLayer() {
+		if(getParent() == null) return getLayerRelative();
+		return getLayerRelative() + getParent().getLayer();
+	};
+	int getLayerRelative();
 	void setLayer(int l);
 	
 	boolean isVisible();

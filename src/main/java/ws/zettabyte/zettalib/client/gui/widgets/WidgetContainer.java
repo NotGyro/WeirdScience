@@ -48,16 +48,6 @@ public class WidgetContainer implements IGUIWidget {
 	public Rect2D getRelativeBounds() {
 		return bounds;
 	}
-
-	/**
-	 * Provide our widget with a new position, width, and height.
-	 * NOTE: This sets values on an existing Rect2D object, and it can't
-	 * be used to do clever things with references.
-	 */
-	@Override
-	public void setBounds(Rect2D b) {
-		bounds = b.copy();
-	}
 	
 	/**
 	 * @return false if the widget already has this one as a child.
@@ -77,10 +67,14 @@ public class WidgetContainer implements IGUIWidget {
 	public IGUIWidget getParent() { return parent; }
 	@Override
 	public void setParent(IGUIWidget p) { parent = p; }
+	
 	@Override
-	public int getLayer() { return layer; }
+	public int getLayerRelative() {
+		return layer;
+	}
 	@Override
 	public void setLayer(int l) { layer = l; }
+	
 	@Override
 	public boolean isVisible() { return visible; }
 	@Override
@@ -122,5 +116,10 @@ public class WidgetContainer implements IGUIWidget {
 			c.setParent(clone);
 		}
 		return clone;
+	}
+
+	@Override
+	public void setBounds(Rect2D b) {
+		bounds = b;
 	}
 }

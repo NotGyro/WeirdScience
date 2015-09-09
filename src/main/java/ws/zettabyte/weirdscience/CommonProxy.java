@@ -2,6 +2,7 @@ package ws.zettabyte.weirdscience;
 
 import java.util.HashMap;
 
+import ws.zettabyte.zettalib.client.gui.CommonIcons;
 import ws.zettabyte.zettalib.client.gui.GUIBuilder;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetAmountBar;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetContainer;
@@ -58,13 +59,36 @@ public class CommonProxy implements IGuiHandler {
 		slotTest3.setY(currentHeight);
 		slotTest3.setLayer(3);
 		
-		WidgetFluidBar tank = new WidgetFluidBar("exhaust");
-		tank.setDirection(WidgetAmountBar.EXPAND_DIR.UP);
-		tank.setHeight(65);
-		tank.setWidth(25);
+		WidgetContainer tank = new WidgetContainer();
+		tank.setX(4);
+		tank.setY(4);
+		tank.setHeight(72);
+		tank.setWidth(26);
 		tank.setLayer(4);
-		tank.setX(8);
-		tank.setY(8);
+		
+		WidgetFluidBar tankBar = new WidgetFluidBar("exhaust");
+		tankBar.setDirection(WidgetAmountBar.EXPAND_DIR.UP);
+		tankBar.setHeight(66);
+		tankBar.setWidth(20);
+		tankBar.setLayer(0);
+		tankBar.setX(3);
+		tankBar.setY(3);
+		
+		tankBar.setParent(tank);
+		tank.addChild(tankBar);
+
+		WidgetSimple tankBack = new WidgetSimple(tank);
+		tankBack.setHeight(72);
+		tankBack.setWidth(26);
+		tankBack.setLayer(-1);
+		tankBack.setArt(CommonIcons.tank1Background);
+		
+		WidgetSimple tankFront = new WidgetSimple(tank);
+		tankFront.setHeight(72);
+		tankFront.setWidth(26);
+		tankFront.setLayer(1);
+		tankFront.setArt(CommonIcons.tank1Overlay);
+		
 		testInv.addWidget(tank);
 	}
 	// Client stuff
