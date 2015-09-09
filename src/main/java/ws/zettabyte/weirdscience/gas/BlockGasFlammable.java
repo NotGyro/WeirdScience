@@ -6,13 +6,13 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
 
-public class BlockGasExplosive extends BlockGas {
+public class BlockGasFlammable extends BlockGas {
 
 	public float explosionStrength = 4.0f;
 	public boolean explosionsEnabled = true;
 	public int explosionThreshhold = 0;
 	
-	public BlockGasExplosive(Fluid fluid) {
+	public BlockGasFlammable(Fluid fluid) {
 		super(fluid); //Just like liquid hydrogen!
 		isReactive = true;
 	}

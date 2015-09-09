@@ -22,7 +22,7 @@ import ws.zettabyte.weirdscience.block.BlockSkullOverride;
 import ws.zettabyte.weirdscience.fluid.BlockAcid;
 import ws.zettabyte.weirdscience.fluid.FluidAcid;
 import ws.zettabyte.weirdscience.gas.BlockGas;
-import ws.zettabyte.weirdscience.gas.BlockGasExplosive;
+import ws.zettabyte.weirdscience.gas.BlockGasFlammable;
 import ws.zettabyte.weirdscience.gas.FluidSmog;
 import ws.zettabyte.weirdscience.machine.BlockCatalyticEngine;
 import ws.zettabyte.zettalib.BucketEventManager;
@@ -72,7 +72,7 @@ public class WeirdScience {
     public static Configuration config;
 
     public static FluidSmog fluidSmog;
-    public static BlockGasExplosive blockSmog;
+    public static BlockGasFlammable blockSmog;
     
     public static FluidAcid fluidAcid;
     public static BlockAcid blockAcid;
@@ -140,7 +140,7 @@ public class WeirdScience {
         FluidRegistry.registerFluid(fluidAcid);
 	   
         
-    	blockSmog = (BlockGasExplosive) new BlockGasExplosive(fluidSmog);
+    	blockSmog = (BlockGasFlammable) new BlockGasFlammable(fluidSmog);
     	blockSmog.entitiesInteract = true;
     	blockSmog.isReactive = true;
     	blockSmog.explosionThreshhold = 6;

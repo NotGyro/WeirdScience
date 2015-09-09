@@ -10,6 +10,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -114,7 +115,9 @@ public class BlockCatalyticEngine extends BlockContainerBase implements
 	@Override
 	public void onBlockPlacedBy(World world, int x, int y, int z,
 			EntityLivingBase placer, ItemStack thisItemStack) {
-		int quadrant = (int) ((placer.rotationYaw / 360.0F) + 0.5F);
+		super.onBlockPlacedBy(world, x, y, z, placer, thisItemStack);
+		if(world.isRemote) return;
+		int quadrant = MathHelper.floor_double(((placer.rotationYaw * 4.0F) / 360.0F) + 0.5F);
 
 		// Modulo out any 360 degree dealies.
 		quadrant %= 4;
@@ -125,22 +128,22 @@ public class BlockCatalyticEngine extends BlockContainerBase implements
 		 */
 		// Facing south
 		if (quadrant == 0) {
-			world.setBlockMetadataWithNotify(x, y, z, 2, 2);
+			world.setBlockMetadataWithNotify(x, y, z, 2, 1|2);
 		}
 
 		// Facing west
 		else if (quadrant == 1) {
-			world.setBlockMetadataWithNotify(x, y, z, 5, 2);
+			world.setBlockMetadataWithNotify(x, y, z, 5, 1|2);
 		}
 
 		// Facing north
 		else if (quadrant == 2) {
-			world.setBlockMetadataWithNotify(x, y, z, 3, 2);
+			world.setBlockMetadataWithNotify(x, y, z, 3, 1|2);
 		}
 
 		// Facing east
 		else if (quadrant == 3) {
-			world.setBlockMetadataWithNotify(x, y, z, 4, 2);
+			world.setBlockMetadataWithNotify(x, y, z, 4, 1|2);
 		}
 	}
 	public boolean onBlockActivated(World world, int x, int y, int z,

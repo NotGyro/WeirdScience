@@ -22,7 +22,7 @@ import ws.zettabyte.weirdscience.block.BlockSkullOverride;
 import ws.zettabyte.weirdscience.fluid.BlockAcid;
 import ws.zettabyte.weirdscience.fluid.FluidAcid;
 import ws.zettabyte.weirdscience.gas.BlockGas;
-import ws.zettabyte.weirdscience.gas.BlockGasExplosive;
+import ws.zettabyte.weirdscience.gas.BlockGasFlammable;
 import ws.zettabyte.weirdscience.gas.FluidSmog;
 import ws.zettabyte.zettalib.initutils.ICreativeTabInfo;
 import cpw.mods.fml.common.FMLLog;

@@ -70,8 +70,10 @@ public class TECatalyticEngine extends TileEntityBase implements
     @Conf(name="Catalytic Engine: Ticks between cycles", def="2")
     public static int ticksPerBurn; //Time between ticks where we burn dirt. To reduce lag.
 
-    @Conf(name="Catalytic Engine: Ticks between exhaust attempts", def="20")
+    @Conf(name="Catalytic Engine: Ticks between  passive exhaust ejection attempts", def="2")
     public static int ticksPerExhaust; //How long until we try to spawn smog?
+    @Conf(name="Catalytic Engine: Rate of passive exhaust ejection", def="128")
+    public static int rateExhaustOut; //How long until we try to spawn smog?
 
     @Conf(name="Catalytic Engine: do exhaust", def="true")
     public static boolean doExhaust;
@@ -98,11 +100,13 @@ public class TECatalyticEngine extends TileEntityBase implements
     //---- end of conf ----
 
     private int ticksUntilBurn = ticksPerBurn;
+    private int ticksUntilExhaust = ticksPerExhaust;
     private boolean wasRunningLastBurn = false;
 	protected Random itemDropRand = new Random();
 
     protected FluidTankNamed fluidTank;
     protected ArrayList<FluidTankNamed> tanks = new ArrayList<FluidTankNamed>(1);
+	private int ticksLastBurn;
     
     
 	public TECatalyticEngine() {
@@ -262,6 +266,7 @@ public class TECatalyticEngine extends TileEntityBase implements
                         //Consume fuel
                         if(inf.fuel.stackSize <= fuelStack.stackSize) {
                         	flagInvChanged = true;
+                        	ticksLastBurn = 0;
                         	fuelStack.stackSize -= inf.fuel.stackSize;
                         	if(doExhaust) receiveExhaust(inf.fluidExhaust.copy());
                             //Null the stack if there's nothing in it.
@@ -285,6 +290,34 @@ public class TECatalyticEngine extends TileEntityBase implements
             worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
             markDirty();
         }
+        if (this.ticksUntilExhaust > 0) {
+            --this.ticksUntilExhaust;
+            if(this.ticksUntilExhaust < 0) ticksUntilExhaust = 0;
+        }
+        if((doExhaust) && (ticksLastBurn > (ticksPerBurn+ticksPerExhaust)*2)){
+            if ((!worldObj.isRemote) && fluidTank.getFluidAmount() > rateExhaustOut){
+                //Burn logic:
+                //Are we still waiting to burn fuel?
+                if (this.ticksUntilExhaust <= 0) {
+		            Block fBlock = fluidTank.getFluid().getFluid().getBlock();
+		            if (fBlock instanceof BlockGas) {
+		            	BlockGas ourWaste = (BlockGas)fBlock;
+		                for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+		                    if (dir != ForgeDirection.UP) {
+		                        if (fluidTank.getFluid().amount < rateExhaustOut) {
+		                            break;
+		                        }
+		                    	fluidTank.getFluid().amount -= (rateExhaustOut - ourWaste.pushIntoBlock(worldObj, xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ, rateExhaustOut));
+		                    }
+		                }
+		            }
+		            ticksUntilExhaust += ticksPerExhaust; //Reset the timer, but only if we did anything.
+		            worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+		            markDirty();
+                }
+            }
+        }
+        ticksLastBurn++;
     }
     public void recieveByproduct(ItemStack stack) {
     	for(int i = 0; i < slotsOut.size(); ++i) {
