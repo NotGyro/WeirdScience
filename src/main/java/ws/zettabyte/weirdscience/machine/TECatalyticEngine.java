@@ -112,7 +112,7 @@ public class TECatalyticEngine extends TileEntityBase implements
 
     protected FluidTankNamed fluidTank;
     protected ArrayList<FluidTankNamed> tanks = new ArrayList<FluidTankNamed>(1);
-	private int ticksLastBurn = 256;
+	private int ticksLastBurn = 127;
     
     
 	public TECatalyticEngine() {
@@ -313,13 +313,12 @@ public class TECatalyticEngine extends TileEntityBase implements
         }
         burnProgress.val = 1.0F - Math.min(((float)ticksUntilBurn) / ((float)ticksPerBurn), 1.0F);
         if(burnProgress.val > 0.8F) burnProgress.val = 1.0F;
-        /*if(worldObj.isRemote) {
-        	//Setting the thing that only matters client-side, when client-side, doesn't work. Because reasons.
+        if(worldObj.isRemote) {
 	        Block b = worldObj.getBlock(xCoord, yCoord, zCoord);
 	        if(b instanceof IMetaActive) {
 	        	((IMetaActive)b).setActiveStatus((ticksLastBurn < 20), worldObj, xCoord, yCoord, zCoord);
 	        }
-        }*/
+        }
         ticksLastBurn++;
         if(flagInvChanged || (this.ticksUntilBurn > 0)) {
 	        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
@@ -419,6 +418,7 @@ public class TECatalyticEngine extends TileEntityBase implements
             }
         }
         //Read how far we are from doing another engine tick.
+		ticksLastBurn = nbt.getShort("LastBurnTime");
         ticksUntilBurn = nbt.getShort("BurnTime");
 
         fluidTank.readFromNBT(nbt);
@@ -428,7 +428,8 @@ public class TECatalyticEngine extends TileEntityBase implements
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
         //Write time until next engine burn tick.
-        nbt.setShort("BurnTime", (short)this.ticksUntilBurn);
+		nbt.setShort("BurnTime", (short)this.ticksUntilBurn);
+		nbt.setShort("LastBurnTime", (short)this.ticksLastBurn);
         //Write item stacks.
         NBTTagList nbttaglist = new NBTTagList();
         for (int i = 0; i < slots.size(); ++i) {
@@ -507,5 +508,11 @@ public class TECatalyticEngine extends TileEntityBase implements
 			fullComponentList.add(t);
 		}
 		fullComponentList.add(burnProgress);
+	}
+
+	@Override
+	public boolean shouldRefresh(Block oldBlock, Block newBlock, int oldMeta, int newMeta, World world, int x, int y, int z) {
+		//Ignore metadata, onlly refresh when block changes.
+		return (oldBlock != newBlock);
 	}
 }

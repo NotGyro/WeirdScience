@@ -3,8 +3,9 @@ package ws.zettabyte.zettalib.block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
+import ws.zettabyte.zettalib.inventory.IComponentContainer;
 
-public class TileEntityBase extends TileEntity implements ICachedTileEntity {
+public abstract class TileEntityBase extends TileEntity implements ICachedTileEntity, IComponentContainer {
 	public TileEntityBase() {
 		super();
 	}

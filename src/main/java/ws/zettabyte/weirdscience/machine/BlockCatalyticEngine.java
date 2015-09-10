@@ -167,11 +167,11 @@ public class BlockCatalyticEngine extends BlockContainerBase implements
 		if(isOperating(meta) == status) return;
 		if(status) {
 			world.setBlockMetadataWithNotify(x, y, z, 
-				this.getFacing(meta)|8, 1|2);
+				this.getFacing(meta)|8, 2);
 		}
 		else {
 			world.setBlockMetadataWithNotify(x, y, z, 
-					this.getFacing(meta), 1|2);
+					this.getFacing(meta), 2);
 		}
 	}
 
