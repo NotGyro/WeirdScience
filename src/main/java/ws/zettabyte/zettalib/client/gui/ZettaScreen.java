@@ -8,6 +8,7 @@ import org.lwjgl.opengl.GL11;
 
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetContainer;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetSimple;
+import ws.zettabyte.zettalib.client.render.SpriteResourceLocation;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.gui.GuiScreen;
@@ -34,7 +35,7 @@ public class ZettaScreen extends SmartScreenBase {
 		bg.setWidth(176);
 		bg.setHeight(166);
 		bg.setLayer(1);
-		bg.setArt(CommonIcons.backgroundInv);
+		bg.setSprite(new SpriteResourceLocation(CommonIcons.backgroundInv));
 	}
 	
 	//TODO: Inventory logic.

@@ -9,7 +9,7 @@ import java.util.Iterator;
  * over each block position in a cuboid area.
  * 
  * Importantly, it is inclusive on its upper bounds.
- * @author Samuel "Gyro" Cutlip
+ * @author Samuel "Gyro" C.
  *
  */
 public class BlockRange implements Iterable<BlockCoord> {

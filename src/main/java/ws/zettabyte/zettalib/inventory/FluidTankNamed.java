@@ -11,11 +11,11 @@ import net.minecraftforge.fluids.FluidTank;
 import ws.zettabyte.zettalib.client.gui.IGUIWidget;
 
 /**
- * Any Forge fluid tank with a component name. TODO: Refactor this with a unified component system.
- * @author Sam "Gyro" Cutlip
+ * Any Forge fluid tank with a component name.
+ * @author Sam "Gyro" C.
  *
  */
-public class FluidTankNamed extends FluidTank {
+public class FluidTankNamed extends FluidTank implements IInvComponent {
 
 	protected String name;
 
@@ -28,8 +28,8 @@ public class FluidTankNamed extends FluidTank {
 	public FluidTankNamed(FluidStack stack, int capacity) {
 		super(stack, capacity);
 	}
-	
-	public String getName() {
+	@Override
+	public String getComponentName() {
 		return name;
 	}
 	public void setName(String name) {

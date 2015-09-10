@@ -8,7 +8,7 @@ import net.minecraft.item.ItemStack;
  * Generally, the way items get in there in the first place is that the
  * machine which owns this slot puts them there.
  * 
- * @author Sam "Gyro" Cutlip
+ * @author Sam "Gyro" C.
  *
  */
 public class SlotOutput extends ItemSlot {

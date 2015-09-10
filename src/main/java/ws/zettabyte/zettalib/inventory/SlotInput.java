@@ -5,7 +5,7 @@ import net.minecraft.item.ItemStack;
 
 /**
  * An item slot you can put stacks into but not take them out of.
- * @author Sam "Gyro" Cutlip
+ * @author Sam "Gyro" C.
  */
 public class SlotInput extends ItemSlot {
 

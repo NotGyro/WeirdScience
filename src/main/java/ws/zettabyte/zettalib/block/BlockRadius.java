@@ -8,7 +8,7 @@ package ws.zettabyte.zettalib.block;
  * The origin block is, by default, excluded from the query.
  * 
  * Importantly, it is inclusive on its upper bounds.
- * @author Samuel "Gyro" Cutlip
+ * @author Samuel "Gyro" C.
  *
  */
 public class BlockRadius extends BlockRange {

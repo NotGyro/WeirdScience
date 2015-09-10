@@ -20,17 +20,20 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import ws.zettabyte.zettalib.IDebugInfo;
+import ws.zettabyte.zettalib.block.IMetaActive;
 import ws.zettabyte.zettalib.block.TileEntityBase;
 import ws.zettabyte.zettalib.initutils.Conf;
 import ws.zettabyte.zettalib.initutils.Configgable;
 import ws.zettabyte.zettalib.inventory.FluidTankNamed;
 import ws.zettabyte.zettalib.inventory.IDescriptiveInventory;
-import ws.zettabyte.zettalib.inventory.INamedTankInfo;
+import ws.zettabyte.zettalib.inventory.IInvComponent;
 import ws.zettabyte.zettalib.inventory.ItemSlot;
+import ws.zettabyte.zettalib.inventory.SimpleInvComponent;
 import ws.zettabyte.zettalib.inventory.SlotInput;
 import ws.zettabyte.zettalib.inventory.SlotOutput;
 import ws.zettabyte.weirdscience.WeirdScience;
@@ -38,14 +41,15 @@ import ws.zettabyte.weirdscience.gas.BlockGas;
 
 @Configgable(section="Machine")
 public class TECatalyticEngine extends TileEntityBase implements
-		IDebugInfo, ISidedInventory, IDescriptiveInventory, INamedTankInfo {
+		IDebugInfo, ISidedInventory, IDescriptiveInventory {
 	//---- Inventory ----
-	private ItemSlot slotInput = new ItemSlot(this, 0, "fuel");
-	private ItemSlot slotOutput1 = new SlotOutput(this, 1, "out1");
-	private ItemSlot slotOutput2 = new SlotOutput(this, 2, "out2");
+	protected ItemSlot slotInput = new ItemSlot(this, 0, "fuel");
+	protected ItemSlot slotOutput1 = new SlotOutput(this, 1, "out1");
+	protected ItemSlot slotOutput2 = new SlotOutput(this, 2, "out2");
 
-	private ArrayList<ItemSlot> slots = new ArrayList<ItemSlot>(3);
-	private ArrayList<ItemSlot> slotsOut = new ArrayList<ItemSlot>(2);
+	protected ArrayList<ItemSlot> slots = new ArrayList<ItemSlot>(3);
+	protected ArrayList<ItemSlot> slotsOut = new ArrayList<ItemSlot>(2);
+	protected ArrayList<IInvComponent> fullComponentList = null; //new ArrayList<IInvComponent>(8);
 	//---- end of inventory ----
     
     //Fractional RF per fuel values are achievable: rfPerStack = 1 and an itemstack of 16 fuel is 1/16 RF per fuel.
@@ -63,16 +67,17 @@ public class TECatalyticEngine extends TileEntityBase implements
     
     protected static HashMap<Item, FuelInfo> fuels = new HashMap<Item, FuelInfo>(3);
 	
+    protected SimpleInvComponent<Float> burnProgress = new SimpleInvComponent<Float>("progress");
 	//---- Conf ----
     //@Conf(name="Catalytic Engine: Max dirt burned per cycle", def="16")
     //public static int quantityPerBurn; //Amount of dirt to attempt to consume at once.
 
-    @Conf(name="Catalytic Engine: Ticks between cycles", def="2")
+    @Conf(name="Catalytic Engine: Ticks between cycles", def="8")
     public static int ticksPerBurn; //Time between ticks where we burn dirt. To reduce lag.
 
     @Conf(name="Catalytic Engine: Ticks between  passive exhaust ejection attempts", def="2")
     public static int ticksPerExhaust; //How long until we try to spawn smog?
-    @Conf(name="Catalytic Engine: Rate of passive exhaust ejection", def="128")
+    @Conf(name="Catalytic Engine: Rate of passive exhaust ejection", def="128", comment="Set to 0 to disable passive exhaust.")
     public static int rateExhaustOut; //How long until we try to spawn smog?
 
     @Conf(name="Catalytic Engine: do exhaust", def="true")
@@ -85,14 +90,14 @@ public class TECatalyticEngine extends TileEntityBase implements
     
     public static FuelInfo dirtFuel = new FuelInfo();
     static {
-    	dirtFuel.fuel = new ItemStack(Blocks.dirt, 1);
+    	dirtFuel.fuel = new ItemStack(Blocks.dirt, 8);
     	dirtFuel.rfPerStack = 4;
 
     	dirtFuel.metadataSensitive = false;
     	
-    	dirtFuel.byproducts.add(new ItemStack(Blocks.sand, 1));
-    	//dirtFuel.byproducts.add(new ItemStack(Blocks.gravel, 1));
-    	dirtFuel.fluidExhaust = new FluidStack(WeirdScience.fluidSmog, 64);
+    	dirtFuel.byproducts.add(new ItemStack(Blocks.sand, 2));
+    	dirtFuel.byproducts.add(new ItemStack(Blocks.gravel, 1));
+    	dirtFuel.fluidExhaust = new FluidStack(WeirdScience.fluidSmog, 512);
     	
     	addFuel(dirtFuel);
     };
@@ -100,16 +105,18 @@ public class TECatalyticEngine extends TileEntityBase implements
     //---- end of conf ----
 
     private int ticksUntilBurn = ticksPerBurn;
+    private int ticksUntilBurnClientside = ticksPerBurn;
     private int ticksUntilExhaust = ticksPerExhaust;
     private boolean wasRunningLastBurn = false;
 	protected Random itemDropRand = new Random();
 
     protected FluidTankNamed fluidTank;
     protected ArrayList<FluidTankNamed> tanks = new ArrayList<FluidTankNamed>(1);
-	private int ticksLastBurn;
+	private int ticksLastBurn = 256;
     
     
 	public TECatalyticEngine() {
+		super();
 		slots.add(slotInput);
 		slots.add(slotOutput1);
 		slots.add(slotOutput2);
@@ -148,18 +155,6 @@ public class TECatalyticEngine extends TileEntityBase implements
 			return slots.get(s).decrStackSize(amount);
 		}
 		return null;
-		/*if (this.slots[s] != null) {
-            ItemStack itemstack;
-            if (this.slots[s].getStack().stackSize <= amount) {
-                itemstack = this.slots[s].getStack();
-                this.slots[s].getStack() = null;
-                return itemstack;
-            }
-            else {
-                itemstack = this.slots[s]..getStack().splitStack(amount);
-                return itemstack;
-            }
-		}*/
 	}
 
 	@Override
@@ -284,20 +279,20 @@ public class TECatalyticEngine extends TileEntityBase implements
                         }
                     }
                 }
+    	        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+    	        markDirty();
             }
-        }
-        if(flagInvChanged) {
-            worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
-            markDirty();
         }
         if (this.ticksUntilExhaust > 0) {
             --this.ticksUntilExhaust;
             if(this.ticksUntilExhaust < 0) ticksUntilExhaust = 0;
         }
-        if((doExhaust) && (ticksLastBurn > (ticksPerBurn+ticksPerExhaust)*2)){
-            if ((!worldObj.isRemote) && fluidTank.getFluidAmount() > rateExhaustOut){
-                //Burn logic:
-                //Are we still waiting to burn fuel?
+        //Is this behavior enabled?
+        if(doExhaust && (rateExhaustOut > 0)){
+        	//Are the conditions met to vent?
+            if ((!worldObj.isRemote) && (fluidTank.getFluidAmount() > rateExhaustOut)
+            		&& (ticksLastBurn > (ticksPerBurn+ticksPerExhaust)*4)){
+            	//Has the countdown finished?
                 if (this.ticksUntilExhaust <= 0) {
 		            Block fBlock = fluidTank.getFluid().getFluid().getBlock();
 		            if (fBlock instanceof BlockGas) {
@@ -312,13 +307,26 @@ public class TECatalyticEngine extends TileEntityBase implements
 		                }
 		            }
 		            ticksUntilExhaust += ticksPerExhaust; //Reset the timer, but only if we did anything.
-		            worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
-		            markDirty();
+		            flagInvChanged = true;
                 }
             }
         }
+        burnProgress.val = 1.0F - Math.min(((float)ticksUntilBurn) / ((float)ticksPerBurn), 1.0F);
+        if(burnProgress.val > 0.8F) burnProgress.val = 1.0F;
+        /*if(worldObj.isRemote) {
+        	//Setting the thing that only matters client-side, when client-side, doesn't work. Because reasons.
+	        Block b = worldObj.getBlock(xCoord, yCoord, zCoord);
+	        if(b instanceof IMetaActive) {
+	        	((IMetaActive)b).setActiveStatus((ticksLastBurn < 20), worldObj, xCoord, yCoord, zCoord);
+	        }
+        }*/
         ticksLastBurn++;
+        if(flagInvChanged || (this.ticksUntilBurn > 0)) {
+	        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+	        markDirty();
+        }
     }
+    
     public void recieveByproduct(ItemStack stack) {
     	for(int i = 0; i < slotsOut.size(); ++i) {
     		ItemSlot s = slotsOut.get(i);
@@ -482,10 +490,22 @@ public class TECatalyticEngine extends TileEntityBase implements
 		// TODO Auto-generated method stub
 		return this.isUseableByPlayer(player);
 	}
-
+	
 	@Override
-	public Iterable<FluidTankNamed> getTanks() {
-		return tanks;
+	public Iterable<IInvComponent> getComponents() {
+		if(fullComponentList == null) buildComponentList();
+		return fullComponentList;
 	}
-
+	
+	
+	protected void buildComponentList() {
+		fullComponentList = new ArrayList<IInvComponent>(slots.size() + tanks.size());
+		for(ItemSlot s : slots) {
+			fullComponentList.add(s);
+		}
+		for(FluidTankNamed t : tanks) {
+			fullComponentList.add(t);
+		}
+		fullComponentList.add(burnProgress);
+	}
 }

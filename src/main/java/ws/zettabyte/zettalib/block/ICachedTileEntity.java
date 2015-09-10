@@ -8,7 +8,7 @@ import net.minecraftforge.common.util.ForgeDirection;
  * of TileEntities adjacent to it, in order to optimize past Minecraft's
  * incredibly slow Tile Entity lookups.
  * 
- * @author Sam "Gyro" Cutlip
+ * @author Sam "Gyro" C.
  *
  */
 public interface ICachedTileEntity {

@@ -15,7 +15,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 /**
  * A number of convenience functions to do common bits of Minecraft object initialization.
  * Intended to reduce boilerplate and copy-and-paste errors.
- * @author Sam "Gyro" Cutlip 
+ * @author Sam "Gyro" C. 
  */
 public final class InitUtils {
 	

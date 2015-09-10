@@ -9,7 +9,10 @@ import ws.zettabyte.zettalib.client.gui.widgets.WidgetContainer;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetFluidBar;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetSimple;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetSlot;
+import ws.zettabyte.zettalib.client.gui.widgets.WidgetValBar;
+import ws.zettabyte.zettalib.client.render.SpriteSolidColor;
 import ws.zettabyte.zettalib.inventory.IDescriptiveInventory;
+import ws.zettabyte.zettalib.inventory.SimpleInvComponent;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
@@ -36,24 +39,44 @@ public class CommonProxy implements IGuiHandler {
 		
 		currentHeight = slotTest1.getHeight() + margin;
 		
-		WidgetSimple slotAlart = new WidgetSimple(inventoryPanel);
-		slotAlart.setHeight(16);
-		slotAlart.setWidth(22);
-		slotAlart.centerX();
-		slotAlart.setY(currentHeight);
-		slotAlart.setLayer(3);
-		slotAlart.setArt(new ResourceLocation("weirdscience", "textures/gui/iconDanger.png"));
+		WidgetSimple alertIcon = new WidgetSimple(inventoryPanel);
+		alertIcon.setHeight(16);
+		alertIcon.setWidth(22);
+		alertIcon.centerX();
+		alertIcon.setY(currentHeight);
+		alertIcon.setLayer(3);
+		alertIcon.setSprite(new ResourceLocation("weirdscience", "textures/gui/iconDanger.png"));
 		
-		currentHeight += slotAlart.getHeight();
+
+	    //SimpleInvComponent<Float> test = new SimpleInvComponent<Float>("progress");
+	    //test.val = 1.0F;
+		WidgetValBar progress = new WidgetValBar("progress", inventoryPanel);
+		//progress.provideComponent(test);
+		progress.setBounds(alertIcon.getRelativeBounds());
+		SpriteSolidColor progressFiller = new SpriteSolidColor();
+		progressFiller.r = 1.0F;
+		progressFiller.a = 1.0F;
+		progress.setSprite(progressFiller);
+		progress.setDirection(WidgetAmountBar.EXPAND_DIR.UP);
+		progress.setLayer(4);
+		
+		WidgetSimple alertOverlay = new WidgetSimple(inventoryPanel);
+		alertOverlay.setBounds(alertIcon.getRelativeBounds());
+		alertOverlay.setLayer(5);
+		alertOverlay.setSprite(new ResourceLocation("weirdscience", "textures/gui/iconDangerOverlay.png"));
+		
+		currentHeight += alertIcon.getHeight();
 		currentHeight += margin;
 		
 		int realX = slotTest1.getXRelative();
 
+		
 		WidgetSlot slotTest2 = new WidgetSlot(inventoryPanel, "out1");
 		slotTest2.setX(realX - 10);
 		slotTest2.setY(currentHeight);
 		slotTest2.setLayer(3);
 		
+		//Comment this out and watch as the GUI is smart enough to deal sanely with this guy's absence.
 		WidgetSlot slotTest3 = new WidgetSlot(inventoryPanel, "out2");
 		slotTest3.setX(realX + 10);
 		slotTest3.setY(currentHeight);
@@ -64,13 +87,13 @@ public class CommonProxy implements IGuiHandler {
 		tank.setY(4);
 		tank.setHeight(72);
 		tank.setWidth(26);
-		tank.setLayer(4);
+		tank.setLayer(9);
 		
 		WidgetFluidBar tankBar = new WidgetFluidBar("exhaust");
 		tankBar.setDirection(WidgetAmountBar.EXPAND_DIR.UP);
 		tankBar.setHeight(66);
 		tankBar.setWidth(20);
-		tankBar.setLayer(0);
+		tankBar.setLayer(1);
 		tankBar.setX(3);
 		tankBar.setY(3);
 		
@@ -80,14 +103,14 @@ public class CommonProxy implements IGuiHandler {
 		WidgetSimple tankBack = new WidgetSimple(tank);
 		tankBack.setHeight(72);
 		tankBack.setWidth(26);
-		tankBack.setLayer(-1);
-		tankBack.setArt(CommonIcons.tank1Background);
+		tankBack.setLayer(0);
+		tankBack.setSprite(CommonIcons.tank1Background);
 		
 		WidgetSimple tankFront = new WidgetSimple(tank);
 		tankFront.setHeight(72);
 		tankFront.setWidth(26);
-		tankFront.setLayer(1);
-		tankFront.setArt(CommonIcons.tank1Overlay);
+		tankFront.setLayer(2);
+		tankFront.setSprite(CommonIcons.tank1Overlay);
 		
 		testInv.addWidget(tank);
 	}

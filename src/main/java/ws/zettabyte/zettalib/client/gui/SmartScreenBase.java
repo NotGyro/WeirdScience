@@ -4,9 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import org.lwjgl.opengl.GL11;
+
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetContainer;
+import ws.zettabyte.zettalib.client.render.IRenders2D;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
@@ -19,10 +23,10 @@ import net.minecraft.util.IIcon;
  * TODO: Will probably refactor this entirely. I'll extract an interface,
  * at the very least.
  * 
- * @author Sam "Gyro" Cutlip
+ * @author Sam "Gyro" C.
  *
  */
-public abstract class SmartScreenBase extends GuiContainer {
+public abstract class SmartScreenBase extends GuiContainer implements IRenders2D, IGUI {
 	protected IGUIWidget rootWidget;
 	protected IGUIWidget currentMouseOver = null;
 	protected GUIContext ctx;
@@ -109,15 +113,10 @@ public abstract class SmartScreenBase extends GuiContainer {
     	}
     }
     
-    /**
-     * Adds a widget to this screen's root widget,
-     * providing it as a child to our rootWidget and also
-     * calling setParent on w.
-     * 
-     * 
-     * @param w
-     * @return Were we able to add this widget (true), or is it a duplicate (false)?
-     */
+    /* (non-Javadoc)
+	 * @see ws.zettabyte.zettalib.client.gui.IGUI#addWidget(ws.zettabyte.zettalib.client.gui.IGUIWidget)
+	 */
+	@Override
 	public boolean addWidget(IGUIWidget w) {
     	boolean ret = rootWidget.addChild(w);
     	if(ret) w.setParent(rootWidget);
@@ -138,12 +137,10 @@ public abstract class SmartScreenBase extends GuiContainer {
     	return this.zLevel;
     }
 
-	/**
-	 * Gets the root widget, the parent farthest up the widget tree of this screen's
-	 * hierarchy. Recursively walking through all children of this object and all of
-	 * their children and etc... will touch on every single widget involved in this
-	 * screen.
+	/* (non-Javadoc)
+	 * @see ws.zettabyte.zettalib.client.gui.IGUI#getRootWidget()
 	 */
+	@Override
 	public IGUIWidget getRootWidget() { return rootWidget; }
     
     /**
@@ -151,6 +148,7 @@ public abstract class SmartScreenBase extends GuiContainer {
      * 
      * Overridden to prevent annoying "must be 256x256" things.
      */
+	@Override
     public void drawTexturedRect(double x, double y, 
     		double uStart, double vStart, double uWidth, double vHeight, 
     		double width, double height) {
@@ -174,7 +172,7 @@ public abstract class SmartScreenBase extends GuiContainer {
         tessellator.addVertexWithUV((x + 0), 
         		(y + 0), 
         		(double)this.zLevel, 
-        		uStart + 0.0F,
+        		uStart,
         		vStart );
         tessellator.draw();
     }
@@ -185,11 +183,64 @@ public abstract class SmartScreenBase extends GuiContainer {
      * Draws the whole whole source image in the defined area. -
      * from u 0, v 0 to u 1, v 1.
      */
+	@Override
     public void drawWholeTexturedRect(double x, double y, double width, double height) {
     	this.drawTexturedRect(x, y, 0.0D,  0.0D, 1.0D, 1.0D, width, height);
     }
 
+	@Override
 	public Minecraft getMC() {
 		return this.mc;
 	}
+	
+	@Override
+	public void drawGradientRectangle(int p_73733_1_, int p_73733_2_,
+			int p_73733_3_, int p_73733_4_, int p_73733_5_, int p_73733_6_) {
+		this.drawGradientRect(p_73733_1_, p_73733_2_, p_73733_3_, p_73733_4_, p_73733_5_, p_73733_6_);
+	}
+	
+	@Override
+	public void drawHorzLine(int p_73730_1_, int p_73730_2_, int p_73730_3_,
+			int p_73730_4_) {
+		this.drawHorizontalLine(p_73730_1_, p_73730_2_, p_73730_3_, p_73730_4_);
+	}
+	
+	@Override
+	public void drawVertLine(int p_73728_1_, int p_73728_2_, int p_73728_3_,
+			int p_73728_4_) {
+		this.drawVerticalLine(p_73728_1_, p_73728_2_, p_73728_3_, p_73728_4_);
+	}
+
+	@Override
+    public void drawRectangle(float x1, float y1, float x2, float y2, float r, float g, float b, float a) {
+        float swap;
+
+        if (x1 < x2) {
+            swap = x1;
+            x1 = x2;
+            x2 = swap;
+        }
+
+        if (y1 < y2) {
+            swap = y1;
+            y1 = y2;
+            y2 = swap;
+        }
+        
+        Tessellator tessellator = Tessellator.instance;
+        //GL11.glEnable(GL11.GL_BLEND);
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        //OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+        GL11.glColor4f(r, g, b, a);
+        tessellator.startDrawingQuads();
+        tessellator.addVertex((double)x1, (double)y2, this.getZLevel());
+        tessellator.addVertex((double)x2, (double)y2, this.getZLevel());
+        tessellator.addVertex((double)x2, (double)y1, this.getZLevel());
+        tessellator.addVertex((double)x1, (double)y1, this.getZLevel());
+        tessellator.draw();
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        //GL11.glDisable(GL11.GL_BLEND);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+    }
 }

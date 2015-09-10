@@ -7,7 +7,7 @@ import net.minecraft.util.ResourceLocation;
  * where you can access the full player inventory, a background for accessing only
  * the hotbar, and a background graphic that resembles the standard Minecraft look
  * but provides no access to the player's inventory at all.
- * @author Sam "Gyro" Cutlip
+ * @author Sam "Gyro" C.
  *
  */
 public final class CommonIcons {

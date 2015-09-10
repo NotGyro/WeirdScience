@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 /**
  * A simple little wrapper around a Minecraft block which allows the programmer to
  * declaratively describe some things you'd normally have to produce imperatively.
- * @author Sam "Gyro" Cutlip
+ * @author Sam "Gyro" C.
  *
  */
 public class BlockGeneric extends Block {

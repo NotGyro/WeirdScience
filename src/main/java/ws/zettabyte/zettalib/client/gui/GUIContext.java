@@ -8,7 +8,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 
 /**
  * Everything that a Widget would need to sanely draw itself.
- * @author Sam "Gyro" Cutlip
+ * @author Sam "Gyro" C.
  */
 public class GUIContext {
 	public SmartScreenBase screen;

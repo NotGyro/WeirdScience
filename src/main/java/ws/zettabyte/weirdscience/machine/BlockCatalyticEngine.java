@@ -18,10 +18,11 @@ import net.minecraftforge.common.util.RotationHelper;
 import ws.zettabyte.weirdscience.WeirdScience;
 import ws.zettabyte.zettalib.block.BlockContainerBase;
 import ws.zettabyte.zettalib.block.IInfoTileEntity;
+import ws.zettabyte.zettalib.block.IMetaActive;
 import ws.zettabyte.zettalib.initutils.ICreativeTabInfo;
 
 public class BlockCatalyticEngine extends BlockContainerBase implements
-		ICreativeTabInfo, IInfoTileEntity {
+		ICreativeTabInfo, IInfoTileEntity, IMetaActive {
 	public BlockCatalyticEngine(Material material) {
 		super(material);
 		// TODO Auto-generated constructor stub
@@ -155,5 +156,27 @@ public class BlockCatalyticEngine extends BlockContainerBase implements
 		}
 		player.openGui(WeirdScience.instance, 0, world, x, y, z);
 		return true;
+	}
+
+	@Override
+	public void setActiveStatus(boolean status, World world, int x,
+			int y, int z) {
+		int meta = world.getBlockMetadata(x, y, z);
+		
+		//The below behavior breaks sync for no earthly reason.
+		if(isOperating(meta) == status) return;
+		if(status) {
+			world.setBlockMetadataWithNotify(x, y, z, 
+				this.getFacing(meta)|8, 1|2);
+		}
+		else {
+			world.setBlockMetadataWithNotify(x, y, z, 
+					this.getFacing(meta), 1|2);
+		}
+	}
+
+	@Override
+	public boolean getActiveStatus(World world, int x, int y, int z) {
+		return isOperating(world.getBlockMetadata(x, y, z));
 	}
 }

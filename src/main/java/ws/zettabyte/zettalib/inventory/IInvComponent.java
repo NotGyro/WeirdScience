@@ -5,5 +5,5 @@ package ws.zettabyte.zettalib.inventory;
  * 
  * Item slots are a maybe. */
 public interface IInvComponent {
-	String getName();
+	String getComponentName();
 }

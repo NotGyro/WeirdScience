@@ -2,13 +2,14 @@ package ws.zettabyte.zettalib.client.gui.widgets;
 
 import ws.zettabyte.zettalib.client.gui.CommonIcons;
 import ws.zettabyte.zettalib.client.gui.IGUIWidget;
+import ws.zettabyte.zettalib.client.render.SpriteResourceLocation;
 /**
  * A widget that represents an inventory slot, with the default Minecraft inventory slot icon as
  * its background, that automatically creates a WidgetDummySlot as its child to mesh with Minecraft's
  * inventory logic.
  * 
  * Size defaults to (18, 18) and the offset of the dummy slot defaults to (1, 1). 
- * @author Sam "Gyro" Cutlip
+ * @author Sam "Gyro" C.
  *
  */
 public class WidgetSlot extends WidgetSimple {
@@ -24,7 +25,7 @@ public class WidgetSlot extends WidgetSimple {
 		super();
 		
 		//Init:
-		this.setArt(CommonIcons.slotItem);
+		this.setSprite(new SpriteResourceLocation(CommonIcons.slotItem));
 		this.setWidth(18); 
 		this.setHeight(18);
 		

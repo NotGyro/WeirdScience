@@ -10,21 +10,21 @@ import net.minecraft.item.ItemStack;
  * An implementation of the Slot class which also encapsulates the ItemStack - not only
  * is it a description of properties and a way of interacting with Inventories, now, but it's
  * actually a part of the inventory.
- * @author Sam "Gyro" Cutlip
+ * @author Sam "Gyro" C.
  *
  */
-public class ItemSlot extends Slot {
+public class ItemSlot extends Slot implements IInvComponent {
 	protected ItemStack stack = null;
 	public int maxSize = 64;
 	
 	public final int slotNumber;
-	public String name;
+	protected String name;
 	public final IInventory inventory;
 	
 	public IGUIWidget guiInfo = null;
 	
 	public ItemSlot(IInventory inv, int slotnum) {
-		super(inv, slotnum, 0, 0);
+		super(inv, slotnum, -1, -1);
 		inventory = inv;
 		slotNumber = slotnum;
 		name = null;
@@ -137,8 +137,9 @@ public class ItemSlot extends Slot {
 	public int getSlotIndex() {
 		return slotNumber;
 	}
-	
-	//TODO: Run item-stack NBT saving through this, so that ghost slots can save properly.
-	
-	
+
+	@Override
+	public String getComponentName() {
+		return name;
+	}	
 }

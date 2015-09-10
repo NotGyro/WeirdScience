@@ -3,6 +3,8 @@ package ws.zettabyte.zettalib.client.gui;
 import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
+
+import ws.zettabyte.zettalib.client.render.ISprite;
 /**
  * An element of a GUI which has a mutable upper-left-hand corner position, a mutable width and height 
  * for a bounding box, and which can be incorporated into a tree of other IGUIWidgets.
@@ -15,7 +17,7 @@ import org.lwjgl.opengl.GL11;
  * 
  * Width and height are absolutes and do not bend to the hierarchy. Calling parent.setWidth(x) will not
  * alter the output of child.getWidth(); in any way (except possibly in some odd special cases).
- * @author Sam "Gyro" Cutlip
+ * @author Sam "Gyro" C.
  *
  */
 public interface IGUIWidget {
@@ -128,4 +130,5 @@ public interface IGUIWidget {
         int l = Math.abs(this.getParent().getHeight() - this.getHeight()) / 2;
         setY(l);
 	}
+	default void setSprite(ISprite s) { };
 }

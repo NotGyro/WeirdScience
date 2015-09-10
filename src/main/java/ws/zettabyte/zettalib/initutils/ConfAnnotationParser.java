@@ -8,7 +8,7 @@ import net.minecraftforge.common.config.Configuration;
 /**
  * Sets variables annotated with @Conf, in a given class, from a given config file, 
  * and recursively does the same to variables annotated @Configgable.
- * @author Samuel "Gyro" Cutlip 
+ * @author Samuel "Gyro" C. 
  */
 public class ConfAnnotationParser {
 	final Configuration context;

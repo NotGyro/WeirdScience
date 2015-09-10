@@ -15,7 +15,7 @@ import net.minecraftforge.event.entity.player.FillBucketEvent;
 /**
  * A handler for Forge bucket events which also allows you to map fluid blocks
  * to the resulting filled bucket item, rather than explicitly checking for each one.
- * @author Sam "Gyro" Cutlip
+ * @author Sam "Gyro" C.
  *
  */
 public class BucketEventManager {

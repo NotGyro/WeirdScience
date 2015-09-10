@@ -9,7 +9,7 @@ import net.minecraft.item.ItemStack;
  * 
  * Intended for things like setting filters.
  * 
- * @author Sam "Gyro" Cutlip
+ * @author Sam "Gyro" C.
  */
 public class SlotGhost extends ItemSlot {
 

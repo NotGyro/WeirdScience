@@ -12,7 +12,7 @@ import ws.zettabyte.zettalib.client.gui.Rect2D;
  * 
  * This Widget does not have any visual representation, and calling draw() on it
  * does nothing.
- * @author Sam "Gyro" Cutlip
+ * @author Sam "Gyro" C.
  *
  */
 public class WidgetContainer implements IGUIWidget {
@@ -120,6 +120,6 @@ public class WidgetContainer implements IGUIWidget {
 
 	@Override
 	public void setBounds(Rect2D b) {
-		bounds = b;
+		bounds = b.copy();
 	}
 }

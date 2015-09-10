@@ -5,7 +5,7 @@ package ws.zettabyte.zettalib.client.gui;
  * The position (X and Y) represents the 
  * upper-left-hand corner.
  * 
- * @author Sam "Gyro" Cutlip
+ * @author Sam "Gyro" C.
  */
 public class Rect2D {
 	protected Vert2D pos;

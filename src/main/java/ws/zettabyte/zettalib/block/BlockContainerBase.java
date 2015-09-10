@@ -13,7 +13,7 @@ import net.minecraftforge.common.util.ForgeDirection;
  * A BlockContainer (that is, block which has an associated Tile Entity) with all of the 
  * extra functionality required to make use of ZettaLib's bells and whistles.
  * Will only work with an ICachedTileEntity.
- * @author Sam "Gyro" Cutlip
+ * @author Sam "Gyro" C.
  */
 public abstract class BlockContainerBase extends BlockContainer implements IDebuggableBlock {
 

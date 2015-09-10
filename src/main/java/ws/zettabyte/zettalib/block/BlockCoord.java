@@ -3,7 +3,7 @@ package ws.zettabyte.zettalib.block;
 /**
  * An immutable representation of a cell in a Voxel world.
  * Used mostly for iteration and query results.
- * @author Sam "Gyro" Cutlip
+ * @author Sam "Gyro" C.
  *
  */
 public final class BlockCoord {

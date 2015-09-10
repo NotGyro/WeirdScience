@@ -24,6 +24,7 @@ import ws.zettabyte.weirdscience.fluid.FluidAcid;
 import ws.zettabyte.weirdscience.gas.BlockGas;
 import ws.zettabyte.weirdscience.gas.BlockGasFlammable;
 import ws.zettabyte.weirdscience.gas.FluidSmog;
+import ws.zettabyte.zettalib.client.gui.widgets.WidgetAmountBar;
 import ws.zettabyte.zettalib.initutils.ICreativeTabInfo;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
@@ -56,6 +57,8 @@ public class ZettaLib {
     //The logger for the mod. Should this not be static? Since it's Minecraft, it's unlikely that there will be threading issues.
     public static final Logger logger = Logger.getLogger("ZettaLib");
     
+    public static boolean enableStick = false;
+    
 	public ZettaLib() {
 		instance = this;
 		logger.setLevel(Level.ALL);
@@ -63,15 +66,24 @@ public class ZettaLib {
 	
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+	    Configuration config = new Configuration(event.getSuggestedConfigurationFile());
+        config.load();
+
+        /*WidgetAmountBar.forceDisableInterpolate = ! (
+        		config.getBoolean("Enable GUI bar interpolation", "Client", true, "Allow GUI bars, such as fluid tanks and energy meters, to try to smooth out their own change over time. Disabling this may decrease lag inside of GUIs.")
+        		);*/
+        enableStick = config.getBoolean("Enable debug stick", "Dev", false, "Enable a stick that prints information about tiles to the console.");
     }
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
+    	if(enableStick) {
     	ItemDebugStick stick = new ItemDebugStick();
     	stick.setUnlocalizedName("itemDebugStick");
     	stick.setTextureName("stick");
 	    GameRegistry.registerItem(stick, "itemDebugStick");
 	    stick.setCreativeTab(CreativeTabs.tabMisc);
+    	}
     }
 
     @EventHandler

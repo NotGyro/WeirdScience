@@ -1,20 +1,22 @@
 package ws.zettabyte.zettalib.inventory;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
 /**
  * A container object which provides access to the player's inventory and hotbar, and works with
  * more dynamic ItemSlots and the Widget system.
- * @author gyro
+ * @author Sam "Gyro" C.
  *
  */
-public class ContainerPlayerInv extends Container {
+public class ContainerPlayerInv extends Container implements ICleanableContainer {
 
 	protected IDescriptiveInventory inv;
 	public HashMap<String, ItemSlot> namedSlots = new HashMap<String, ItemSlot>(3);
@@ -82,36 +84,33 @@ public class ContainerPlayerInv extends Container {
 				//Do clever checks n' stuff
 				if(slot instanceof ItemSlot) {
 					if(((ItemSlot)slot).canOutput()) {
-						if(putToPlayerInventory(stackCurrent) == null) {
-							return null;
-						}
+						stackCurrent = putToPlayerInventory(stackCurrent);
 						slot.onSlotChange(stackCurrent, stackInitial);
 					}
 					else {
-						//Do not even try to merge, shouldn't do anything here.
-						return null;
+						//Do not even try to take the stack, shouldn't do anything here.
 					}
 				} 
 				else { //Native-type slot
-					if(putToPlayerInventory(stackCurrent) == null) {
-						return null;
-					}
+					stackCurrent = putToPlayerInventory(stackCurrent);
 					slot.onSlotChange(stackCurrent, stackInitial);
 				}
 			}
 			else {
 				for(ItemSlot e : inv.getSlots()) {
 					if(e.isItemValid(stackCurrent)) {
-						if (!mergeItemStack(stackCurrent, e.slotNumber, e.slotNumber, false)) {
-							return null;
-						}
+						stackCurrent = e.acceptInput(stackCurrent);
 					}
 				}
 			}
 
-			if (stackCurrent.stackSize == 0) {
+			if(stackCurrent == null) {
 				slot.putStack((ItemStack) null);
-			} else {
+				slot.onSlotChanged();
+				return null;
+			}
+			else if (stackCurrent.stackSize == 0) {
+				slot.putStack((ItemStack) null);
 				slot.onSlotChanged();
 			}
 
@@ -122,18 +121,45 @@ public class ContainerPlayerInv extends Container {
 			slot.onPickupFromSlot(player, stackCurrent);
 			return stackInitial;
 		} else {
+			//Nothing in the slot
 			return null;
 		}
 	}
 	
 	protected ItemStack putToPlayerInventory(ItemStack stackCurrent) {
+		if(stackCurrent == null) return null;
 		// mergeItemStack takes the item stack to attempt to merge, and
 		// the slots on this object to attempt to merge it into. Bool at
 		// the end is "reverse order or no?"
-		if (!this.mergeItemStack(stackCurrent, beginPlayerInvRange, endHotbarRange, true)) {
-			return null;
-		}
+		//
+		// Returns "could we do anything with it? 
+		mergeItemStack(stackCurrent, beginPlayerInvRange, endHotbarRange, true);
+		if(stackCurrent.stackSize <= 0) return null;
 		return stackCurrent;
 	}
 
+	/**
+	 * Remove any slot with a negative position variable.
+	 * 
+	 * Note: Missing slots will break sync between client and server.
+	 */
+	@Override
+	public void cleanupUnlinkedSlots() {
+		Iterator iter = inventorySlots.iterator();
+		int i = -1;
+		while(iter.hasNext()) {
+			Slot slot = (Slot)iter.next();
+			//The world's silliest hack, right here.
+			if(slot.xDisplayPosition < 0) {
+				slot.xDisplayPosition = -99999;
+				slot.yDisplayPosition = -99999;
+			}
+			else if(slot.yDisplayPosition < 0) {
+				slot.xDisplayPosition = -99999;
+				slot.yDisplayPosition = -99999;
+			}
+		}
+	}
+
+	
 }

@@ -1,10 +1,14 @@
 package ws.zettabyte.zettalib.client.gui.widgets;
 
+import java.util.ArrayList;
+
+import net.minecraft.inventory.Slot;
 import ws.zettabyte.zettalib.client.gui.GUIContext;
-import ws.zettabyte.zettalib.client.gui.IGUIItemSlot;
 import ws.zettabyte.zettalib.client.gui.IGUIWidget;
 import ws.zettabyte.zettalib.client.gui.Rect2D;
 import ws.zettabyte.zettalib.client.gui.Vert2D;
+import ws.zettabyte.zettalib.inventory.IComponentReceiver;
+import ws.zettabyte.zettalib.inventory.IInvComponent;
 
 /**
  * A widget that is neither displayed nor possible to interact with directly -
@@ -19,16 +23,17 @@ import ws.zettabyte.zettalib.client.gui.Vert2D;
  * the slot logic in the GUI is likely to be at 0,0. TODO: Log a warning
  * rather than failing silently on this.
  * 
- * @author Sam "Gyro" Cutlip
+ * @author Sam "Gyro" C.
  *
  */
-public class WidgetDummySlot implements IGUIItemSlot {
+public class WidgetDummySlot implements IComponentReceiver, IGUIWidget {
 	public int idx = -1;
 	public String name = null;
 	
 	protected Rect2D bounds = new Rect2D();
 	protected IGUIWidget parent = null;
 	protected int layer = -1;
+	protected ArrayList<String> comps = new ArrayList<String>(1);
 
 	/**
 	 * Sets its size to 16x16.
@@ -45,6 +50,7 @@ public class WidgetDummySlot implements IGUIItemSlot {
 		this();
 		idx = i;
 		name = n;
+		if(name != null) comps.add(name);
 	}
 	/**
 	 * @param n Name of slot component, to match against an inventory.
@@ -97,10 +103,6 @@ public class WidgetDummySlot implements IGUIItemSlot {
 	@Override
 	public void setVisible(boolean v) {	}
 
-	/**
-	 * @return The name of our slot component, to be matched against slots on an inventory.
-	 */
-	@Override
 	public String getName() {
 		return name;
 	}
@@ -108,14 +110,13 @@ public class WidgetDummySlot implements IGUIItemSlot {
 	/**
 	 * @return The index of our slot, to be matched against slots on an inventory.
 	 */
-	@Override
 	public int getSlotIndex() {
 		return idx;
 	}
 	
 	@Override 
 	public IGUIWidget copy() {
-		IGUIWidget clone = new WidgetDummySlot();
+		IGUIWidget clone = new WidgetDummySlot(name);
 		
 		clone.setParent(null);
 		
@@ -129,4 +130,31 @@ public class WidgetDummySlot implements IGUIItemSlot {
 		return clone;
 	}
 
+	/**
+	 * @return The name of our slot component, to be matched against slots on an inventory.
+	 */
+	@Override
+	public Iterable<String> getComponentsSought() {
+		return comps;
+	}
+	@Override
+	public void provideComponent(IInvComponent comp) {
+		//Handle item slot
+		if(comp == null) return;
+		if(!(comp instanceof Slot)) return;
+		Slot slot = (Slot)comp;
+		//Set up the slot's position to properly track this object's.
+		if(slot != null) {
+			slot.xDisplayPosition = this.getX();
+			slot.yDisplayPosition = this.getY();
+		}
+	}
+	@Override
+	public boolean addChild(IGUIWidget child) {
+		return false;
+	}
+	@Override
+	public ArrayList<IGUIWidget> getChildren() {
+		return null;
+	}
 }

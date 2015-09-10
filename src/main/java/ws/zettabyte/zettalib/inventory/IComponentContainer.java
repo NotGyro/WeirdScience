@@ -1,10 +1,11 @@
 package ws.zettabyte.zettalib.inventory;
 
 import net.minecraft.entity.player.EntityPlayer;
+
 /**
  * An IComponentContainer can be queried for any (named) object which should
- * be provided to an associated GUI.
- * @author Sam "Gyro" Cutlip
+ * be provided to an associated GUI or other logic tile.
+ * @author Sam "Gyro" C.
  *
  */
 public interface IComponentContainer {
@@ -17,8 +18,8 @@ public interface IComponentContainer {
 	default IInvComponent getComponent(String name) { 
 		for(IInvComponent e : this.getComponents()) {
 			if(e != null) {
-				if(e.getName() != null) {
-					if(e.getName().equals(name)) {
+				if(e.getComponentName() != null) {
+					if(e.getComponentName().equals(name)) {
 						return e;
 					}
 				}

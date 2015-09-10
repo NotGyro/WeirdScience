@@ -9,8 +9,11 @@ import net.minecraft.inventory.Container;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetContainer;
 import ws.zettabyte.zettalib.inventory.ContainerPlayerInv;
 import ws.zettabyte.zettalib.inventory.FluidTankNamed;
+import ws.zettabyte.zettalib.inventory.ICleanableContainer;
+import ws.zettabyte.zettalib.inventory.IComponentContainer;
+import ws.zettabyte.zettalib.inventory.IComponentReceiver;
 import ws.zettabyte.zettalib.inventory.IDescriptiveInventory;
-import ws.zettabyte.zettalib.inventory.INamedTankInfo;
+import ws.zettabyte.zettalib.inventory.IInvComponent;
 import ws.zettabyte.zettalib.inventory.ItemSlot;
 
 /**
@@ -22,7 +25,7 @@ import ws.zettabyte.zettalib.inventory.ItemSlot;
  * @author Samuel "Gyro"
  *
  */
-public class GUIBuilder {
+public class GUIBuilder implements IGUI {
     
 	//Not copied.
 	protected WidgetContainer rootWidget = new WidgetContainer();
@@ -35,8 +38,7 @@ public class GUIBuilder {
 	
 	protected GUIType invType = GUIType.INV_FULL;
 
-	protected ArrayList<IGUIItemSlot> slotInfo = new ArrayList<IGUIItemSlot>();
-	protected ArrayList<IGUITank> tankInfo = new ArrayList<IGUITank>();
+	protected ArrayList<IComponentReceiver> componentWidgets = new ArrayList<IComponentReceiver>();
 
 	public GUIBuilder() {
 	    rootWidget.setWidth(176);
@@ -58,22 +60,17 @@ public class GUIBuilder {
     }
 	
 	/**
-	 * Anything that the GUIBuilder does to every widget in its tree should happen here.
-	 * 
-	 * TODO: Refactor to use a component system rather than separate types of widgets to process.
+	 * Anything that the GUIBuilder does to every widget in its tree will involve this function.
 	 */
-	protected static void recurseProcess(IGUIWidget parent, ArrayList<IGUIItemSlot> slotInfo, ArrayList<IGUITank> tankInfo) {
+	protected static void recurseProcess(IGUIWidget parent, ArrayList<IComponentReceiver> list) {
 		if(parent.getChildren() == null) {
 			return;
 		}
 		for(IGUIWidget e : parent.getChildren()) {
-			if(e instanceof IGUIItemSlot) {
-				slotInfo.add((IGUIItemSlot) (e));
+			if(e instanceof IComponentReceiver) {
+				list.add((IComponentReceiver) (e));
 			}
-			else if(e instanceof IGUITank) {
-				tankInfo.add((IGUITank) (e));
-			}
-			recurseProcess(e, slotInfo, tankInfo);
+			recurseProcess(e, list);
 		}
 	}
 	/**
@@ -81,58 +78,46 @@ public class GUIBuilder {
 	 * and re-position all of the Minecraft Slot objects such that they work properly
 	 * with the container.
 	 * 
-	 * TODO: Refactor to use component system, split up a bit.
-	 * 
-	 * @param obj Whatever's providng the game logic backing our GUI (typically a Tile Entity).
+	 * @param obj Whatever's providing the game logic backing our GUI (typically a Tile Entity)?
+	 * @param gui The GUI to which we'll be linking various values from the object.
+	 * @param componentWidgets An array to reuse. Totally optional, there to not churn so much memory.
 	 */
-	protected void buildSlotPositions(Object obj) {
-		slotInfo.clear();
-		tankInfo.clear();
-		recurseProcess(rootWidget, slotInfo, tankInfo);
-		//Handle item slots
-		if(obj instanceof IDescriptiveInventory) {
-			IDescriptiveInventory inv = (IDescriptiveInventory)obj;
-			for(IGUIItemSlot e : slotInfo) {
-				if(e == null) continue;
-				//Search for an appropriate itemSlot
-				//Does this GUISlot know the slot number?
-				int idx = e.getSlotIndex();
-				String name = e.getName();
-				if(idx != -1) {
-					ItemSlot slot = inv.getSlot(idx);
-					if(slot != null) {
-						//Isn't it a little stupid that this is on the "Server-sided" part of the container?
-						slot.xDisplayPosition = e.getX();
-						slot.yDisplayPosition = e.getY();
-						slot.guiInfo = e;
-					}
-				}
-				//Does this GUISlot have a name?
-				else if(name != null) {
-					ItemSlot slot = inv.getSlot(name);
-					if(slot != null) {
-						//Isn't it a little stupid that this is on the "Server-sided" part of the container?
-						slot.xDisplayPosition = e.getX();
-						slot.yDisplayPosition = e.getY();
-						slot.guiInfo = e;
+	protected static void processComponents(Object obj, IGUI gui, ArrayList<IComponentReceiver> componentWidgets) {
+		if(componentWidgets == null) {
+			componentWidgets = new ArrayList<IComponentReceiver>(8);
+		}
+		else {
+			componentWidgets.clear();
+		}
+		recurseProcess(gui.getRootWidget(), componentWidgets);
+		if(obj instanceof IComponentContainer) {
+			//We have components to process.
+			IComponentContainer inv = (IComponentContainer)obj;
+			for(IComponentReceiver widget : componentWidgets) {
+				if(widget == null) continue;
+				Iterable<String> searching = widget.getComponentsSought();
+				if(searching == null) continue;
+				//See if we have any of the components the GUI is looking for in this object.
+				for(String name : searching) {
+					IInvComponent c = inv.getComponent(name);
+					if(c != null) {
+						widget.provideComponent(c);
 					}
 				}
 			}
 		}
-		if(obj instanceof INamedTankInfo) {
-			INamedTankInfo invTanks = (INamedTankInfo)obj;
-			for(IGUITank e : tankInfo) {
-				if(e == null) continue;
-				String name = e.getComponentName();
-				//Does this GUITank have a name?
-				if(name != null) {
-					FluidTankNamed tank = invTanks.getTank(name);
-					if(tank != null) {
-						e.provideTank(tank);
-					}
-				}
-			}
-		}
+	}
+	
+	/**
+	 * Process all GUI elements which need information from obj,
+	 * and re-position all of the Minecraft Slot objects such that they work properly
+	 * with the container.
+	 * 
+	 * @param obj Whatever's providing the game logic backing our GUI (typically a Tile Entity)?
+	 * @param gui The GUI to which we'll be linking various values from the object.
+	 */
+	protected static void processComponents(Object obj, IGUI gui) {
+		processComponents(obj, gui, null);
 	}
 
 	/**
@@ -148,12 +133,20 @@ public class GUIBuilder {
 	 * @param inventoryPlayer The player opening this GUI.
 	 */
 	public GuiScreen buildScreen(Object obj, InventoryPlayer inventoryPlayer) {
-		
+		Container container = buildContainer(obj, inventoryPlayer);
+				
 		//Todo: sensitive to inventory type.
-		SmartScreenBase result = (SmartScreenBase) new ZettaScreen(buildContainer(obj, inventoryPlayer));
+		SmartScreenBase result = (SmartScreenBase) new ZettaScreen(container);
 		
 		for(IGUIWidget e : rootWidget.getChildren()) {
 			result.addWidget(e.copy());
+		}
+		
+		processComponents(obj, result, this.componentWidgets);
+		
+		if(container instanceof ICleanableContainer) {
+			//Remove any slots not associated with the GUI.
+			((ICleanableContainer)container).cleanupUnlinkedSlots();
 		}
 		
 		return (GuiScreen)result;
@@ -167,10 +160,14 @@ public class GUIBuilder {
 	 * @param obj Whatever's providing the game logic backing our GUI (typically a Tile Entity).
 	 * @param inventoryPlayer The player opening this GUI.
 	 */
-	public Container buildContainer(Object obj, InventoryPlayer inventoryPlayer) {
-		buildSlotPositions(obj);
-		
+	public Container buildContainer(Object obj, InventoryPlayer inventoryPlayer) {		
 		//Todo: sensitive to inventory type.
-		return (Container) new ContainerPlayerInv((IDescriptiveInventory)obj, inventoryPlayer);
+		Container result = (Container) new ContainerPlayerInv((IDescriptiveInventory)obj, inventoryPlayer);
+		return result;
+	}
+
+	@Override
+	public IGUIWidget getRootWidget() {
+		return rootWidget;
 	}
 }
