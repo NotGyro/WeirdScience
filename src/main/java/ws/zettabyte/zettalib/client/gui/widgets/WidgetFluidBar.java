@@ -1,11 +1,13 @@
 package ws.zettabyte.zettalib.client.gui.widgets;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.StatCollector;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidTank;
 
@@ -27,6 +29,8 @@ import ws.zettabyte.zettalib.inventory.IInvComponent;
 public class WidgetFluidBar extends WidgetAmountBar implements IComponentReceiver {
 	protected final String name;
 	protected FluidTank currentTank = null;
+	
+	protected ArrayList<String> tankTooltip = new ArrayList<String>(1);
 	//protected SpriteTiler sprite = null;
 	//private final ResourceLocation tex = new ResourceLocation("weirdscience", "textures/blocks/smog.png"); //TODO: Not this
 	
@@ -82,5 +86,37 @@ public class WidgetFluidBar extends WidgetAmountBar implements IComponentReceive
 	public Iterable<String> getComponentsSought() {
 		return comps;
 	}
+	protected String getTankTooltip() {
+		if(this.currentTank != null) {
+			if(this.currentTank.getFluidAmount() != 0) {
+				return StatCollector.translateToLocal("gui.tank.contains") + " " 
+						+ this.currentTank.getFluidAmount() + "/" + this.currentTank.getCapacity() 
+						+ " mb of " + this.currentTank.getFluid().getLocalizedName(); //TODO: Figure out non-stupid way to localize this.
+				//String processing on the localization, maybe? 
+			}
+			else {
+				return StatCollector.translateToLocal("gui.tank.empty") + ":" + "0" + "/" + this.currentTank.getCapacity();
+			}
+		}
+		return StatCollector.translateToLocal("gui.tank.empty");
+	}
+
+	@Override
+	public boolean getHasTooltip(boolean verbose) {
+		return true;
+	}
+
+	@Override
+	public boolean getHasTooltip() {
+		return true;
+	}
+
+	@Override
+	public List getTooltips(boolean verbose) {
+		tankTooltip.clear();
+		tankTooltip.add(getTankTooltip());
+		return tankTooltip;
+	}
+	
 	
 }

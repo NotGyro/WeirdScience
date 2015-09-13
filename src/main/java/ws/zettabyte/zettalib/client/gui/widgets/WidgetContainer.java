@@ -1,7 +1,9 @@
 package ws.zettabyte.zettalib.client.gui.widgets;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import net.minecraft.entity.player.EntityPlayer;
 import ws.zettabyte.zettalib.client.gui.GUIContext;
 import ws.zettabyte.zettalib.client.gui.IGUIWidget;
 import ws.zettabyte.zettalib.client.gui.Rect2D;
@@ -26,6 +28,9 @@ public class WidgetContainer implements IGUIWidget {
 	protected int layer = 0;
 	
 	protected boolean visible = true;
+	
+	protected ArrayList<String> tooltips = null;
+	protected boolean showTooltip = false;
 
 	public WidgetContainer() {}
 	
@@ -108,6 +113,13 @@ public class WidgetContainer implements IGUIWidget {
 		
 		clone.setLayer(layer);
 		clone.setVisible(isVisible());
+
+		if(this.tooltips != null) {
+			for(String tooltip : this.tooltips) {
+				clone.addTooltip(tooltip);
+			}
+		}
+		clone.setHasTooltip(showTooltip);
 		
 		//Do recursion
 		for(IGUIWidget e : children) {
@@ -122,4 +134,36 @@ public class WidgetContainer implements IGUIWidget {
 	public void setBounds(Rect2D b) {
 		bounds = b.copy();
 	}
+
+	@Override
+	public boolean getHasTooltip(boolean verbose) {
+		return getHasTooltip();
+	}
+
+	@Override
+	public boolean getHasTooltip() {
+		return ((tooltips != null) && showTooltip);
+	}
+
+	@Override
+	public void setHasTooltip(boolean b) {
+		IGUIWidget.super.setHasTooltip(b);
+		showTooltip = true;
+	}
+
+	@Override
+	public void addTooltip(String text) {
+		if(tooltips == null) tooltips = new ArrayList<String>(2);
+		tooltips.add(text);
+	}
+
+	@Override
+	public List getTooltips(boolean verbose) {
+		if(!showTooltip) {
+			return null;
+		}
+		return tooltips;
+	}
+	
+	
 }

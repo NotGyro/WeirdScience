@@ -59,11 +59,21 @@ public class CommonProxy implements IGuiHandler {
 		progress.setSprite(progressFiller);
 		progress.setDirection(WidgetAmountBar.EXPAND_DIR.UP);
 		progress.setLayer(4);
-		
+
 		WidgetSimple alertOverlay = new WidgetSimple(inventoryPanel);
 		alertOverlay.setBounds(alertIcon.getRelativeBounds());
 		alertOverlay.setLayer(5);
 		alertOverlay.setSprite(new ResourceLocation("weirdscience", "textures/gui/iconDangerOverlay.png"));
+		
+		WidgetSimple testw = new WidgetSimple();
+		testw.setWidth(16);
+		testw.setHeight(16);
+		testw.setLayer(24);
+		testw.setSprite(new ResourceLocation("weirdscience", "textures/gui/iconDangerOverlay.png"));
+		testw.setX(30); testw.setY(40);
+		testw.setHasTooltip(true);
+		testw.addTooltip("Beep boop.");
+		testInv.addWidget(testw);
 		
 		currentHeight += alertIcon.getHeight();
 		currentHeight += margin;
@@ -96,6 +106,7 @@ public class CommonProxy implements IGuiHandler {
 		tankBar.setLayer(1);
 		tankBar.setX(3);
 		tankBar.setY(3);
+		tankBar.setHasTooltip(true);
 		
 		tankBar.setParent(tank);
 		tank.addChild(tankBar);

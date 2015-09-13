@@ -52,4 +52,15 @@ public class Rect2D {
 	public Rect2D copy() {
 		return new Rect2D(pos.copy(), size.copy());
 	}
+	
+	public boolean contains(Vert2D point) {
+		if(point.x < getX()) return false; //To the left our our left bound
+		if(point.y < getY()) return false; //Above our top bound
+		if(point.x > (getX() + getWidth())) return false; //To the right of our right bound.
+		if(point.y > (getY() + getHeight())) return false; //Below our bottom bound.
+		return true;
+	}
+	//public boolean intersects(Rect2D other) {
+	//	return false;
+	//}
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetContainer;
@@ -31,8 +32,12 @@ public abstract class SmartScreenBase extends GuiContainer implements IRenders2D
 	protected IGUIWidget currentMouseOver = null;
 	protected GUIContext ctx;
 	
-	protected Rect2D guiArea;
+	//protected Rect2D guiArea;
 	protected ArrayList<IGUIWidget> drawList = new ArrayList<IGUIWidget>(128);
+	private int eventButton;
+	private long lastMouseEvent;
+	private int mouseX;
+	private int mouseY;
 	
 	protected static Comparator<IGUIWidget> compareLayer = new Comparator<IGUIWidget>() {
 		@Override
@@ -55,20 +60,22 @@ public abstract class SmartScreenBase extends GuiContainer implements IRenders2D
 	    rootWidget = new WidgetContainer();
 	    rootWidget.setWidth(176);
 	    rootWidget.setHeight(166);
+        rootWidget.setX(this.guiLeft);
+        rootWidget.setY(this.guiTop);
 	    
-	    guiArea = rootWidget.getRelativeBounds();
+	    //guiArea = rootWidget.getRelativeBounds();
 	}
     /**
      * Centers the GUI screen in the game window.
      */
-	protected void center(){
+	/*protected void center(){
 		//NOTE: Width and height refer to the screen in this context. As in, the whole screen.
         int k = (this.width - this.guiArea.getWidth()) / 2;
         int l = (this.height - this.guiArea.getHeight()) / 2;
 
         rootWidget.setX(k);
         rootWidget.setY(l);
-	}
+	}*/
 	
 	/**
 	 * First, lists all widgets attached to the screen, by performing a recursive query
@@ -77,7 +84,7 @@ public abstract class SmartScreenBase extends GuiContainer implements IRenders2D
 	 * Lastly, calls widget.draw(); on each of them.
 	 */
     public void drawWidgets(int a, int b, float c) {
-    	this.center();
+    	//this.center();
         this.drawDefaultBackground();
         drawList.clear();
         addChildrenToDrawList(rootWidget);
@@ -87,7 +94,15 @@ public abstract class SmartScreenBase extends GuiContainer implements IRenders2D
         }
     }
     
-    /**
+    @Override
+	protected void drawGuiContainerForegroundLayer(int p_146979_1_,
+			int p_146979_2_) {
+		super.drawGuiContainerForegroundLayer(p_146979_1_, p_146979_2_);
+
+		drawTooltips(this.mouseX, this.mouseY);
+	}
+
+	/**
      * A method invoked by our parent class' drawScreen() method. 
      * 
      * Inventory slots and items will be drawn on top of anything drawn here.
@@ -243,4 +258,66 @@ public abstract class SmartScreenBase extends GuiContainer implements IRenders2D
         //GL11.glDisable(GL11.GL_BLEND);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
     }
+	@Override
+	protected void mouseClicked(int p_73864_1_, int p_73864_2_, int p_73864_3_) {
+		// TODO Auto-generated method stub
+		super.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
+	}
+	@Override
+	protected void mouseClickMove(int p_146273_1_, int p_146273_2_,
+			int p_146273_3_, long p_146273_4_) {
+		// TODO Auto-generated method stub
+		super.mouseClickMove(p_146273_1_, p_146273_2_, p_146273_3_, p_146273_4_);
+	}
+	protected static ArrayList<IGUIWidget> getIntersecting(IGUIWidget w, Vert2D point, ArrayList<IGUIWidget> list) {
+		if(w.getBounds().contains(point)){
+			list.add(w);
+			if(w.getChildren() != null) {
+				for(IGUIWidget e : w.getChildren()) {
+					if(e != null) getIntersecting(e, point, list);
+				}
+			}
+		}
+		return list;
+	}
+	//This does not actually get called when the mouse has merely moved.
+	/*@Override
+	protected void mouseMovedOrUp(int mouseX, int mouseY,
+			int which) {
+		super.mouseMovedOrUp(mouseX, mouseY, which);
+		if(which != -1) return;
+		ArrayList<IGUIWidget> list = new ArrayList<IGUIWidget>(64);
+		list = getIntersecting(rootWidget, new Vert2D(mouseX, mouseY), list);
+		for(IGUIWidget e : list) {
+			if(e.getHasTooltip()) {
+				if(e.getTooltips() != null) {
+					this.drawHoveringText(e.getTooltips(), mouseX, mouseY, fontRendererObj);
+				}
+			}
+		}
+		
+	}*/
+	protected void drawTooltips(int mouseX, int mouseY) {
+        rootWidget.setX(this.guiLeft);
+        rootWidget.setY(this.guiTop);
+		ArrayList<IGUIWidget> list = new ArrayList<IGUIWidget>(64);
+		list = getIntersecting(rootWidget, new Vert2D(mouseX, mouseY), list);
+		for(IGUIWidget e : list) {
+			if(e.getHasTooltip()) {
+				if(e.getTooltips() != null) {
+					//Our position messes up the mousepos for reasons unknown.
+					this.drawHoveringText(e.getTooltips(), mouseX-this.guiLeft, mouseY-this.guiTop, fontRendererObj);
+				}
+			}
+		}
+	}
+	@Override
+	public void handleMouseInput() {
+        mouseX = Mouse.getEventX() * this.width / this.mc.displayWidth;
+        mouseY = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
+        int btn = Mouse.getEventButton();
+        super.handleMouseInput();
+    }
+
+	
 }

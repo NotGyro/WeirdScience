@@ -1,6 +1,9 @@
 package ws.zettabyte.zettalib.client.gui;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import net.minecraft.entity.player.EntityPlayer;
 
 import org.lwjgl.opengl.GL11;
 
@@ -59,6 +62,8 @@ public interface IGUIWidget {
 	default int getYRelative() {return getRelativeBounds().getY(); };
 	default int getWidth() { return getSize().getX(); };
 	default int getHeight() { return getSize().getY(); };
+	
+	default Rect2D getBounds() { return new Rect2D(getPos(), getSize());}
 
 	void setBounds(Rect2D bounds);
 	default void setPos(Vert2D pos) { getRelativeBounds().setPos(pos); };
@@ -131,4 +136,15 @@ public interface IGUIWidget {
         setY(l);
 	}
 	default void setSprite(ISprite s) { };
+
+	default boolean getHasTooltip(boolean verbose) { return false; }
+	default boolean getHasTooltip() { return getHasTooltip(false); }
+	default void setHasTooltip(boolean b) {}
+	/**
+	 * These should be unlocalized values
+	 * @param text
+	 */
+	default void addTooltip(String text) {}
+	default List getTooltips( boolean verbose) { return null; }
+	default List getTooltips() { return getTooltips(false); }
 }
