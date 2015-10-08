@@ -12,14 +12,11 @@ import net.minecraft.world.World;
 public class HeatBehaviorRegistry
 {
     //Protected constructor, for laffs.
-    protected HeatBehaviorRegistry()
-    {
-    }
+    protected HeatBehaviorRegistry() { }
 
     protected HeatBehaviorRegistry instance = new HeatBehaviorRegistry();
 
-    public HeatBehaviorRegistry getInstance ()
-    {
+    public HeatBehaviorRegistry getInstance () {
         return instance;
     }
 
@@ -29,16 +26,13 @@ public class HeatBehaviorRegistry
      * isn't any central heat manager enforcing heat behavior globally, rather, certain blocks will
      * cause this behavior in other blocks and entities adjacent.
      */
-    protected class BlockHeatBehavior
-    {
+    protected class BlockHeatBehavior {
         public int upperTemp, lowerTemp = 0;
 
         //Returns how much heat has been "consumed" in an endothermic process (negative for produced in exothermic)
-        public int DoBehavior (World world, int x, int y, int z, int temperature)
-        {
+        public int DoBehavior (World world, int x, int y, int z, int temperature) {
             return 0;
-        }
-
+        } 
     }
 
     /* 

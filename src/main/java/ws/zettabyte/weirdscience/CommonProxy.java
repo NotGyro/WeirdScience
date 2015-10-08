@@ -7,8 +7,10 @@ import ws.zettabyte.zettalib.client.gui.GUIBuilder;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetAmountBar;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetContainer;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetFluidBar;
+import ws.zettabyte.zettalib.client.gui.widgets.WidgetLabel;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetSimple;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetSlot;
+import ws.zettabyte.zettalib.client.gui.widgets.WidgetTextField;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetValBar;
 import ws.zettabyte.zettalib.client.render.SpriteSolidColor;
 import ws.zettabyte.zettalib.inventory.IDescriptiveInventory;
@@ -20,7 +22,10 @@ import net.minecraft.world.World;
 import cpw.mods.fml.common.network.IGuiHandler;
 
 public class CommonProxy implements IGuiHandler {
+	
 	GUIBuilder testInv;
+	GUIBuilder testHeat;
+	
 	public CommonProxy() {
 		testInv = new GUIBuilder();
 		int margin = 1;
@@ -64,7 +69,7 @@ public class CommonProxy implements IGuiHandler {
 		alertOverlay.setBounds(alertIcon.getRelativeBounds());
 		alertOverlay.setLayer(5);
 		alertOverlay.setSprite(new ResourceLocation("weirdscience", "textures/gui/iconDangerOverlay.png"));
-		
+		/*
 		WidgetSimple testw = new WidgetSimple();
 		testw.setWidth(16);
 		testw.setHeight(16);
@@ -73,7 +78,7 @@ public class CommonProxy implements IGuiHandler {
 		testw.setX(30); testw.setY(40);
 		testw.setHasTooltip(true);
 		testw.addTooltip("Beep boop.");
-		testInv.addWidget(testw);
+		testInv.addWidget(testw);*/
 		
 		currentHeight += alertIcon.getHeight();
 		currentHeight += margin;
@@ -124,6 +129,51 @@ public class CommonProxy implements IGuiHandler {
 		tankFront.setSprite(CommonIcons.tank1Overlay);
 		
 		testInv.addWidget(tank);
+		
+		WidgetTextField textTest = new WidgetTextField();
+		textTest.setText("test");
+		textTest.setX(40);
+		textTest.setY(40);
+		textTest.setWidth(64);
+		textTest.setHeight(16);
+		textTest.setMaxStringLength(16);
+		textTest.setVisible(true);
+		textTest.setEnabled(true);
+		textTest.setLayer(200);
+		
+		testInv.addWidget(textTest);
+	}
+	
+	public void setupTestHeatGUI() {
+		testHeat = new GUIBuilder();
+		
+		WidgetContainer bar = new WidgetContainer(testHeat.getRootWidget());
+		bar.centerX();
+		bar.setY(4);
+		bar.setHeight(72);
+		bar.setWidth(26);
+		bar.setLayer(9);
+		
+		WidgetFluidBar heatBar = new WidgetFluidBar("exhaust", bar);
+		heatBar.setDirection(WidgetAmountBar.EXPAND_DIR.UP);
+		heatBar.setHeight(66);
+		heatBar.setWidth(20);
+		heatBar.setLayer(1);
+		heatBar.setX(3);
+		heatBar.setY(3);
+		heatBar.setHasTooltip(true);
+
+		WidgetSimple barBack = new WidgetSimple(bar);
+		barBack.setHeight(72);
+		barBack.setWidth(26);
+		barBack.setLayer(0);
+		barBack.setSprite(CommonIcons.tank1Background);
+		
+		WidgetSimple barFront = new WidgetSimple(bar);
+		barFront.setHeight(72);
+		barFront.setWidth(26);
+		barFront.setLayer(2);
+		barFront.setSprite(CommonIcons.tank1Overlay);
 	}
 	// Client stuff
 	public void registerRenderers() {
@@ -141,6 +191,12 @@ public class CommonProxy implements IGuiHandler {
 				return testInv.buildContainer(tileEntity, player.inventory);
 			}
 		}
+		else if(ID == 1) {
+			TileEntity tileEntity = world.getTileEntity(x, y, z);
+			if(tileEntity instanceof IDescriptiveInventory) {
+				return testHeat.buildContainer(tileEntity, player.inventory);
+			}
+		}
 		return null;
 	}
 
@@ -150,6 +206,12 @@ public class CommonProxy implements IGuiHandler {
 			TileEntity tileEntity = world.getTileEntity(x, y, z);
 			if(tileEntity instanceof IDescriptiveInventory) {
 				return testInv.buildScreen(tileEntity, player.inventory);
+			}
+		}
+		else if(ID == 1) {
+			TileEntity tileEntity = world.getTileEntity(x, y, z);
+			if(tileEntity instanceof IDescriptiveInventory) {
+				return testHeat.buildScreen(tileEntity, player.inventory);
 			}
 		}
 		return null;
