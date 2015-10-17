@@ -51,7 +51,7 @@ public interface IRenders2D {
     /**
      * Renders the specified text to the screen.
      */
-    void drawString(FontRenderer fr, String str, int x, int y, int z);
+    void drawString(String str, int x, int y, int z);
 
     /**
      * Draws a textured rectangle at the stored z-value. Args: x, y, u, v, width, height.
@@ -64,4 +64,6 @@ public interface IRenders2D {
     
     
 	Minecraft getMC();
+	
+	FontRenderer getFR();
 }

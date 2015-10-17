@@ -26,6 +26,7 @@ import ws.zettabyte.weirdscience.gas.BlockGasFlammable;
 import ws.zettabyte.weirdscience.gas.FluidSmog;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetAmountBar;
 import ws.zettabyte.zettalib.initutils.ICreativeTabInfo;
+import ws.zettabyte.zettalib.network.MessageTileIntComponent;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -35,6 +36,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -59,6 +61,9 @@ public class ZettaLib {
     
     public static boolean enableStick = false;
     
+    //Used for GUI packets and etc 
+    public static SimpleNetworkWrapper network;
+    
 	public ZettaLib() {
 		instance = this;
 		logger.setLevel(Level.ALL);
@@ -66,6 +71,8 @@ public class ZettaLib {
 	
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+    	network = NetworkRegistry.INSTANCE.newSimpleChannel(this.modid);
+    	network.registerMessage(MessageTileIntComponent.Handler.class, MessageTileIntComponent.class, MessageTileIntComponent.packetID, Side.SERVER);
 	    Configuration config = new Configuration(event.getSuggestedConfigurationFile());
         config.load();
 

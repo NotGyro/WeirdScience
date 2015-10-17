@@ -29,6 +29,7 @@ public class ContainerPlayerInv extends Container implements ICleanableContainer
 	public ContainerPlayerInv(IDescriptiveInventory ourInv, InventoryPlayer inventoryPlayer) {
 		inv = ourInv;
 		Iterable<ItemSlot> slots = ourInv.getSlots();
+		if(slots != null) {
 		for(ItemSlot slot : slots) {
 			//TODO: Reposition.
 			addSlotToContainer(slot);
@@ -42,6 +43,7 @@ public class ContainerPlayerInv extends Container implements ICleanableContainer
 			
 			++beginHotbarRange;
 			++endHotbarRange;
+		}
 		}
 		
 

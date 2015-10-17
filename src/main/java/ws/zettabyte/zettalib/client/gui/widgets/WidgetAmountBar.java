@@ -116,6 +116,9 @@ public abstract class WidgetAmountBar extends WidgetSimple {
 			}
 		}
 		timeLastDraw = timeNow;
+		if(drawValue < 0.0F) {
+			drawValue = 0.0F;
+		}
 		return drawValue;
 	}
 	protected void track(float secondsDraw) {

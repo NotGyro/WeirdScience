@@ -3,6 +3,7 @@ package ws.zettabyte.zettalib.client.gui;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -10,6 +11,7 @@ import org.lwjgl.opengl.GL11;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetContainer;
 import ws.zettabyte.zettalib.client.render.IRenders2D;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
@@ -31,13 +33,15 @@ public abstract class SmartScreenBase extends GuiContainer implements IRenders2D
 	protected IGUIWidget rootWidget;
 	protected IGUIWidget currentMouseOver = null;
 	protected GUIContext ctx;
+	protected IGUIWidgetKeyboard capture = null;
 	
 	//protected Rect2D guiArea;
 	protected ArrayList<IGUIWidget> drawList = new ArrayList<IGUIWidget>(128);
 	private int eventButton;
 	private long lastMouseEvent;
-	private int mouseX;
-	private int mouseY;
+	//private int mouseX;
+	//private int mouseY;
+	protected Vert2D mousePos = new Vert2D();
 	
 	protected static Comparator<IGUIWidget> compareLayer = new Comparator<IGUIWidget>() {
 		@Override
@@ -60,22 +64,22 @@ public abstract class SmartScreenBase extends GuiContainer implements IRenders2D
 	    rootWidget = new WidgetContainer();
 	    rootWidget.setWidth(176);
 	    rootWidget.setHeight(166);
-        rootWidget.setX(this.guiLeft);
-        rootWidget.setY(this.guiTop);
+	    //if(this.guiLeft != 0) rootWidget.setX(this.guiLeft);
+	    //if(this.guiTop != 0) rootWidget.setY(this.guiTop);
 	    
 	    //guiArea = rootWidget.getRelativeBounds();
 	}
     /**
      * Centers the GUI screen in the game window.
      */
-	/*protected void center(){
+	protected void center(){
 		//NOTE: Width and height refer to the screen in this context. As in, the whole screen.
-        int k = (this.width - this.guiArea.getWidth()) / 2;
-        int l = (this.height - this.guiArea.getHeight()) / 2;
+        int k = (this.width - this.rootWidget.getWidth()) / 2;
+        int l = (this.height - this.rootWidget.getHeight()) / 2;
 
         rootWidget.setX(k);
         rootWidget.setY(l);
-	}*/
+	}
 	
 	/**
 	 * First, lists all widgets attached to the screen, by performing a recursive query
@@ -84,10 +88,10 @@ public abstract class SmartScreenBase extends GuiContainer implements IRenders2D
 	 * Lastly, calls widget.draw(); on each of them.
 	 */
     public void drawWidgets(int a, int b, float c) {
-    	//this.center();
+    	this.center();
         this.drawDefaultBackground();
         drawList.clear();
-        addChildrenToDrawList(rootWidget);
+        getWidgetsFlat(rootWidget, drawList);
         Collections.sort(drawList, compareLayer);
         for(IGUIWidget e : drawList) {
         	e.draw(ctx);
@@ -99,7 +103,7 @@ public abstract class SmartScreenBase extends GuiContainer implements IRenders2D
 			int p_146979_2_) {
 		super.drawGuiContainerForegroundLayer(p_146979_1_, p_146979_2_);
 
-		drawTooltips(this.mouseX, this.mouseY);
+		drawTooltips();
 	}
 
 	/**
@@ -117,13 +121,13 @@ public abstract class SmartScreenBase extends GuiContainer implements IRenders2D
 	/**
 	 * Used for recursively querying our widgets.
 	 */
-    protected void addChildrenToDrawList(IGUIWidget w) {
+    protected void getWidgetsFlat(IGUIWidget w, List<IGUIWidget> list) {
     	if(w == null) return;
     	if(w.getChildren() == null) return;
     	for(IGUIWidget e : w.getChildren()) {
     		if(e.isVisible()) {
-	    		drawList.add(e);
-	    		addChildrenToDrawList(e);
+    			list.add(e);
+    			getWidgetsFlat(e, list);
     		}
     	}
     }
@@ -269,55 +273,120 @@ public abstract class SmartScreenBase extends GuiContainer implements IRenders2D
 		// TODO Auto-generated method stub
 		super.mouseClickMove(p_146273_1_, p_146273_2_, p_146273_3_, p_146273_4_);
 	}
-	protected static ArrayList<IGUIWidget> getIntersecting(IGUIWidget w, Vert2D point, ArrayList<IGUIWidget> list) {
-		if(w.getBounds().contains(point)){
+
+	private Rect2D boundsTemp = new Rect2D(0,0,0,0);
+	protected boolean getIntersects(IGUIWidget w, Vert2D point) {
+		//Optimization stuff: must allocate less.
+		boundsTemp.setWidth(w.getWidth());
+		boundsTemp.setHeight(w.getHeight());
+		boundsTemp.setX(w.getX());
+		boundsTemp.setY(w.getY());
+		return boundsTemp.contains(point);
+	}
+	protected ArrayList<IGUIWidget> getIntersectingList(IGUIWidget w, Vert2D point, ArrayList<IGUIWidget> list) {
+		if(getIntersects(w, point)){
 			list.add(w);
 			if(w.getChildren() != null) {
 				for(IGUIWidget e : w.getChildren()) {
-					if(e != null) getIntersecting(e, point, list);
+					if(e != null) getIntersectingList(e, point, list);
 				}
 			}
 		}
 		return list;
 	}
-	//This does not actually get called when the mouse has merely moved.
-	/*@Override
+	/* This does not actually get called when the mouse has merely moved.
+	 * Here, we use it to try to hand control to textboxes n' such. 
+	 * (non-Javadoc)
+	 * @see net.minecraft.client.gui.inventory.GuiContainer#mouseMovedOrUp(int, int, int)
+	 */
+	protected void defocusWidget() {
+		if(capture != null) {
+			capture.setCanLoseFocus(true);
+			capture.setFocused(false);
+			capture = null; 
+		}
+	}
+	@Override
 	protected void mouseMovedOrUp(int mouseX, int mouseY,
 			int which) {
 		super.mouseMovedOrUp(mouseX, mouseY, which);
-		if(which != -1) return;
-		ArrayList<IGUIWidget> list = new ArrayList<IGUIWidget>(64);
-		list = getIntersecting(rootWidget, new Vert2D(mouseX, mouseY), list);
-		for(IGUIWidget e : list) {
-			if(e.getHasTooltip()) {
-				if(e.getTooltips() != null) {
-					this.drawHoveringText(e.getTooltips(), mouseX, mouseY, fontRendererObj);
-				}
+		if(which == -1) return;
+		
+		if(capture != null) {
+			capture.click(which, mousePos.getX(), mousePos.getY());
+			if(!capture.isInputCaptured()) {
+				defocusWidget();
+			}
+			else if (!getIntersects(capture, mousePos)) { 
+				defocusWidget();
 			}
 		}
-		
-	}*/
-	protected void drawTooltips(int mouseX, int mouseY) {
-        rootWidget.setX(this.guiLeft);
-        rootWidget.setY(this.guiTop);
+		if(capture != null) return;
 		ArrayList<IGUIWidget> list = new ArrayList<IGUIWidget>(64);
-		list = getIntersecting(rootWidget, new Vert2D(mouseX, mouseY), list);
+		list = getIntersectingList(rootWidget, mousePos, list);
 		for(IGUIWidget e : list) {
+			if(e instanceof IGUIWidgetKeyboard) {
+				IGUIWidgetKeyboard wk = (IGUIWidgetKeyboard)e;
+				wk.click(which, mouseX, mouseY);
+				capture = wk;
+				wk.setFocused(true);
+				wk.setCanLoseFocus(false);
+				break;
+			}
+		}
+	}
+	protected ArrayList<IGUIWidget> tooltipWidgetList = new ArrayList<IGUIWidget>(64);
+	
+	protected void drawTooltips() {
+	    //if(this.guiLeft != 0) rootWidget.setX(this.guiLeft);
+	    //if(this.guiTop != 0) rootWidget.setY(this.guiTop);
+		center();
+        tooltipWidgetList.clear();
+        tooltipWidgetList = getIntersectingList(rootWidget, mousePos, tooltipWidgetList);
+		for(IGUIWidget e : tooltipWidgetList) {
 			if(e.getHasTooltip()) {
 				if(e.getTooltips() != null) {
 					//Our position messes up the mousepos for reasons unknown.
-					this.drawHoveringText(e.getTooltips(), mouseX-this.guiLeft, mouseY-this.guiTop, fontRendererObj);
+					this.drawHoveringText(e.getTooltips(), mousePos.getX()-this.guiLeft, mousePos.getY()-this.guiTop, fontRendererObj);
 				}
 			}
 		}
 	}
 	@Override
 	public void handleMouseInput() {
-        mouseX = Mouse.getEventX() * this.width / this.mc.displayWidth;
-        mouseY = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
+		mousePos.setX(Mouse.getEventX() * this.width / this.mc.displayWidth);
+        mousePos.setY(this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1);
         int btn = Mouse.getEventButton();
         super.handleMouseInput();
     }
-
+	@Override
+	public void drawString(String str, int x, int y, int z) {
+		this.drawString(fontRendererObj, str, x, y, z);
+	}
 	
+	public FontRenderer getFR() {
+		return this.fontRendererObj;
+	}
+	@Override
+	protected void keyTyped(char p_73869_1_, int p_73869_2_) {
+		if(this.capture == null) {
+			super.keyTyped(p_73869_1_, p_73869_2_);
+		}
+		else {
+			this.capture.keyTyped(p_73869_1_, p_73869_2_);
+			if(!capture.isInputCaptured()) {
+				capture = null;
+			}
+		}
+	}
+	
+	private void debugType() {
+		ArrayList<IGUIWidget> l = new ArrayList<IGUIWidget>(32);
+		getWidgetsFlat(rootWidget, l);
+		for(IGUIWidget e : l) {
+			if(e instanceof IGUIWidgetText) {
+				System.out.println("X: " + e.getX() + " Y: " + e.getY() + " W: " + e.getWidth() + " H: " + e.getHeight());
+			}
+		}
+	}
 }

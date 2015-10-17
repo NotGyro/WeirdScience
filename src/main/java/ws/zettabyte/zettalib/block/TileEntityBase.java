@@ -28,5 +28,4 @@ public abstract class TileEntityBase extends TileEntity implements ICachedTileEn
 		// TODO Auto-generated method stub
 		
 	}
-
 }

@@ -8,18 +8,20 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 
-//A singleton
-public class HeatBehaviorRegistry
+/**
+ * A singleton (formerly known as "HeatBehaviorRegistry," name cut down for the sake of convenience)
+ * providing a registry of simple in-world heat behaviors and some static utility functions for heat stuff.
+ * @author Sam "Gyro" C.
+ *
+ */
+public class Heat
 {
     //Protected constructor, for laffs.
-    protected HeatBehaviorRegistry()
-    {
-    }
+    protected Heat() { }
 
-    protected HeatBehaviorRegistry instance = new HeatBehaviorRegistry();
+    protected Heat instance = new Heat();
 
-    public HeatBehaviorRegistry getInstance ()
-    {
+    public Heat getInstance () {
         return instance;
     }
 
@@ -29,16 +31,13 @@ public class HeatBehaviorRegistry
      * isn't any central heat manager enforcing heat behavior globally, rather, certain blocks will
      * cause this behavior in other blocks and entities adjacent.
      */
-    protected class BlockHeatBehavior
-    {
+    protected class BlockHeatBehavior {
         public int upperTemp, lowerTemp = 0;
 
         //Returns how much heat has been "consumed" in an endothermic process (negative for produced in exothermic)
-        public int DoBehavior (World world, int x, int y, int z, int temperature)
-        {
+        public int DoBehavior (World world, int x, int y, int z, int temperature) {
             return 0;
-        }
-
+        } 
     }
 
     /* 
@@ -127,5 +126,9 @@ public class HeatBehaviorRegistry
         }
 
         entityBehavior.get(ent.getUniqueID()).add(behv);
+    }
+    
+    public static void doBalance(IHeatLogic a, IHeatLogic b) {
+    	
     }
 }

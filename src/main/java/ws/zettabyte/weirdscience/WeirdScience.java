@@ -25,6 +25,7 @@ import ws.zettabyte.weirdscience.gas.BlockGas;
 import ws.zettabyte.weirdscience.gas.BlockGasFlammable;
 import ws.zettabyte.weirdscience.gas.FluidSmog;
 import ws.zettabyte.weirdscience.machine.BlockCatalyticEngine;
+import ws.zettabyte.weirdscience.machine.testheat.BlockHeatTest;
 import ws.zettabyte.zettalib.BucketEventManager;
 import ws.zettabyte.zettalib.block.BlockGeneric;
 import ws.zettabyte.zettalib.initutils.Conf;
@@ -82,6 +83,8 @@ public class WeirdScience {
     public static BlockGeneric blockRust;
     
     public static BlockCatalyticEngine blockCEngine;
+    
+    public static BlockHeatTest blockHeatTest;
     
     @Conf(name="test", comment="Beep boop.", def="9")
     public static int testConf = 0;
@@ -159,6 +162,10 @@ public class WeirdScience {
         blockRust = new BlockGeneric(Material.iron);
         iu.initBlockConfig(blockRust, "Rust").setHarvestLevel("pickaxe",0);
         blockRust.setHardness(0.6F);
+        
+        blockHeatTest = new BlockHeatTest(Material.iron);
+        iu.initBlockConfig(blockHeatTest, "HeatTest").setHarvestLevel("pickaxe",0);
+        blockHeatTest.setHardness(0.6F);
     	
 	    itemAcidBucket = new ItemBucket(blockAcid);
 	    FluidContainerRegistry.registerFluidContainer(fluidAcid, new ItemStack(itemAcidBucket), new ItemStack(Items.bucket));

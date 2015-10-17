@@ -121,11 +121,13 @@ public class WidgetContainer implements IGUIWidget {
 		}
 		clone.setHasTooltip(showTooltip);
 		
-		//Do recursion
-		for(IGUIWidget e : children) {
-			IGUIWidget c = e.copy();
-			clone.addChild(c);
-			c.setParent(clone);
+		if(children != null) {
+			//Do recursion
+			for(IGUIWidget e : children) {
+				IGUIWidget c = e.copy();
+				clone.addChild(c);
+				c.setParent(clone);
+			}
 		}
 		return clone;
 	}
