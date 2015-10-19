@@ -3,7 +3,8 @@ package ws.zettabyte.weirdscience;
 import java.util.HashMap;
 
 import ws.zettabyte.zettalib.client.gui.CommonIcons;
-import ws.zettabyte.zettalib.client.gui.GUIBuilder;
+import ws.zettabyte.zettalib.client.gui.GUIRegistry;
+import ws.zettabyte.zettalib.client.gui.GUITemplate;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetAmountBar;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetContainer;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetFluidBar;
@@ -23,14 +24,20 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import cpw.mods.fml.common.network.IGuiHandler;
 
-public class CommonProxy implements IGuiHandler {
+public class CommonProxy extends GUIRegistry {
 	
-	GUIBuilder catalyticInv = new GUIBuilder();
-	GUIBuilder testHeat = new GUIBuilder();
+	public static GUITemplate catalyticInv = new GUITemplate();
+	public static GUITemplate testHeat = new GUITemplate();
 	
 	public CommonProxy() {
 		setupCatalyticEngineGUI();
 		setupTestHeatGUI();
+		
+		catalyticInv.setGuiID(0);
+		testHeat.setGuiID(1);
+
+		this.addGUI(catalyticInv);
+		this.addGUI(testHeat);
 	}
 	public void setupCatalyticEngineGUI() {
 		int margin = 1;
@@ -57,11 +64,7 @@ public class CommonProxy implements IGuiHandler {
 		alertIcon.setLayer(3);
 		alertIcon.setSprite(new ResourceLocation("weirdscience", "textures/gui/iconDanger.png"));
 		
-
-	    //SimpleInvComponent<Float> test = new SimpleInvComponent<Float>("progress");
-	    //test.val = 1.0F;
 		WidgetValBar progress = new WidgetValBar("progress", inventoryPanel);
-		//progress.provideComponent(test);
 		progress.setBounds(alertIcon.getRelativeBounds());
 		SpriteSolidColor progressFiller = new SpriteSolidColor();
 		progressFiller.r = 1.0F;
@@ -74,16 +77,6 @@ public class CommonProxy implements IGuiHandler {
 		alertOverlay.setBounds(alertIcon.getRelativeBounds());
 		alertOverlay.setLayer(5);
 		alertOverlay.setSprite(new ResourceLocation("weirdscience", "textures/gui/iconDangerOverlay.png"));
-		/*
-		WidgetSimple testw = new WidgetSimple();
-		testw.setWidth(16);
-		testw.setHeight(16);
-		testw.setLayer(24);
-		testw.setSprite(new ResourceLocation("weirdscience", "textures/gui/iconDangerOverlay.png"));
-		testw.setX(30); testw.setY(40);
-		testw.setHasTooltip(true);
-		testw.addTooltip("Beep boop.");
-		testInv.addWidget(testw);*/
 		
 		currentHeight += alertIcon.getHeight();
 		currentHeight += margin;
@@ -137,7 +130,7 @@ public class CommonProxy implements IGuiHandler {
 	}
 	
 	public void setupTestHeatGUI() {
-		testHeat = new GUIBuilder();
+		testHeat = new GUITemplate();
 		
 		WidgetContainer bar = new WidgetContainer(testHeat.getRootWidget());
 		bar.setX(4);
@@ -187,39 +180,5 @@ public class CommonProxy implements IGuiHandler {
 	}
 	public void registerSound() {
 		// TODO: Nothing. This is the server-side class.
-	}
-
-	@Override
-	public Object getServerGuiElement ( int ID, EntityPlayer player, World world, int x, int y, int z ) {
-		if(ID == 0) {
-			TileEntity tileEntity = world.getTileEntity(x, y, z);
-			if(tileEntity instanceof IDescriptiveInventory) {
-				return catalyticInv.buildContainer(tileEntity, player.inventory);
-			}
-		}
-		else if(ID == 1) {
-			TileEntity tileEntity = world.getTileEntity(x, y, z);
-			if(tileEntity instanceof IDescriptiveInventory) {
-				return testHeat.buildContainer(tileEntity, player.inventory);
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public Object getClientGuiElement ( int ID, EntityPlayer player, World world, int x, int y, int z ) {
-		if(ID == 0) {
-			TileEntity tileEntity = world.getTileEntity(x, y, z);
-			if(tileEntity instanceof IDescriptiveInventory) {
-				return catalyticInv.buildScreen(tileEntity, player.inventory);
-			}
-		}
-		else if(ID == 1) {
-			TileEntity tileEntity = world.getTileEntity(x, y, z);
-			if(tileEntity instanceof IDescriptiveInventory) {
-				return testHeat.buildScreen(tileEntity, player.inventory);
-			}
-		}
-		return null;
 	}
 }

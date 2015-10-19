@@ -22,7 +22,7 @@ import ws.zettabyte.zettalib.thermal.SimpleHeatLogic;
 
 public class TEHeatTest extends TileEntityBase implements IHasHeatLogic,
 		IComponentContainer, IDescriptiveInventory {
-	boolean initialize = true;
+
 	protected ArrayList<IInvComponent> fullComponentList = new ArrayList<IInvComponent>(); //new ArrayList<IInvComponent>(8);
 	protected SimpleHeatLogic tempLogic = new SimpleHeatLogic();
 	public TEHeatTest() {
@@ -47,9 +47,8 @@ public class TEHeatTest extends TileEntityBase implements IHasHeatLogic,
 	@Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
-        if(!worldObj.isRemote) initialize = false;
-		//this.tempLogic.setupAmbientHeat(worldObj, xCoord, yCoord, yCoord);
         tempLogic.readFromNBT(nbt);
+        tempLogic.initialized = true;
     }
 
 	@Override
@@ -72,9 +71,9 @@ public class TEHeatTest extends TileEntityBase implements IHasHeatLogic,
 	
 	//------------- Update behavior -----------
 	protected void trySetupHeat() {
-    	if(initialize && (worldObj != null)){
+    	if((worldObj != null) && !tempLogic.initialized){
+    		//if(worldObj.isRemote) return;
     		tempLogic.setupAmbientHeat(worldObj, xCoord, yCoord, zCoord);
-    		initialize = false;
     		this.markDirty();
             worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
     	}
@@ -98,6 +97,9 @@ public class TEHeatTest extends TileEntityBase implements IHasHeatLogic,
 
     	if(testAgainst.size() != 0 ) {
     		this.tempLogic.doBalance(testAgainst);
+    	}
+    	if((worldObj.getTotalWorldTime() % tempLogic.getTicksPerPassiveLoss()) == 0) {
+    		this.tempLogic.doPassiveLoss();
     	}
     	
     	if(tempLogic.isDirty()) {

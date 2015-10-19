@@ -15,69 +15,69 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.common.util.RotationHelper;
+import ws.zettabyte.weirdscience.CommonProxy;
 import ws.zettabyte.weirdscience.WeirdScience;
 import ws.zettabyte.zettalib.block.BlockContainerBase;
 import ws.zettabyte.zettalib.block.IInfoTileEntity;
 import ws.zettabyte.zettalib.block.IMetaActive;
+import ws.zettabyte.zettalib.block.CubeIconSet;
+import ws.zettabyte.zettalib.block.RotationTools;
 import ws.zettabyte.zettalib.initutils.ICreativeTabInfo;
 
 public class BlockCatalyticEngine extends BlockContainerBase implements
 		ICreativeTabInfo, IInfoTileEntity, IMetaActive {
+	
+    @SideOnly(Side.CLIENT)
+    public CubeIconSet iconsInactive = new CubeIconSet();
+    public CubeIconSet iconsActive = new CubeIconSet();
+    
 	public BlockCatalyticEngine(Material material) {
 		super(material);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public TileEntity createNewTileEntity(World world, int meta) {
-		// TODO Auto-generated method stub
 		return new TECatalyticEngine();
 	}
 
 	@Override
 	public Class getTileEntityType() {
-		// TODO Auto-generated method stub
 		return TECatalyticEngine.class;
 	}
 	
-    @SideOnly(Side.CLIENT)
-    public IIcon sidesIcon;
-    @SideOnly(Side.CLIENT)
-    public IIcon topIcon;
-    @SideOnly(Side.CLIENT)
-    public IIcon frontIcon;
-    @SideOnly(Side.CLIENT)
-    public IIcon frontIconPowered;
-    
-    
-    //TODO: abstract this furnace-like side stuff out.
 	@Override
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(int side, int meta) {
-		if (side == 1) {
-			return topIcon;
-		} else if (side == 0) {
-			return sidesIcon;
-		} else if (side == getFacing(meta)) {
-			// Is it powered?
-			if (isOperating(meta)) {
-				return frontIconPowered;
-			} else {
-				return frontIcon;
-			}
-		} else {
-			return sidesIcon;
+		if(isOperating(meta)){
+			return iconsActive.getIconFurnaceStyle(ForgeDirection.VALID_DIRECTIONS[side], 
+					ForgeDirection.VALID_DIRECTIONS[getFacing(meta)]);
+		}
+		else {
+			return iconsInactive.getIconFurnaceStyle(ForgeDirection.VALID_DIRECTIONS[side], 
+					ForgeDirection.VALID_DIRECTIONS[getFacing(meta)]);
 		}
 	}
 	
     @SideOnly(Side.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconRegister) {
-		frontIcon = iconRegister.registerIcon("weirdscience:genericmachine5");
+    	iconsInactive.setAllSidesName("weirdscience:genericmachine");
+    	iconsInactive.setTextureName("weirdscience:genericmachine5", ForgeDirection.EAST);
+    	iconsInactive.setTextureName("weirdscience:genericmachine3", ForgeDirection.UP);
+
+    	iconsInactive.setTextureName("weirdscience:genericmachine4", ForgeDirection.NORTH);
+    	
+    	iconsActive.makeCopy(iconsInactive);
+    	iconsActive.setTextureName("weirdscience:genericmachine5_active", ForgeDirection.EAST);
+
+    	iconsInactive.registerBlockIcons(iconRegister);
+    	iconsActive.registerBlockIcons(iconRegister);
+    	
+		/*frontIcon = iconRegister.registerIcon("weirdscience:genericmachine5");
 		sidesIcon = iconRegister.registerIcon("weirdscience:genericmachine");
 		topIcon = iconRegister.registerIcon("weirdscience:genericmachine3");
 		frontIconPowered = iconRegister
-				.registerIcon("weirdscience:genericmachine5_active");
+				.registerIcon("weirdscience:genericmachine5_active");*/
 	}
 
 	public boolean isOperating(int meta) {
@@ -105,47 +105,11 @@ public class BlockCatalyticEngine extends BlockContainerBase implements
 	}
 
 	@Override
-	public String getDebugInfo(IBlockAccess world, int x, int y, int z,
-			int metadata) {
-		String info = "Facing " + ForgeDirection.VALID_DIRECTIONS[getFacing(metadata)] + "\n";
-		info += "According to metadata, this block is ";
-		if(isOperating(metadata)) { info += "active.";} else { info += "inactive.";}
-		info += "\n";
-		return info + super.getDebugInfo(world, x, y, z, metadata);
-	}
-	@Override
 	public void onBlockPlacedBy(World world, int x, int y, int z,
 			EntityLivingBase placer, ItemStack thisItemStack) {
 		super.onBlockPlacedBy(world, x, y, z, placer, thisItemStack);
 		if(world.isRemote) return;
-		int quadrant = MathHelper.floor_double(((placer.rotationYaw * 4.0F) / 360.0F) + 0.5F);
-
-		// Modulo out any 360 degree dealies.
-		quadrant %= 4;
-
-		/*
-		 * public static final ForgeDirection[] VALID_DIRECTIONS = {DOWN, UP,
-		 * NORTH, SOUTH, WEST, EAST}; 0 1 2 3 4 5
-		 */
-		// Facing south
-		if (quadrant == 0) {
-			world.setBlockMetadataWithNotify(x, y, z, 2, 1|2);
-		}
-
-		// Facing west
-		else if (quadrant == 1) {
-			world.setBlockMetadataWithNotify(x, y, z, 5, 1|2);
-		}
-
-		// Facing north
-		else if (quadrant == 2) {
-			world.setBlockMetadataWithNotify(x, y, z, 3, 1|2);
-		}
-
-		// Facing east
-		else if (quadrant == 3) {
-			world.setBlockMetadataWithNotify(x, y, z, 4, 1|2);
-		}
+		RotationTools.initFourDirBlock(world, x, y, z, placer);
 	}
 	public boolean onBlockActivated(World world, int x, int y, int z,
 			EntityPlayer player, int metadata, float par1, float par2,
@@ -154,7 +118,7 @@ public class BlockCatalyticEngine extends BlockContainerBase implements
 		if (tileEntity == null || player.isSneaking()) {
 			return false;
 		}
-		player.openGui(WeirdScience.instance, 0, world, x, y, z);
+		player.openGui(WeirdScience.instance, CommonProxy.catalyticInv.getGuiID(), world, x, y, z);
 		return true;
 	}
 
@@ -163,7 +127,6 @@ public class BlockCatalyticEngine extends BlockContainerBase implements
 			int y, int z) {
 		int meta = world.getBlockMetadata(x, y, z);
 		
-		//The below behavior breaks sync for no earthly reason.
 		if(isOperating(meta) == status) return;
 		if(status) {
 			world.setBlockMetadataWithNotify(x, y, z, 

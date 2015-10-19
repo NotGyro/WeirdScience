@@ -28,7 +28,7 @@ public class ZettaScreen extends SmartScreenBase {
     
 	public ZettaScreen(Container container) {
 		super(container);
-		bg = new WidgetSimple(rootWidget);
+		bg = new WidgetSimple(getRootWidget());
 
 		bg.setX(0);
 		bg.setY(0);

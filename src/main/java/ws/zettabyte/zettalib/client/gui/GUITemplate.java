@@ -25,10 +25,10 @@ import ws.zettabyte.zettalib.inventory.ItemSlot;
  * @author Samuel "Gyro"
  *
  */
-public class GUIBuilder implements IGUI {
+public class GUITemplate extends GUIManagerWidgets implements IGUI {
     
 	//Not copied.
-	protected WidgetContainer rootWidget = new WidgetContainer();
+	//protected WidgetContainer rootWidget = new WidgetContainer();
 	
 	public enum GUIType {
 		INV_FULL,
@@ -36,28 +36,13 @@ public class GUIBuilder implements IGUI {
 		INV_NONE
 	}
 	
-	protected GUIType invType = GUIType.INV_FULL;
+	protected GUIType invType = GUIType.INV_FULL; //TODO: Options for this.
 
 	protected ArrayList<IComponentReceiver> componentWidgets = new ArrayList<IComponentReceiver>();
 
-	public GUIBuilder() {
-	    rootWidget.setWidth(176);
-	    rootWidget.setHeight(166);
+	public GUITemplate() {
+		super();
 	}
-	
-	/**
-	 * Adds a widget to the root node of this GUIBuilder.
-	 * 
-	 * All added widgets and their children will be copied,
-	 * and their copies will be passed to a GUI Screen class.
-	 * 
-	 * @return Was the widget successfully added?
-	 */
-	public boolean addWidget(IGUIWidget w) {
-    	boolean ret = rootWidget.addChild(w);
-    	if (ret) w.setParent(rootWidget);
-    	return ret;
-    }
 	
 	/**
 	 * Anything that the GUIBuilder does to every widget in its tree will involve this function.
@@ -149,6 +134,8 @@ public class GUIBuilder implements IGUI {
 			((ICleanableContainer)container).cleanupUnlinkedSlots();
 		}
 		
+		result.setGuiID(this.getGuiID());
+
 		return (GuiScreen)result;
 	}
 	
@@ -165,9 +152,15 @@ public class GUIBuilder implements IGUI {
 		Container result = (Container) new ContainerPlayerInv((IDescriptiveInventory)obj, inventoryPlayer);
 		return result;
 	}
+	
+	protected int GuiID = -1;
+	@Override
+	public int getGuiID() {
+		return GuiID;
+	}
 
 	@Override
-	public IGUIWidget getRootWidget() {
-		return rootWidget;
+	public void setGuiID(int id) {
+		GuiID = id;
 	}
 }

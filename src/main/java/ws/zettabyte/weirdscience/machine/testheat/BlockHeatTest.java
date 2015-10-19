@@ -15,6 +15,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.common.util.RotationHelper;
+import ws.zettabyte.weirdscience.CommonProxy;
 import ws.zettabyte.weirdscience.WeirdScience;
 import ws.zettabyte.zettalib.block.BlockContainerBase;
 import ws.zettabyte.zettalib.block.IInfoTileEntity;
@@ -44,7 +45,7 @@ public class BlockHeatTest extends BlockContainerBase implements
 		if (tileEntity == null || player.isSneaking()) {
 			return false;
 		}
-		player.openGui(WeirdScience.instance, 1, world, x, y, z);
+		player.openGui(WeirdScience.instance, CommonProxy.testHeat.getGuiID(), world, x, y, z);
 		return true;
 	}
 }

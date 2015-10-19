@@ -147,4 +147,27 @@ public interface IGUIWidget {
 	default void addTooltip(String text) {}
 	default List getTooltips( boolean verbose) { return null; }
 	default List getTooltips() { return getTooltips(false); }
+	default boolean getIntersects(Vert2D point) {
+		return getBounds().contains(point);
+	}
+	default Iterable<IGUIWidget> getWidgetsFlat(List<IGUIWidget> list) {
+    	if(list == null) return null;
+    	if(!this.isVisible()) return list;
+    	list.add(this);
+    	if(this.getChildren() == null) return list;
+    	for(IGUIWidget e : this.getChildren()) {
+    		e.getWidgetsFlat(list);
+    	}
+    	return list;
+    }
+	default Iterable<IGUIWidget> getWidgetsFlat() {
+    	if(!this.isVisible()) return null;
+		ArrayList<IGUIWidget> list = new ArrayList<IGUIWidget>(8);
+    	list.add(this);
+    	if(this.getChildren() == null) return list;
+    	for(IGUIWidget e : this.getChildren()) {
+    		e.getWidgetsFlat(list);
+    	}
+    	return list;
+    }
 }

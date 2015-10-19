@@ -1,12 +1,10 @@
-package ws.zettabyte.weirdscience.gas;
+package ws.zettabyte.zettalib.fluid;
 
+import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidBlock;
-import net.minecraft.block.Block;
-import net.minecraft.world.World;
 
-//This has to be separate from the specific implementations, I know from experience.
-public interface IGasBlock extends IFluidBlock {
+public interface IFiniteFluidBlock extends IFluidBlock {
 	//Properties of the type of block:
 	
 	//int getMaxConcentration();
@@ -35,7 +33,4 @@ public interface IGasBlock extends IFluidBlock {
 	FluidStack partialDrain(World world, int x, int y, int z, int amount);
 	//Gives you the same results a PartialDrain would, without affecting our block. 
 	FluidStack wouldDrain(World world, int x, int y, int z, int amount);
-	
-	//How heavy is it? I.e., will it more likely float up or settle down?
-	GasWeight getWeight(World world, int x, int y, int z);
 }

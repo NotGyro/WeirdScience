@@ -37,7 +37,7 @@ public class MessageTileIntComponent implements IMessage {
 		x = buf.readInt();
 		y = buf.readInt();
 		z = buf.readInt();
-        val = ByteBufUtils.readVarInt(buf, Integer.SIZE/8);
+        val = buf.readInt();
         componentName = ByteBufUtils.readUTF8String(buf);
 	}
 
@@ -46,7 +46,7 @@ public class MessageTileIntComponent implements IMessage {
 		buf.writeInt(x);
 		buf.writeInt(y);
 		buf.writeInt(z);
-        ByteBufUtils.writeVarInt(buf, val, Integer.SIZE/8);
+		buf.writeInt(val);
         ByteBufUtils.writeUTF8String(buf, componentName);
 	}
 	public static class Handler implements IMessageHandler<MessageTileIntComponent, IMessage> {

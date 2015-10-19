@@ -1,4 +1,4 @@
-package ws.zettabyte.weirdscience.gas;
+package ws.zettabyte.zettalib.fluid;
 
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;

@@ -1,5 +1,7 @@
 package ws.zettabyte.zettalib.client.render;
 
+import java.util.List;
+
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
@@ -66,4 +68,6 @@ public interface IRenders2D {
 	Minecraft getMC();
 	
 	FontRenderer getFR();
+
+	void drawTooltipText(List l, int x, int y, FontRenderer fr);
 }

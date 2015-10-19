@@ -21,10 +21,10 @@ import net.minecraftforge.oredict.OreDictionary;
 import ws.zettabyte.weirdscience.block.BlockSkullOverride;
 import ws.zettabyte.weirdscience.fluid.BlockAcid;
 import ws.zettabyte.weirdscience.fluid.FluidAcid;
-import ws.zettabyte.weirdscience.gas.BlockGas;
-import ws.zettabyte.weirdscience.gas.BlockGasFlammable;
 import ws.zettabyte.weirdscience.gas.FluidSmog;
 import ws.zettabyte.zettalib.client.gui.widgets.WidgetAmountBar;
+import ws.zettabyte.zettalib.fluid.BlockGas;
+import ws.zettabyte.zettalib.fluid.BlockGasFlammable;
 import ws.zettabyte.zettalib.initutils.ICreativeTabInfo;
 import ws.zettabyte.zettalib.network.MessageTileIntComponent;
 import cpw.mods.fml.common.FMLLog;
@@ -73,24 +73,24 @@ public class ZettaLib {
     public void preInit(FMLPreInitializationEvent event) {
     	network = NetworkRegistry.INSTANCE.newSimpleChannel(this.modid);
     	network.registerMessage(MessageTileIntComponent.Handler.class, MessageTileIntComponent.class, MessageTileIntComponent.packetID, Side.SERVER);
-	    Configuration config = new Configuration(event.getSuggestedConfigurationFile());
-        config.load();
+	    //Configuration config = new Configuration(event.getSuggestedConfigurationFile());
+        //config.load();
 
         /*WidgetAmountBar.forceDisableInterpolate = ! (
         		config.getBoolean("Enable GUI bar interpolation", "Client", true, "Allow GUI bars, such as fluid tanks and energy meters, to try to smooth out their own change over time. Disabling this may decrease lag inside of GUIs.")
         		);*/
-        enableStick = config.getBoolean("Enable debug stick", "Dev", false, "Enable a stick that prints information about tiles to the console.");
+        //enableStick = config.getBoolean("Enable debug stick", "Dev", false, "Enable a stick that prints information about tiles to the console.");
     }
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-    	if(enableStick) {
-    	ItemDebugStick stick = new ItemDebugStick();
-    	stick.setUnlocalizedName("itemDebugStick");
-    	stick.setTextureName("stick");
-	    GameRegistry.registerItem(stick, "itemDebugStick");
-	    stick.setCreativeTab(CreativeTabs.tabMisc);
-    	}
+    	//if(enableStick) {
+    	//ItemDebugStick stick = new ItemDebugStick();
+    	//stick.setUnlocalizedName("itemDebugStick");
+    	//stick.setTextureName("stick");
+	    //GameRegistry.registerItem(stick, "itemDebugStick");
+	    //stick.setCreativeTab(CreativeTabs.tabMisc);
+    	//}
     }
 
     @EventHandler

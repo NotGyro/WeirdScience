@@ -17,7 +17,7 @@ public class ItemSlot extends Slot implements IInvComponent {
 	protected ItemStack stack = null;
 	public int maxSize = 64;
 	
-	public final int slotNumber;
+	//public final int slotNumber;
 	protected String name;
 	public final IInventory inventory;
 	
@@ -26,7 +26,7 @@ public class ItemSlot extends Slot implements IInvComponent {
 	public ItemSlot(IInventory inv, int slotnum) {
 		super(inv, slotnum, -1, -1);
 		inventory = inv;
-		slotNumber = slotnum;
+		//slotNumber = slotnum;
 		name = null;
 	}
 
@@ -42,12 +42,16 @@ public class ItemSlot extends Slot implements IInvComponent {
 	 */
 	@Override
 	public boolean isItemValid(ItemStack stack) { return true; }
-	
+
 	/**
 	 * 
 	 * @return If we called any of our item output functions, would they do anything?
 	 */
 	public boolean canOutput() { return true; }
+	/**
+	 * Checked by Tile Entities and such but not by GUIs.
+	 */
+	public boolean canOutputMachine() { return true; }
 	/**
 	 * 
 	 * @param s Input stack.

@@ -70,6 +70,10 @@ public class SimpleHeatLogic implements IHeatLogic, IInvComponentInt {
 	public int getHeatTransferRate() {
 		return 4; //TODO
 	}
+	
+	public int getTicksPerPassiveLoss() {
+		return 8;
+	}
 
 	@Override
 	public int getAmbientHeat() {
@@ -93,12 +97,24 @@ public class SimpleHeatLogic implements IHeatLogic, IInvComponentInt {
         else {
         	this.balanceCounter = 0;
         }
+        if (nbt.hasKey("AmbientTemperature")) {
+        	this.ambTemperature = nbt.getInteger("AmbientTemperature");
+        }
+        else {
+        	if(te != null) {
+        		this.setupAmbientHeat(te.getWorldObj(), te.xCoord, te.yCoord, te.zCoord);
+        	} else {
+        		this.ambTemperature = 0;
+        	}
+        }
+        initialized = true;
         return this;
     }
 
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
     	nbt.setInteger("Temperature", temperature);
     	nbt.setInteger("TBalanceCounter", balanceCounter);
+    	nbt.setInteger("AmbientTemperature", ambTemperature);
         return nbt;
     }
     
@@ -139,23 +155,33 @@ public class SimpleHeatLogic implements IHeatLogic, IInvComponentInt {
 				int transfer = (this.getHeat() - l.getHeat())/2;
 				transfer = Math.min(transfer, (getHeatTransferRate()+l.getHeatTransferRate())/2);
 				this.modifyHeat(-transfer);
-				l.recieveBalance(transfer);
+				l.modifyHeat(transfer);
 			}
 		}
 		this.dirty = true;
 	}
+	
 	@Override
 	public void doPassiveLoss() {
-		// TODO Auto-generated method stub
+		//TODO: Dependent on insulation, etc. 
+		if(!initialized) return;
+		int transfer = Math.min(1, Math.abs(temperature - ambTemperature));
+		if(transfer == 0) return;
+		if(temperature > ambTemperature) {
+			this.recieveBalance(-transfer);
+		}
+		else if(temperature < ambTemperature) {
+			this.recieveBalance(transfer);
+		}
 	}
-	
+
 	@Override
 	public void recieveBalance(int h) {
 		balanceCounter += h;
 	}
 	
 	public void process() {
-		if(balanceCounter > 0) {
+		if(balanceCounter != 0) {
 			this.dirty = true;
 			this.modifyHeat(balanceCounter);
 		}

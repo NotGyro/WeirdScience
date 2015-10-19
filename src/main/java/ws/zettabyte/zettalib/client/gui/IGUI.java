@@ -21,4 +21,6 @@ public interface IGUI {
 	 */
 	public IGUIWidget getRootWidget();
 
+	public int getGuiID();
+	public void setGuiID(int id);
 }

@@ -1,7 +1,9 @@
 package ws.zettabyte.zettalib.block;
 
+import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import ws.zettabyte.zettalib.inventory.IComponentContainer;
 
@@ -27,5 +29,11 @@ public abstract class TileEntityBase extends TileEntity implements ICachedTileEn
 	public void updateAdjacency(TileEntity te, ForgeDirection side) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public boolean shouldRefresh(Block oldBlock, Block newBlock, int oldMeta, int newMeta, World world, int x, int y, int z) {
+		//Ignore metadata, only refresh when block changes.
+		return (oldBlock != newBlock);
 	}
 }

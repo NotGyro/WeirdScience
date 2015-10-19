@@ -1,7 +1,5 @@
 package ws.zettabyte.zettalib.block;
 
-import ws.zettabyte.zettalib.IDebugInfo;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -15,7 +13,7 @@ import net.minecraftforge.common.util.ForgeDirection;
  * Will only work with an ICachedTileEntity.
  * @author Sam "Gyro" C.
  */
-public abstract class BlockContainerBase extends BlockContainer implements IDebuggableBlock {
+public abstract class BlockContainerBase extends BlockContainer implements IInfoTileEntity {
 
 	public BlockContainerBase(Material material) {
 		super(material);
@@ -59,16 +57,4 @@ public abstract class BlockContainerBase extends BlockContainer implements IDebu
             }
         }
     }
-    
-	@Override
-	public String getDebugInfo(IBlockAccess world, int x, int y, int z,
-			int metadata) {
-		TileEntity TE = world.getTileEntity(x, y, z);
-		if(TE == null) {
-			return "Tile Entity is null!";
-		}
-		if(TE instanceof IDebugInfo) return ((IDebugInfo)TE).getDebugInfo();
-		return "";
-	}
-
 }

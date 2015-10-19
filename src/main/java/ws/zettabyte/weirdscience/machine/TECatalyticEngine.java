@@ -24,9 +24,10 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
-import ws.zettabyte.zettalib.IDebugInfo;
 import ws.zettabyte.zettalib.block.IMetaActive;
 import ws.zettabyte.zettalib.block.TileEntityBase;
+import ws.zettabyte.zettalib.block.TileEntityInventoryBase;
+import ws.zettabyte.zettalib.fluid.BlockGas;
 import ws.zettabyte.zettalib.initutils.Conf;
 import ws.zettabyte.zettalib.initutils.Configgable;
 import ws.zettabyte.zettalib.inventory.FluidTankNamed;
@@ -35,21 +36,19 @@ import ws.zettabyte.zettalib.inventory.IInvComponent;
 import ws.zettabyte.zettalib.inventory.ItemSlot;
 import ws.zettabyte.zettalib.inventory.SimpleInvComponent;
 import ws.zettabyte.zettalib.inventory.SlotInput;
+import ws.zettabyte.zettalib.inventory.SlotInputOnly;
 import ws.zettabyte.zettalib.inventory.SlotOutput;
 import ws.zettabyte.weirdscience.WeirdScience;
-import ws.zettabyte.weirdscience.gas.BlockGas;
 
 @Configgable(section="Machine")
-public class TECatalyticEngine extends TileEntityBase implements
-		IDebugInfo, ISidedInventory, IDescriptiveInventory {
+public class TECatalyticEngine extends TileEntityInventoryBase implements
+		ISidedInventory, IDescriptiveInventory {
 	//---- Inventory ----
-	protected ItemSlot slotInput = new ItemSlot(this, 0, "fuel");
+	protected ItemSlot slotInput = new SlotInput(this, 0, "fuel");
 	protected ItemSlot slotOutput1 = new SlotOutput(this, 1, "out1");
 	protected ItemSlot slotOutput2 = new SlotOutput(this, 2, "out2");
-
-	protected ArrayList<ItemSlot> slots = new ArrayList<ItemSlot>(3);
+	
 	protected ArrayList<ItemSlot> slotsOut = new ArrayList<ItemSlot>(2);
-	protected ArrayList<IInvComponent> fullComponentList = null; //new ArrayList<IInvComponent>(8);
 	//---- end of inventory ----
     
     //Fractional RF per fuel values are achievable: rfPerStack = 1 and an itemstack of 16 fuel is 1/16 RF per fuel.
@@ -133,79 +132,11 @@ public class TECatalyticEngine extends TileEntityBase implements
 		fuels.put(f.fuel.getItem(), f);
 	}
 	
-	// ---- inventory logic ----
-	@Override
-	public int getSizeInventory() {
-		return 3;
-	}
-
-	@Override
-	public ItemStack getStackInSlot(int s) {
-		if(s < slots.size()) {
-			return slots.get(s).getStack();
-		}
-		return null;
-	}
-	
-	@Override
-	public ItemStack decrStackSize(int s, int amount) {
-		//Attempts to remove amount from slot # slotID. Returns a usable
-		//itemstack taken out of the slot: Split or just yanked.
-		if(s < slots.size()) {
-			return slots.get(s).decrStackSize(amount);
-		}
-		return null;
-	}
-
-	@Override
-	public ItemStack getStackInSlotOnClosing(int s) {
-		if(s < slots.size()) {
-			return slots.get(s).getStack();
-		}
-		return null;
-	}
-
-	@Override
-	public void setInventorySlotContents(int s, ItemStack stack) {
-		if(s < slots.size()) {
-			slots.get(s).setStackForce(stack);
-
-	        if (stack != null && stack.stackSize > this.getInventoryStackLimit()) {
-	        	stack.stackSize = this.getInventoryStackLimit();
-	        }
-	        markDirty();
-		}
-	}
-
 	@Override
 	public String getInventoryName() {
 		return "CatalyticEngine";
 	}
 
-	@Override
-	public boolean hasCustomInventoryName() {
-		return false;
-	}
-
-	@Override
-	public int getInventoryStackLimit() {
-		return 64;
-	}
-
-	@Override
-	public boolean isUseableByPlayer(EntityPlayer player) {
-		return (player.getDistanceSq((double)this.xCoord + 0.5D, (double)this.yCoord + 0.5D, (double)this.zCoord + 0.5D) 
-				<= 16.0D);
-	}
-
-	//More relevant to chests, I think..?
-	@Override
-	public void openInventory() { }
-
-	@Override
-	public void closeInventory() { }
-
-	
 	public boolean isItemFuel(Item item) {
 		return fuels.containsKey(item);
 	}
@@ -213,28 +144,11 @@ public class TECatalyticEngine extends TileEntityBase implements
 	public boolean isItemValidForSlot(int s, ItemStack stack) {
     	//Only allow inserting into the input slot, and only allow
 		//fuel to be inserted.
-		return (isItemFuel(stack.getItem()) && (s == 0));
+		if (isItemFuel(stack.getItem()) && (s == 0)) {
+			return super.isItemValidForSlot(s, stack);
+		}
+		return false;
 	}
-
-	@Override
-	public int[] getAccessibleSlotsFromSide(int p_94128_1_) {
-		// TODO: Rotation-sensitive stuff.
-		return new int[]{0, 1, 2};
-	}
-
-	@Override
-	public boolean canInsertItem(int s, ItemStack stack,
-			int fromDirection) {
-		return isItemValidForSlot(s, stack);
-	}
-
-	//TODO: Make this a property of the slots somehow.
-	@Override
-	public boolean canExtractItem(int s, ItemStack stack,
-			int fromDirection) {
-        return ((s == 1) || (s == 2));
-	}
-	// ---- end inventory logic ----
 
 	//Beefy engine stuff:
 
@@ -406,17 +320,6 @@ public class TECatalyticEngine extends TileEntityBase implements
 	@Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
-        //Read the item stacks.
-        NBTTagList itemList = (NBTTagList)nbt.getTag("Items");
-        NBTTagCompound nbttagcompound1 = null;
-        for (int i = 0; i < itemList.tagCount(); ++i) {
-        	nbttagcompound1 = (NBTTagCompound)itemList.getCompoundTagAt(i);
-            byte b0 = nbttagcompound1.getByte("Slot");
-
-            if (b0 >= 0 && b0 < this.slots.size()) {
-                slots.get(b0).setStackForce(ItemStack.loadItemStackFromNBT(nbttagcompound1));
-            }
-        }
         //Read how far we are from doing another engine tick.
 		ticksLastBurn = nbt.getShort("LastBurnTime");
         ticksUntilBurn = nbt.getShort("BurnTime");
@@ -430,17 +333,6 @@ public class TECatalyticEngine extends TileEntityBase implements
         //Write time until next engine burn tick.
 		nbt.setShort("BurnTime", (short)this.ticksUntilBurn);
 		nbt.setShort("LastBurnTime", (short)this.ticksLastBurn);
-        //Write item stacks.
-        NBTTagList nbttaglist = new NBTTagList();
-        for (int i = 0; i < slots.size(); ++i) {
-            if (slots.get(i).getStack() != null) {
-                NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-                nbttagcompound1.setByte("Slot", (byte)i);
-                this.slots.get(i).getStack().writeToNBT(nbttagcompound1);
-                nbttaglist.appendTag(nbttagcompound1);
-            }
-        }
-        nbt.setTag("Items", nbttaglist);
         //Write our internal fluid tank (which stores smog)
         fluidTank.writeToNBT(nbt);
 	}
@@ -458,61 +350,17 @@ public class TECatalyticEngine extends TileEntityBase implements
 	}
 	
 	@Override
-	public String getDebugInfo() {
-		String inf1 = "nothing";
-		if(slotInput.getStack() != null) {
-			inf1 = slotInput.getStack().getUnlocalizedName() + " x" + slotInput.getStack().stackSize;
-		}
-		String inf2 = "nothing";
-		if(slotOutput1.getStack() != null) {
-			inf2 = slotOutput1.getStack().getUnlocalizedName() + " x" + slotOutput1.getStack().stackSize;
-		}
-		String inf3 = "nothing";
-		if(slotOutput2.getStack() != null) {
-			inf3 = slotOutput2.getStack().getUnlocalizedName() + " x" + slotOutput2.getStack().stackSize;
-		}
-		String finalinf = "Input slot contains " + inf1 + ".\n";
-		//finalinf += "Output slot contains " + inf2 + ".\n";
-		finalinf += "Output slot 1 contains " + inf2 + ".\n";
-		finalinf += "Output slot 2 contains " + inf3 + ".\n";
-		String inf4 = "nothing";
-		if(fluidTank.getFluidAmount() > 0) inf4 = fluidTank.getFluidAmount() + " mb of " + fluidTank.getFluid().getFluid().getName();
-		finalinf += "Exhaust buffer tank contains " + inf4 + ".\n";
-		return finalinf;
-	}
-
-	@Override
 	public Iterable<ItemSlot> getSlots() {
 		return slots;
 	}
 
-	@Override
-	public boolean canInteractWith(EntityPlayer player) {
-		// TODO Auto-generated method stub
-		return this.isUseableByPlayer(player);
-	}
 	
 	@Override
-	public Iterable<IInvComponent> getComponents() {
-		if(fullComponentList == null) buildComponentList();
-		return fullComponentList;
-	}
-	
-	
 	protected void buildComponentList() {
-		fullComponentList = new ArrayList<IInvComponent>(slots.size() + tanks.size());
-		for(ItemSlot s : slots) {
-			fullComponentList.add(s);
-		}
+		super.buildComponentList();
 		for(FluidTankNamed t : tanks) {
 			fullComponentList.add(t);
 		}
 		fullComponentList.add(burnProgress);
-	}
-
-	@Override
-	public boolean shouldRefresh(Block oldBlock, Block newBlock, int oldMeta, int newMeta, World world, int x, int y, int z) {
-		//Ignore metadata, onlly refresh when block changes.
-		return (oldBlock != newBlock);
 	}
 }
