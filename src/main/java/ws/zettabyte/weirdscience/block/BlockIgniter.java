@@ -31,8 +31,9 @@ public class BlockIgniter extends BlockGeneric {
     public IIcon getIcon(int side, int meta) {
         //Porting danger spot
         ForgeDirection facing = ForgeDirection.VALID_DIRECTIONS[meta];
+        ForgeDirection sideDir = ForgeDirection.VALID_DIRECTIONS[side];
 
-        return icons.getIconPistonStyle(ForgeDirection.VALID_DIRECTIONS[side], facing);
+        return icons.getIconPistonStyle(sideDir, facing);
     }
     @Override
     public boolean rotateBlock(World worldObj, int x, int y, int z,
@@ -53,7 +54,7 @@ public class BlockIgniter extends BlockGeneric {
     @Override
     public void registerBlockIcons(IIconRegister iconRegister) {
         icons.setAllSidesName("weirdscience:genericmachine");
-        icons.setTextureName("weirdscience:genericmachine3", ForgeDirection.EAST);
+        icons.setTextureName("weirdscience:genericmachine3", ForgeDirection.SOUTH);
         icons.registerBlockIcons(iconRegister);
     }
 }

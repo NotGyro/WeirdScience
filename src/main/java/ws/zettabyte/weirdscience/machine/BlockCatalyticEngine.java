@@ -62,12 +62,12 @@ public class BlockCatalyticEngine extends BlockContainerBase implements
 	@Override
 	public void registerBlockIcons(IIconRegister iconRegister) {
 		//NORTH and EAST both face away from the item renderer, gotta change our logic ever so slightly
-		//SOUTH is the same FORWARD that 
+		//SOUTH is the same FORWARD that furnaces and such have.
 		iconsInactive.setAllSidesName("weirdscience:genericmachine");
-		iconsInactive.setTextureName("weirdscience:genericmachine5", ForgeDirection.WEST);
+		iconsInactive.setTextureName("weirdscience:genericmachine4", ForgeDirection.WEST);
 		iconsInactive.setTextureName("weirdscience:genericmachine3", ForgeDirection.UP);
 
-		iconsInactive.setTextureName("weirdscience:genericmachine4", ForgeDirection.SOUTH);
+		iconsInactive.setTextureName("weirdscience:genericmachine5", ForgeDirection.SOUTH);
 		/*
 		iconsInactive.setAllSidesName("weirdscience:genericmachine");
 		iconsInactive.setTextureName("weirdscience:genericmachine5", ForgeDirection.EAST);
@@ -76,7 +76,7 @@ public class BlockCatalyticEngine extends BlockContainerBase implements
 		iconsInactive.setTextureName("weirdscience:genericmachine4", ForgeDirection.NORTH);*/
     	
     	iconsActive.makeCopy(iconsInactive);
-    	iconsActive.setTextureName("weirdscience:genericmachine5_active", ForgeDirection.WEST);
+    	iconsActive.setTextureName("weirdscience:genericmachine5_active", ForgeDirection.SOUTH);
 
     	iconsInactive.registerBlockIcons(iconRegister);
     	iconsActive.registerBlockIcons(iconRegister);

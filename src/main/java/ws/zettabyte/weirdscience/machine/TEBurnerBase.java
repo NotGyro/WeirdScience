@@ -22,7 +22,6 @@ import java.util.ArrayList;
 /**
  * Created by Sam "Gyro" C. on 12/21/2015.
  *
-public class TECatalyticEngine  {
  */
 @Configgable(section="Machine")
 public abstract class TEBurnerBase extends TileEntityInventoryBase implements

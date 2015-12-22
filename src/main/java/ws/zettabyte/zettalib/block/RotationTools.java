@@ -69,10 +69,10 @@ public final class RotationTools {
 		else if(in == ForgeDirection.UP) return 5;
 		
 		//Counter-clockwise rotation from origin.
-		if(in == ForgeDirection.EAST) return 0;
-		else if(in == ForgeDirection.NORTH) return 1;
-		else if(in == ForgeDirection.WEST) return 2;
-		else if(in == ForgeDirection.SOUTH) return 3;
+		else if(in == ForgeDirection.SOUTH) return 0;
+		if(in == ForgeDirection.EAST) return 1;
+		else if(in == ForgeDirection.NORTH) return 2;
+		else if(in == ForgeDirection.WEST) return 3;
 		
 		return -1;
 	}
@@ -81,10 +81,10 @@ public final class RotationTools {
 		else if(in == 5) return ForgeDirection.UP;
 		
 		//Counter-clockwise rotation from origin.
-		if(in == 0) return ForgeDirection.EAST;
-		else if(in == 1) return ForgeDirection.NORTH;
-		else if(in == 2) return ForgeDirection.WEST;
-		else if(in == 3) return ForgeDirection.SOUTH;
+		else if(in == 0) return ForgeDirection.SOUTH;
+		if(in == 1) return ForgeDirection.EAST;
+		else if(in == 2) return ForgeDirection.NORTH;
+		else if(in == 3) return ForgeDirection.WEST;
 		
 		return ForgeDirection.UNKNOWN; //1.8 port problem spot
 	}
@@ -122,26 +122,26 @@ public final class RotationTools {
 	}
 	public static ForgeDirection getTranslatedSidePStyle(ForgeDirection side, ForgeDirection facing) {
 		//Facing is presumed to be the direction faced by the "front" of a block, and the "front" dir in the block's space
-		//is East.
+		//is South.
 		//UP, NORTH, SOUTH, WEST, EAST
 		//I'm just gonna use a table here because I have no idea how to do axis-aligned 3D rotation, sorry senpai
 		if(facing == ForgeDirection.UP) {
-			if(side == ForgeDirection.UP) return ForgeDirection.EAST;
-			if(side == ForgeDirection.DOWN) return ForgeDirection.WEST;
-			if(side == ForgeDirection.EAST) return ForgeDirection.DOWN;
-			if(side == ForgeDirection.WEST) return ForgeDirection.UP;
-			if(side == ForgeDirection.NORTH) return ForgeDirection.NORTH;
-			if(side == ForgeDirection.SOUTH) return ForgeDirection.SOUTH;
-			return ForgeDirection.EAST;
+			if(side == ForgeDirection.UP) return ForgeDirection.SOUTH;
+			if(side == ForgeDirection.DOWN) return ForgeDirection.NORTH;
+			if(side == ForgeDirection.EAST) return ForgeDirection.EAST;
+			if(side == ForgeDirection.WEST) return ForgeDirection.WEST;
+			if(side == ForgeDirection.NORTH) return ForgeDirection.DOWN;
+			if(side == ForgeDirection.SOUTH) return ForgeDirection.UP;
+			return ForgeDirection.SOUTH;
 		}
 		else if(facing == ForgeDirection.DOWN) {
-			if(side == ForgeDirection.UP) return ForgeDirection.WEST;
-			if(side == ForgeDirection.DOWN) return ForgeDirection.EAST;
-			if(side == ForgeDirection.EAST) return ForgeDirection.UP;
-			if(side == ForgeDirection.WEST) return ForgeDirection.DOWN;
-			if(side == ForgeDirection.NORTH) return ForgeDirection.NORTH;
-			if(side == ForgeDirection.SOUTH) return ForgeDirection.SOUTH;
-			return ForgeDirection.EAST;
+			if(side == ForgeDirection.UP) return ForgeDirection.NORTH;
+			if(side == ForgeDirection.DOWN) return ForgeDirection.SOUTH;
+			if(side == ForgeDirection.EAST) return ForgeDirection.EAST;
+			if(side == ForgeDirection.WEST) return ForgeDirection.WEST;
+			if(side == ForgeDirection.NORTH) return ForgeDirection.UP;
+			if(side == ForgeDirection.SOUTH) return ForgeDirection.DOWN;
+			return ForgeDirection.SOUTH;
 		}
 		else {
 			return getTranslatedSideFStyle(side, facing);
