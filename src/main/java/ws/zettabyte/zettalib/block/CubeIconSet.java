@@ -54,9 +54,13 @@ public class CubeIconSet {
 		}
 	}
 
-    public IIcon getIconFurnaceStyle(ForgeDirection side, ForgeDirection facing) {
+	public IIcon getIconFurnaceStyle(ForgeDirection side, ForgeDirection facing) {
 		return icons[RotationTools.ForgeDirectionToIndex(
 				RotationTools.getTranslatedSideFStyle(side, facing))];
+	}
+	public IIcon getIconPistonStyle(ForgeDirection side, ForgeDirection facing) {
+		return icons[RotationTools.ForgeDirectionToIndex(
+				RotationTools.getTranslatedSidePStyle(side, facing))];
 	}
     
     public String getTexture(ForgeDirection side) {

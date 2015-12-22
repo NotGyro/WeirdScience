@@ -76,10 +76,11 @@ public class TECatalyticEngine extends TileEntityInventoryBase implements
 
     @Conf(name="Catalytic Engine: Ticks between  passive exhaust ejection attempts", def="2")
     public static int ticksPerExhaust; //How long until we try to spawn smog?
-    @Conf(name="Catalytic Engine: Rate of passive exhaust ejection", def="128", comment="Set to 0 to disable passive exhaust.")
+    @Conf(name="Catalytic Engine: Rate of passive exhaust ejection", def="64", comment="Set to 0 to disable passive exhaust.")
     public static int rateExhaustOut; //How long until we try to spawn smog?
 
-    @Conf(name="Catalytic Engine: do exhaust", def="true")
+	//TODO: Better way to do this.
+    //@Conf(name="Catalytic Engine: do exhaust", def="true")
     public static boolean doExhaust;
     @Conf(name="Catalytic Engine: internal tank size", def="4000", comment="How much exhaust the engine can store before it gets vented.")
     public static int wasteCapacity;

@@ -99,4 +99,53 @@ public final class RotationTools {
 		int s = __FDtoUseable2DMath(side);
 		return __FDfromUseable2DMath(Math.abs(s+f) % 4);
 	}
+
+
+	/**
+	 * Piston-style rotations
+	 */
+	public static void initSixDirBlock(World world, int x, int y, int z,
+									   EntityLivingBase placer) {
+		if(world.isRemote) return;
+		//If the player is not looking very far up or down, treat as four-dir.
+		if (MathHelper.abs(placer.rotationPitch) < 60) {
+			initFourDirBlock(world, x, y, z, placer);
+		}
+		else { //The player is looking up or down.
+			if (placer.rotationPitch > 0) {
+				world.setBlockMetadataWithNotify(x, y, z, 1, 1|2); //Player is looking down, block should face up
+			}
+			else {
+				world.setBlockMetadataWithNotify(x, y, z, 0, 1|2); //Player is looking up, block should face down
+			}
+		}
+	}
+	public static ForgeDirection getTranslatedSidePStyle(ForgeDirection side, ForgeDirection facing) {
+		//Facing is presumed to be the direction faced by the "front" of a block, and the "front" dir in the block's space
+		//is East.
+		//UP, NORTH, SOUTH, WEST, EAST
+		//I'm just gonna use a table here because I have no idea how to do axis-aligned 3D rotation, sorry senpai
+		if(facing == ForgeDirection.UP) {
+			if(side == ForgeDirection.UP) return ForgeDirection.EAST;
+			if(side == ForgeDirection.DOWN) return ForgeDirection.WEST;
+			if(side == ForgeDirection.EAST) return ForgeDirection.DOWN;
+			if(side == ForgeDirection.WEST) return ForgeDirection.UP;
+			if(side == ForgeDirection.NORTH) return ForgeDirection.NORTH;
+			if(side == ForgeDirection.SOUTH) return ForgeDirection.SOUTH;
+			return ForgeDirection.EAST;
+		}
+		else if(facing == ForgeDirection.DOWN) {
+			if(side == ForgeDirection.UP) return ForgeDirection.WEST;
+			if(side == ForgeDirection.DOWN) return ForgeDirection.EAST;
+			if(side == ForgeDirection.EAST) return ForgeDirection.UP;
+			if(side == ForgeDirection.WEST) return ForgeDirection.DOWN;
+			if(side == ForgeDirection.NORTH) return ForgeDirection.NORTH;
+			if(side == ForgeDirection.SOUTH) return ForgeDirection.SOUTH;
+			return ForgeDirection.EAST;
+		}
+		else {
+			return getTranslatedSideFStyle(side, facing);
+		}
+	}
+
 }

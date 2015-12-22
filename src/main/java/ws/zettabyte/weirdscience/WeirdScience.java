@@ -18,6 +18,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.oredict.OreDictionary;
+import ws.zettabyte.weirdscience.block.BlockIgniter;
 import ws.zettabyte.weirdscience.block.BlockSkullOverride;
 import ws.zettabyte.weirdscience.fluid.BlockAcid;
 import ws.zettabyte.weirdscience.fluid.FluidAcid;
@@ -85,6 +86,8 @@ public class WeirdScience {
     public static BlockCatalyticEngine blockCEngine;
     
     public static BlockHeatTest blockHeatTest;
+
+    public static BlockIgniter blockIgniter;
     
     @Conf(name="test", comment="Beep boop.", def="9")
     public static int testConf = 0;
@@ -194,6 +197,9 @@ public class WeirdScience {
 
         blockCEngine = new BlockCatalyticEngine(Material.iron);
         iu.initBlockConfig(blockCEngine, "Catalytic Engine");
+
+        blockIgniter = new BlockIgniter(Material.iron);
+        iu.initBlockConfig(blockIgniter, "Igniter");
         
 	    
         config.save();
