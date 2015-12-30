@@ -4,36 +4,32 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.minecraft.block.Block;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBucket;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.oredict.OreDictionary;
-import ws.zettabyte.weirdscience.block.BlockIgniter;
-import ws.zettabyte.weirdscience.block.BlockSkullOverride;
+import ws.zettabyte.weirdscience.machine.BlockIgniter;
 import ws.zettabyte.weirdscience.fluid.BlockAcid;
 import ws.zettabyte.weirdscience.fluid.FluidAcid;
 import ws.zettabyte.weirdscience.gas.FluidSmog;
 import ws.zettabyte.weirdscience.machine.BlockCatalyticEngine;
+import ws.zettabyte.weirdscience.machine.BlockSolidBurner;
 import ws.zettabyte.weirdscience.machine.testheat.BlockHeatTest;
 import ws.zettabyte.zettalib.BucketEventManager;
 import ws.zettabyte.zettalib.block.BlockGeneric;
-import ws.zettabyte.zettalib.fluid.BlockGas;
 import ws.zettabyte.zettalib.fluid.BlockGasFlammable;
 import ws.zettabyte.zettalib.initutils.Conf;
 import ws.zettabyte.zettalib.initutils.ConfAnnotationParser;
 import ws.zettabyte.zettalib.initutils.Configgable;
 import ws.zettabyte.zettalib.initutils.InitUtils;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -42,10 +38,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 //Packet handler is just a dummy as of this point.
 @Configgable(section="test")
@@ -61,17 +54,14 @@ public class WeirdScience {
     
     @SidedProxy(clientSide="ws.zettabyte.weirdscience.client.ClientProxy", serverSide="ws.zettabyte.weirdscience.CommonProxy")
     public static CommonProxy proxy;
-    
-    protected static InitUtils iu;
-    
+
     //The logger for the mod. Should this not be static? Since it's Minecraft, it's unlikely that there will be threading issues.
     public static final Logger logger = Logger.getLogger("WeirdScience");
-    
     public static CreativeTabs tabWeirdScience = new CreativeTabWeirdScience(CreativeTabs.getNextID(), "tabWeirdScience");
-    
-    public static ArrayList<String> sounds;// = CongealedBloodBlock.sounds;
-    
     public static Configuration config;
+    protected static InitUtils iu;
+    BucketEventManager bucketMan = new BucketEventManager(); //My favorite superhero
+    public static ArrayList<String> sounds;// = CongealedBloodBlock.sounds;
 
     public static FluidSmog fluidSmog;
     public static BlockGasFlammable blockSmog;
@@ -88,18 +78,14 @@ public class WeirdScience {
     public static BlockHeatTest blockHeatTest;
 
     public static BlockIgniter blockIgniter;
-    
-    @Conf(name="test", comment="Beep boop.", def="9")
-    public static int testConf = 0;
-	//Important things to note: Values read from config and passed around don't reach their destination serverside unless
-	//they are null. Weird.
-	
+
+    public static BlockSolidBurner blockSolidBurner;
+
 	public WeirdScience() {
 		instance = this;
         //logger.setParent((Logger) FMLLog.getLogger());
 		logger.setLevel(Level.ALL);
 	}
-	BucketEventManager bucketMan = new BucketEventManager(); //My favorite superhero
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
     	//Do strange hacks.
@@ -127,7 +113,7 @@ public class WeirdScience {
 			e.printStackTrace();
 		}
         
-        logger.warning("Important news: " + Integer.toString(this.testConf));
+        //logger.warning("Important news: " + Integer.toString(this.testConf));
     	//logger.info("Testing.");
     	LanguageRegistry.instance().addStringLocalization("itemGroup.tabWeirdScience", "en_US", "Weird Science");    	
     	//NetworkRegistry.registerGuiHandler(this, new WeirdScienceGUIHandler());
@@ -200,6 +186,9 @@ public class WeirdScience {
 
         blockIgniter = new BlockIgniter(Material.iron);
         iu.initBlockConfig(blockIgniter, "Igniter");
+
+        blockSolidBurner = new BlockSolidBurner(Material.iron);
+        iu.initBlockConfig(blockSolidBurner, "SolidBurner");
         
 	    
         config.save();
@@ -212,8 +201,8 @@ public class WeirdScience {
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-    	itemAcidBucket.setCreativeTab(tabWeirdScience);
-    	bucketMan.addRecipe(blockAcid, new ItemStack(itemAcidBucket));
+        itemAcidBucket.setCreativeTab(tabWeirdScience);
+        bucketMan.addRecipe(blockAcid, new ItemStack(itemAcidBucket));
         fluidSmog.setIcons(blockSmog.getIcon(0, 0));
         fluidAcid.setIcons(blockAcid.getIcon(0, 0));
     }

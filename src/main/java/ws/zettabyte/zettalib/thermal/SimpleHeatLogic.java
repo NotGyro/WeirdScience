@@ -50,7 +50,7 @@ public class SimpleHeatLogic implements IHeatLogic, IInvComponentInt {
 	}
 	
 	public void setupAmbientHeat(World world, int x, int y, int z) {
-		ambTemperature = celsiusFromBiome(world.getBiomeGenForCoords(x, z).temperature);
+		ambTemperature = celsiusFromBiome(world.getBiomeGenForCoords(x, z).temperature) * 1000;
 		temperature = ambTemperature;
 		initialized = true;
 	}
@@ -62,13 +62,14 @@ public class SimpleHeatLogic implements IHeatLogic, IInvComponentInt {
 
 	@Override
 	public int modifyHeat(int value) {
+		if(value != 0) dirty = true;
 		temperature += value;
 		return value;
 	}
 
 	@Override
 	public int getHeatTransferRate() {
-		return 4; //TODO
+		return 2000; //TODO
 	}
 	
 	public int getTicksPerPassiveLoss() {
@@ -158,14 +159,17 @@ public class SimpleHeatLogic implements IHeatLogic, IInvComponentInt {
 				l.modifyHeat(transfer);
 			}
 		}
-		this.dirty = true;
+        this.dirty = true;
 	}
+
+	//TODO: Saner passive loss all around. One quarter of a C.
+	protected final int lossPerTick = 250;
 	
 	@Override
 	public void doPassiveLoss() {
 		//TODO: Dependent on insulation, etc. 
 		if(!initialized) return;
-		int transfer = Math.min(1, Math.abs(temperature - ambTemperature));
+		int transfer = Math.min(lossPerTick, Math.abs(temperature - ambTemperature));
 		if(transfer == 0) return;
 		if(temperature > ambTemperature) {
 			this.recieveBalance(-transfer);

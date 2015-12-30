@@ -63,7 +63,7 @@ public class WidgetTemperatureBar extends WidgetAmountBar implements IComponentR
 	protected float getValue() {
 		if(heat == null)	return 0;
 		if(heat.getHeat() == 0) return 0;
-		return  (float)(heat.getHeat() - 32) / 160.0F; //TODO: Saner min / max values.
+		return  (float)((heat.getHeat()/1000) - 32) / 160.0F; //TODO: Saner min / max values.
 	}
 
 	@Override
@@ -111,7 +111,7 @@ public class WidgetTemperatureBar extends WidgetAmountBar implements IComponentR
 	protected String getHeatTooltip() {
 		if(this.heat != null) {
 			if(this.heat.getHeat() != 0) {
-				return "" + heat.getHeat() + " C";
+				return "" + heat.getHeat()/1000 + " C";
 			}
 		}
 		return "0 C";

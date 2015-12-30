@@ -31,9 +31,9 @@ public final class RotationTools {
 		 * public static final ForgeDirection[] VALID_DIRECTIONS = {DOWN, UP,
 		 * NORTH, SOUTH, WEST, EAST}; 0 1 2 3 4 5
 		 */
-		// Facing north
+		// Facing south
 		if (quadrant == 0) {
-			world.setBlockMetadataWithNotify(x, y, z, 3, 1|2);
+			world.setBlockMetadataWithNotify(x, y, z, 2, 1|2); //face the block North
 		}
 
 		// Facing west
@@ -41,15 +41,17 @@ public final class RotationTools {
 			world.setBlockMetadataWithNotify(x, y, z, 5, 1|2);
 		}
 
-		// Facing south
+		// Facing north
 		else if (quadrant == 2) {
-			world.setBlockMetadataWithNotify(x, y, z, 2, 1|2);
+			world.setBlockMetadataWithNotify(x, y, z, 3, 1|2);
 		}
 
 		// Facing east
 		else if (quadrant == 3) {
 			world.setBlockMetadataWithNotify(x, y, z, 4, 1|2);
 		}
+		System.out.println("Quadrant: " + quadrant);
+		System.out.println("Meta: " + world.getBlockMetadata(x,y,z));
 	}
 
 	public static int ForgeDirectionToIndex(ForgeDirection in) {
@@ -91,13 +93,13 @@ public final class RotationTools {
 	
 	public static ForgeDirection getTranslatedSideFStyle(ForgeDirection side, ForgeDirection facing) {
 		//Facing is presumed to be the "front" of a block. Metadata of 2 is presumed North.
-		//UP, NORTH, SOUTH, WEST, EAST
+		//DOWN, UP, NORTH, SOUTH, WEST, EAST
 		if(side == ForgeDirection.DOWN) return ForgeDirection.DOWN;
 		else if(side == ForgeDirection.UP) return ForgeDirection.UP;
 
 		int f = __FDtoUseable2DMath(facing);
 		int s = __FDtoUseable2DMath(side);
-		return __FDfromUseable2DMath(Math.abs(s+f) % 4);
+		return __FDfromUseable2DMath(Math.abs(s-f) % 4);
 	}
 
 

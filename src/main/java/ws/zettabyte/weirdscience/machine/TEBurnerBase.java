@@ -28,10 +28,12 @@ public abstract class TEBurnerBase extends TileEntityInventoryBase implements
         ISidedInventory, IDescriptiveInventory, IHasHeatLogic {
     protected SimpleHeatLogic heat = new SimpleHeatLogic();
 
+    private int ticksUntilBalance = 0;
+    @Conf(name="Burners: Ticks between trying burn logic", def="20", comment="WARNING: As of right now, this changes throughput.")
+    protected static final int ticksPerBurn = 20; //TODO: Figure out the right way to implement this.
+    private int ticksUntilBurn = ticksPerBurn;
 
-    @Conf(name="Burners: Ticks between trying heat transfer logic", def="20", comment="WARNING: As of right now burner tick rate actually affects heat dissipation rate.")
-    public static int ticksPerBalance; //How many ticks between attempts to balance heat?
-    private int ticksUntilBalance = ticksPerBalance;
+    public boolean burning = false;
 
     @Override
     public IHeatLogic getHeatLogic() {
@@ -41,9 +43,11 @@ public abstract class TEBurnerBase extends TileEntityInventoryBase implements
     protected ArrayList<IInvComponent> fullComponentList = new ArrayList<IInvComponent>(); //new ArrayList<IInvComponent>(8);
 
     public TEBurnerBase() {
+        super();
         heat.te = this;
         fullComponentList.add(heat);
         trySetupHeat();
+        ticksUntilBalance = getTicksPerBalance();
     }
     @Override
     public Iterable<IInvComponent> getComponents() {
@@ -60,14 +64,18 @@ public abstract class TEBurnerBase extends TileEntityInventoryBase implements
         super.readFromNBT(nbt);
         heat.readFromNBT(nbt);
         heat.initialized = true;
-        ticksUntilBalance = nbt.getShort("BalanceTime");
+        ticksUntilBalance = nbt.getShort("TimeToBalance");
+        ticksUntilBurn = nbt.getShort("TimeToBurn");
+        burning = nbt.getBoolean("BurnState");
     }
 
     @Override
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
         heat.writeToNBT(nbt);
-        nbt.setShort("BalanceTime", (short)this.ticksUntilBalance);
+        nbt.setShort("TimeToBalance", (short)this.ticksUntilBalance);
+        nbt.setShort("TimeToBurn", (short)this.ticksUntilBurn);
+        nbt.setBoolean("BurnState", burning);
     }
 
     @Override
@@ -93,14 +101,21 @@ public abstract class TEBurnerBase extends TileEntityInventoryBase implements
         }
     }
 
+    /**
+     * How many ticks are there between burn events for this object?
+     */
+    protected int getTicksPerBurn() { return ticksPerBurn; }
+    /**
+     * How many ticks are there between burn events for this object?
+     */
+    protected int getTicksPerBalance() { return 4; }
+
     @Override
     public void updateEntity () {
         super.updateEntity();
         trySetupHeat();
 
         if (!worldObj.isRemote) {
-            //Burn logic:
-            //Are we still waiting to burn fuel?
             if (this.ticksUntilBalance > 0) {
                 --this.ticksUntilBalance;
             } else {
@@ -128,8 +143,37 @@ public abstract class TEBurnerBase extends TileEntityInventoryBase implements
                     worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
                 }
                 //Reset our timer
-                this.ticksUntilBalance = this.ticksPerBalance;
+                this.ticksUntilBalance = this.getTicksPerBalance();
+            }
+            //Burn logic:
+            //Are we still waiting to burn fuel?
+            if (this.ticksUntilBurn > 0) {
+                --this.ticksUntilBurn;
+            } else {
+                doBurnTick();
+                this.ticksUntilBurn = this.getTicksPerBurn();
+                this.markDirty();
             }
         }
+    }
+
+    /**
+     * Logic for burning fuel, and the result of that.
+     */
+    protected abstract void doBurnTick();
+
+    public void ignite() {
+        boolean wasBurning = this.burning;
+        this.burning = true;
+        if(!wasBurning) {
+            //Force a burn tick, starting up our engine.
+            doBurnTick();
+            this.ticksUntilBurn = this.getTicksPerBurn();
+        }
+        this.markDirty();
+    }
+
+    public boolean isBurning() {
+        return this.burning;
     }
 }

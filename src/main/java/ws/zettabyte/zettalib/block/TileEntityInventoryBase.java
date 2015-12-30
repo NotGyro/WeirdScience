@@ -97,7 +97,6 @@ public abstract class TileEntityInventoryBase extends TileEntityBase implements
 		return isItemValidForSlot(s, stack);
 	}
 
-	//TODO: Make this a property of the slots somehow.
 	@Override
 	public boolean canExtractItem(int s, ItemStack stack,
 			int fromDirection) {
@@ -150,10 +149,10 @@ public abstract class TileEntityInventoryBase extends TileEntityBase implements
         NBTTagCompound nbttagcompound1 = null;
         for (int i = 0; i < itemList.tagCount(); ++i) {
         	nbttagcompound1 = (NBTTagCompound)itemList.getCompoundTagAt(i);
-            byte b0 = nbttagcompound1.getByte("Slot");
+            String slname = nbttagcompound1.getString("Slot");
 
-            if (b0 >= 0 && b0 < this.slots.size()) {
-                slots.get(b0).setStackForce(ItemStack.loadItemStackFromNBT(nbttagcompound1));
+            if (this.getNamedSlot(slname) != null) {
+                this.getNamedSlot(slname).setStackForce(ItemStack.loadItemStackFromNBT(nbttagcompound1));
             }
         }
     }
@@ -165,10 +164,10 @@ public abstract class TileEntityInventoryBase extends TileEntityBase implements
         NBTTagList nbttaglist = new NBTTagList();
         for (int i = 0; i < slots.size(); ++i) {
             if (slots.get(i).getStack() != null) {
-                NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-                nbttagcompound1.setByte("Slot", (byte)i);
-                this.slots.get(i).getStack().writeToNBT(nbttagcompound1);
-                nbttaglist.appendTag(nbttagcompound1);
+                NBTTagCompound nbttagcompoundItem = new NBTTagCompound();
+                nbttagcompoundItem.setString("Slot", slots.get(i).getComponentName());
+                this.slots.get(i).getStack().writeToNBT(nbttagcompoundItem);
+                nbttaglist.appendTag(nbttagcompoundItem);
             }
         }
         nbt.setTag("Items", nbttaglist);

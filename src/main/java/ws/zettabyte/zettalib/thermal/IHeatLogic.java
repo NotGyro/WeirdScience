@@ -9,7 +9,7 @@ import net.minecraftforge.common.util.ForgeDirection;
  */
 public interface IHeatLogic {
 	/**
-	 * @return Heat of this object in degrees celsius.
+	 * @return Heat of this object in mC (thousandths of a degree celsius).
 	 */
 	int getHeat();
 	default int getHeat(ForgeDirection side) { return this.getHeat(); }
@@ -27,7 +27,7 @@ public interface IHeatLogic {
 	default int modifyHeat(int value, ForgeDirection side) { return this.modifyHeat(value); }
 	
 	/**
-	 * @return How many degrees celsius can we transfer into or out of this object
+	 * @return How many thousandths of a degree celsius can we transfer into or out of this object
 	 * per second?
 	 */
 	int getHeatTransferRate();

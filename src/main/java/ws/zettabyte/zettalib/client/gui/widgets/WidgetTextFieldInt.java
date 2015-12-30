@@ -39,6 +39,10 @@ public class WidgetTextFieldInt extends WidgetTextField implements
 			}
 		}
 	}
+
+	protected int getTextInt() {
+		return Integer.parseInt(this.getText());
+	}
 	protected void writeToComponent() {
 		if(this.component != null) {
 			if((this.getText() == null ) || (this.getText().equalsIgnoreCase(""))) {
@@ -46,7 +50,7 @@ public class WidgetTextFieldInt extends WidgetTextField implements
 			}
 			else {
 				try {
-					this.component.setComponentVal(Integer.parseInt(this.getText()));
+					this.component.setComponentVal(this.getTextInt());
 				}
 				catch (Exception e) {
 					this.component.setComponentVal(0);
