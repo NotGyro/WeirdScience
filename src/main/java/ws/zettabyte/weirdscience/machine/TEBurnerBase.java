@@ -1,5 +1,6 @@
 package ws.zettabyte.weirdscience.machine;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.nbt.NBTTagCompound;
@@ -13,6 +14,7 @@ import ws.zettabyte.zettalib.initutils.Conf;
 import ws.zettabyte.zettalib.initutils.Configgable;
 import ws.zettabyte.zettalib.inventory.IDescriptiveInventory;
 import ws.zettabyte.zettalib.inventory.IInvComponent;
+import ws.zettabyte.zettalib.thermal.HeatRegistry;
 import ws.zettabyte.zettalib.thermal.IHasHeatLogic;
 import ws.zettabyte.zettalib.thermal.IHeatLogic;
 import ws.zettabyte.zettalib.thermal.SimpleHeatLogic;
@@ -120,6 +122,7 @@ public abstract class TEBurnerBase extends TileEntityInventoryBase implements
                 --this.ticksUntilBalance;
             } else {
                 heat.process();
+
                 ArrayList<IHeatLogic> testAgainst = new ArrayList<IHeatLogic>(3);
                 for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
                     TileEntity t = worldObj.getTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
@@ -128,6 +131,11 @@ public abstract class TEBurnerBase extends TileEntityInventoryBase implements
                             testAgainst.add((IHeatLogic) t);
                         }
                     }
+                    //Try in-world heat stuff, while we're looping here.
+                    HeatRegistry.getInstance().TryBlockBehaviorAt(worldObj, xCoord + dir.offsetX,
+                            yCoord + dir.offsetY,
+                            zCoord + dir.offsetZ,
+                            this.heat);
                 }
 
                 if (testAgainst.size() != 0) {
@@ -145,15 +153,15 @@ public abstract class TEBurnerBase extends TileEntityInventoryBase implements
                 //Reset our timer
                 this.ticksUntilBalance = this.getTicksPerBalance();
             }
-            //Burn logic:
-            //Are we still waiting to burn fuel?
-            if (this.ticksUntilBurn > 0) {
-                --this.ticksUntilBurn;
-            } else {
-                doBurnTick();
-                this.ticksUntilBurn = this.getTicksPerBurn();
-                this.markDirty();
-            }
+        }
+        //Burn logic:
+        //Are we still waiting to burn fuel?
+        if (this.ticksUntilBurn > 0) {
+            --this.ticksUntilBurn;
+        } else {
+            doBurnTick();
+            this.ticksUntilBurn = this.getTicksPerBurn();
+            //this.markDirty();
         }
     }
 

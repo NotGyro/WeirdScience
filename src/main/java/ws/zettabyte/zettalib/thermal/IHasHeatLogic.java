@@ -9,7 +9,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 public interface IHasHeatLogic extends IHeatLogic {
 	
 	IHeatLogic getHeatLogic();
-	
+
 	default int getHeat() { return getHeatLogic().getHeat(); };
 	default int modifyHeat(int value) { return getHeatLogic().modifyHeat(value); };
 	default int getHeatTransferRate() { return getHeatLogic().getHeatTransferRate(); };

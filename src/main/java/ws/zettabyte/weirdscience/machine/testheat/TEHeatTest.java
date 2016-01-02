@@ -16,6 +16,7 @@ import ws.zettabyte.zettalib.inventory.IComponentContainer;
 import ws.zettabyte.zettalib.inventory.IDescriptiveInventory;
 import ws.zettabyte.zettalib.inventory.IInvComponent;
 import ws.zettabyte.zettalib.inventory.ItemSlot;
+import ws.zettabyte.zettalib.thermal.HeatRegistry;
 import ws.zettabyte.zettalib.thermal.IHasHeatLogic;
 import ws.zettabyte.zettalib.thermal.IHeatLogic;
 import ws.zettabyte.zettalib.thermal.SimpleHeatLogic;
@@ -101,6 +102,18 @@ public class TEHeatTest extends TileEntityBase implements IHasHeatLogic,
     	if((worldObj.getTotalWorldTime() % tempLogic.getTicksPerPassiveLoss()) == 0) {
     		this.tempLogic.doPassiveLoss();
     	}
+		//Try in-world heat stuff
+		ForgeDirection check;
+		for(int i = 0; i < 6; ++i) {
+			check = ForgeDirection.VALID_DIRECTIONS[i];
+			//Block b = worldObj.getBlock(xCoord + check.offsetX,
+			//        yCoord + check.offsetY,
+			//        zCoord + check.offsetZ);
+			HeatRegistry.getInstance().TryBlockBehaviorAt(worldObj, xCoord + check.offsetX,
+					yCoord + check.offsetY,
+					zCoord + check.offsetZ,
+					this.tempLogic);
+		}
     	
     	if(tempLogic.isDirty()) {
     		this.markDirty();

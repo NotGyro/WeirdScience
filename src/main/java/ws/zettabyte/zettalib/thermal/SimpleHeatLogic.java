@@ -1,15 +1,11 @@
 package ws.zettabyte.zettalib.thermal;
 
 import ws.zettabyte.zettalib.ZettaLib;
-import ws.zettabyte.zettalib.inventory.IInvComponent;
 import ws.zettabyte.zettalib.inventory.IInvComponentInt;
 import ws.zettabyte.zettalib.network.MessageTileIntComponent;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTank;
 
 public class SimpleHeatLogic implements IHeatLogic, IInvComponentInt {
 
@@ -29,20 +25,11 @@ public class SimpleHeatLogic implements IHeatLogic, IInvComponentInt {
 	protected boolean dirty = false;
 	
 	public boolean initialized = false;
-	
-	/*
-	 * These values result in Plains with an ambient temperature of 18.8 C
-	 * and Desert with 62 C. Good enough for now.
-	 */
-	protected static final float tempToCelsius = 24.0F;
-	protected static final float tempCelsOffset = -2.0F;
+
 	
 	//Prevent heat logics from tossing one degree back and forth forever.
 	protected static final int minDiffToTransfer = 2;
-	
-	protected static int celsiusFromBiome(float in) {
-		return (int) ((tempToCelsius * in) + tempCelsOffset);
-	};
+
 	public SimpleHeatLogic() {}
 
 	public SimpleHeatLogic(World world, int x, int y, int z) {
@@ -50,7 +37,7 @@ public class SimpleHeatLogic implements IHeatLogic, IInvComponentInt {
 	}
 	
 	public void setupAmbientHeat(World world, int x, int y, int z) {
-		ambTemperature = celsiusFromBiome(world.getBiomeGenForCoords(x, z).temperature) * 1000;
+		ambTemperature = HeatRegistry.celsiusFromBiome(world.getBiomeGenForCoords(x, z).temperature) * 1000;
 		temperature = ambTemperature;
 		initialized = true;
 	}

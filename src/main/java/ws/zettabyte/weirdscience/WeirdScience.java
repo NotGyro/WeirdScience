@@ -7,12 +7,14 @@ import java.util.logging.Logger;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBucket;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.oredict.OreDictionary;
@@ -25,7 +27,9 @@ import ws.zettabyte.weirdscience.machine.BlockSolidBurner;
 import ws.zettabyte.weirdscience.machine.testheat.BlockHeatTest;
 import ws.zettabyte.zettalib.BucketEventManager;
 import ws.zettabyte.zettalib.block.BlockGeneric;
+import ws.zettabyte.zettalib.fluid.BlockGas;
 import ws.zettabyte.zettalib.fluid.BlockGasFlammable;
+import ws.zettabyte.zettalib.fluid.GasWeight;
 import ws.zettabyte.zettalib.initutils.Conf;
 import ws.zettabyte.zettalib.initutils.ConfAnnotationParser;
 import ws.zettabyte.zettalib.initutils.Configgable;
@@ -39,9 +43,11 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
+import ws.zettabyte.zettalib.thermal.HeatRegistry;
+import ws.zettabyte.zettalib.thermal.registryentries.BlockPhaseChange;
 
 //Packet handler is just a dummy as of this point.
-@Configgable(section="test")
+@Configgable(section="Features")
 @Mod(modid = WeirdScience.modid, name = WeirdScience.name, version = WeirdScience.version, dependencies = WeirdScience.dependencies)
 public class WeirdScience {
 	public static final String modid = "WeirdScience";
@@ -55,6 +61,9 @@ public class WeirdScience {
     @SidedProxy(clientSide="ws.zettabyte.weirdscience.client.ClientProxy", serverSide="ws.zettabyte.weirdscience.CommonProxy")
     public static CommonProxy proxy;
 
+    @Conf(name="Enable in-world steam", def="true", comment="Do we boil water in-world into steam gas?")
+    public static boolean enableInWorldSteam = true;
+
     //The logger for the mod. Should this not be static? Since it's Minecraft, it's unlikely that there will be threading issues.
     public static final Logger logger = Logger.getLogger("WeirdScience");
     public static CreativeTabs tabWeirdScience = new CreativeTabWeirdScience(CreativeTabs.getNextID(), "tabWeirdScience");
@@ -63,9 +72,12 @@ public class WeirdScience {
     BucketEventManager bucketMan = new BucketEventManager(); //My favorite superhero
     public static ArrayList<String> sounds;// = CongealedBloodBlock.sounds;
 
+    public static Fluid fluidSteam;
+    public static BlockGas blockSteam;
+
     public static FluidSmog fluidSmog;
     public static BlockGasFlammable blockSmog;
-    
+
     public static FluidAcid fluidAcid;
     public static BlockAcid blockAcid;
     
@@ -123,6 +135,14 @@ public class WeirdScience {
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
+        if(FluidRegistry.isFluidRegistered("steam")) {
+            fluidSteam = FluidRegistry.getFluid("steam");
+        } else {
+            fluidSteam = (Fluid) new Fluid("steam");
+            fluidSteam.setUnlocalizedName("steam");
+            FluidRegistry.registerFluid(fluidSteam);
+        }
+
     	fluidSmog = (FluidSmog) new FluidSmog("smog");
         fluidSmog.setUnlocalizedName("smog");
         FluidRegistry.registerFluid(fluidSmog);
@@ -130,7 +150,14 @@ public class WeirdScience {
 	    fluidAcid = new FluidAcid("acid");
 	    fluidAcid.setUnlocalizedName("acid");
         FluidRegistry.registerFluid(fluidAcid);
-	   
+
+        blockSteam = (BlockGas) new BlockGas(fluidSteam);
+        blockSteam.entitiesInteract = false;
+        blockSteam.isReactive = false;
+        iu.initBlockConfig(blockSteam, "Steam").setHardness(0.5f);
+        blockSteam.weight = GasWeight.LIGHTER; //Steam rises.
+
+        fluidSteam.setBlock(blockSmog);
         
     	blockSmog = (BlockGasFlammable) new BlockGasFlammable(fluidSmog);
     	blockSmog.entitiesInteract = true;
@@ -139,8 +166,7 @@ public class WeirdScience {
         iu.initBlockConfig(blockSmog, "Smog").setHardness(0.5f);
         
     	fluidSmog.setBlock(blockSmog);
-	    
-    	
+
 	    blockAcid = new BlockAcid(fluidAcid);
     	blockAcid.entitiesInteract = true;
     	blockAcid.isReactive = true;
@@ -189,7 +215,19 @@ public class WeirdScience {
 
         blockSolidBurner = new BlockSolidBurner(Material.iron);
         iu.initBlockConfig(blockSolidBurner, "SolidBurner");
-        
+
+
+        if(enableInWorldSteam) {
+            BlockPhaseChange steamBoil = new BlockPhaseChange();
+            steamBoil.from = Blocks.water;
+            steamBoil.to = blockSteam;
+            steamBoil.toMetaSensitive = true;
+            steamBoil.toMeta = 15;
+            steamBoil.rising = true;
+            steamBoil.targetHeat = (100) * 1000; //100 C to heat units
+            steamBoil.metaSensitive = false;
+            HeatRegistry.getInstance().AddBlockBehavior(steamBoil.from, steamBoil);
+        }
 	    
         config.save();
         
@@ -203,6 +241,8 @@ public class WeirdScience {
     public void postInit(FMLPostInitializationEvent event) {
         itemAcidBucket.setCreativeTab(tabWeirdScience);
         bucketMan.addRecipe(blockAcid, new ItemStack(itemAcidBucket));
+
+        fluidSteam.setIcons(blockSteam.getIcon(0, 0));
         fluidSmog.setIcons(blockSmog.getIcon(0, 0));
         fluidAcid.setIcons(blockAcid.getIcon(0, 0));
     }

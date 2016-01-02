@@ -41,6 +41,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import ws.zettabyte.zettalib.thermal.VanillaBlockHeat;
 
 //Packet handler is just a dummy as of this point.
 @Mod(modid = ZettaLib.modid, name = ZettaLib.name, version = ZettaLib.version, dependencies = ZettaLib.dependencies)
@@ -91,6 +92,7 @@ public class ZettaLib {
 	    //GameRegistry.registerItem(stick, "itemDebugStick");
 	    //stick.setCreativeTab(CreativeTabs.tabMisc);
     	//}
+        VanillaBlockHeat.init();
     }
 
     @EventHandler

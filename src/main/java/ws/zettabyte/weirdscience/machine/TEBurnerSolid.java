@@ -9,6 +9,7 @@ import ws.zettabyte.zettalib.initutils.Configgable;
 import ws.zettabyte.zettalib.inventory.ItemSlot;
 import ws.zettabyte.zettalib.inventory.SimpleInvComponent;
 import ws.zettabyte.zettalib.inventory.SlotInput;
+import ws.zettabyte.zettalib.thermal.HeatRegistry;
 
 import java.util.ArrayList;
 
@@ -37,10 +38,6 @@ public class TEBurnerSolid extends TEBurnerBase {
 
     @Conf(name="Burners: mC (thousandths of degrees celsius) per furnace fuel value for Solid Fuel Burner", def="25")
     protected static int mcPerFuelTick = 25;
-
-    //@Conf(name="Burners: Solid burner speed multiplier - generates heat & consumes fuel this many times as fast.", def="2")
-    //TODO: Pump this up with bellows, maybe?
-    protected int burnSpeedMult = 2;
 
     //For our friends in GUI land:
     protected ArrayList<SimpleInvComponent<Float>> remainingDisplay = new ArrayList<SimpleInvComponent<Float>>(9);
@@ -89,26 +86,28 @@ public class TEBurnerSolid extends TEBurnerBase {
     public void updateEntity () {
         /* TEBurnerBase.updateEntity() handles a bunch of tick-counting logic and will call doBurnTick. However we need
          * to count ticks remaining for fuel in the fuel slots. Here: */
-        if((activeCount > 0) && !worldObj.isRemote) {
+        if(activeCount > 0) {
             int tempUp = 0;
             for (int i = 0; i < 9; ++i) {
                 //Is this, before our process, a still-burning slot?
                 if (burnRemain[i] > 0) {
-                    burnRemain[i] -= 1 * burnSpeedMult;
+                    burnRemain[i] -= 1 * HeatRegistry.getInstance().burnSpeedMult;
                     //A fuel slot "goes out".
                     if (burnRemain[i] <= 0) activeCount -= 1;
                     //If they all go out, it is no longer burning.
                     //if (activeCount <= 0) burning = false;
 
-                    tempUp += mcPerFuelTick * burnSpeedMult; /*We have just lost a tick of burn time, add the
+                    tempUp += mcPerFuelTick * HeatRegistry.getInstance().burnSpeedMult; /*We have just lost a tick of burn time, add the
                                                               * conversion ratio to our temperature.*/
                 }
             }
-            if(tempUp != 0) {
-                heat.modifyHeat(tempUp); //Increase heat by cumulative fuel-time converted to heat.
+            if (!worldObj.isRemote) {
+                if (tempUp != 0) {
+                    heat.modifyHeat(tempUp); //Increase heat by cumulative fuel-time converted to heat.
+                }
             }
             //Are there no embers in this hearth?
-            if(activeCount <= 0) {
+            if (activeCount <= 0) {
                 activeCount = 0; //Prevent shenanigans
                 //We are technically no longer burning, then.
                 //burning = false;
@@ -116,7 +115,6 @@ public class TEBurnerSolid extends TEBurnerBase {
             }
             refreshProgressValues();
         }
-
         //We can now try the burn tick.
         super.updateEntity();
     }
@@ -127,6 +125,7 @@ public class TEBurnerSolid extends TEBurnerBase {
         for(int i = 0; i < 9; ++i) tryBurnSlot(i);
         //If fuel-time ran out and there is no more fuel to burn, the fire goes out. Check for that.
         verifyBurning();
+        //this.markDirty();
     }
 
     protected void tryBurnSlot(int sl) {
@@ -148,16 +147,17 @@ public class TEBurnerSolid extends TEBurnerBase {
                         activeCount += 1;
                         burnRemain[sl] = bTime;
                         prevBurnTime[sl] = bTime;
-
-                        //Do removal / replacement logic on burnable item
-                        if(stack.getItem().getContainerItem(stack) != null) {
-                            //Buckets and such
-                            ItemStack replacementStack = stack.getItem().getContainerItem(stack);
-                            slot.setStackForce(replacementStack);
-                        }
-                        else {
-                            //Coal, wood, etc.
-                            slot.decrStackSize(1);
+                        if(!this.worldObj.isRemote) {
+                            //Do removal / replacement logic on burnable item
+                            if (stack.getItem().getContainerItem(stack) != null) {
+                                //Buckets and such
+                                ItemStack replacementStack = stack.getItem().getContainerItem(stack);
+                                slot.setStackForce(replacementStack);
+                            } else {
+                                //Coal, wood, etc.
+                                slot.decrStackSize(1);
+                            }
+                            this.markDirty();
                         }
                     }
                 }
