@@ -1,7 +1,7 @@
 package ws.zettabyte.weirdscience.machine;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
@@ -13,7 +13,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.util.RotationHelper;
 import ws.zettabyte.weirdscience.CommonProxy;
 import ws.zettabyte.weirdscience.WeirdScience;
@@ -49,12 +49,12 @@ public class BlockCatalyticEngine extends BlockContainerBase implements
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(int side, int meta) {
 		if(isOperating(meta)){
-			return iconsActive.getIconFurnaceStyle(ForgeDirection.VALID_DIRECTIONS[side], 
-					ForgeDirection.VALID_DIRECTIONS[getFacing(meta)]);
+			return iconsActive.getIconFurnaceStyle(EnumFacing.VALID_DIRECTIONS[side],
+					EnumFacing.VALID_DIRECTIONS[getFacing(meta)]);
 		}
 		else {
-			return iconsInactive.getIconFurnaceStyle(ForgeDirection.VALID_DIRECTIONS[side], 
-					ForgeDirection.VALID_DIRECTIONS[getFacing(meta)]);
+			return iconsInactive.getIconFurnaceStyle(EnumFacing.VALID_DIRECTIONS[side],
+					EnumFacing.VALID_DIRECTIONS[getFacing(meta)]);
 		}
 	}
 	
@@ -64,19 +64,19 @@ public class BlockCatalyticEngine extends BlockContainerBase implements
 		//NORTH and EAST both face away from the item renderer, gotta change our logic ever so slightly
 		//SOUTH is the same FORWARD that furnaces and such have.
 		iconsInactive.setAllSidesName("weirdscience:genericmachine");
-		iconsInactive.setTextureName("weirdscience:genericmachine4", ForgeDirection.WEST);
-		iconsInactive.setTextureName("weirdscience:genericmachine3", ForgeDirection.UP);
+		iconsInactive.setTextureName("weirdscience:genericmachine4", EnumFacing.WEST);
+		iconsInactive.setTextureName("weirdscience:genericmachine3", EnumFacing.UP);
 
-		iconsInactive.setTextureName("weirdscience:genericmachine5", ForgeDirection.SOUTH);
+		iconsInactive.setTextureName("weirdscience:genericmachine5", EnumFacing.SOUTH);
 		/*
 		iconsInactive.setAllSidesName("weirdscience:genericmachine");
-		iconsInactive.setTextureName("weirdscience:genericmachine5", ForgeDirection.EAST);
-		iconsInactive.setTextureName("weirdscience:genericmachine3", ForgeDirection.UP);
+		iconsInactive.setTextureName("weirdscience:genericmachine5", EnumFacing.EAST);
+		iconsInactive.setTextureName("weirdscience:genericmachine3", EnumFacing.UP);
 
-		iconsInactive.setTextureName("weirdscience:genericmachine4", ForgeDirection.NORTH);*/
+		iconsInactive.setTextureName("weirdscience:genericmachine4", EnumFacing.NORTH);*/
     	
     	iconsActive.makeCopy(iconsInactive);
-    	iconsActive.setTextureName("weirdscience:genericmachine5_active", ForgeDirection.SOUTH);
+    	iconsActive.setTextureName("weirdscience:genericmachine5_active", EnumFacing.SOUTH);
 
     	iconsInactive.registerBlockIcons(iconRegister);
     	iconsActive.registerBlockIcons(iconRegister);
@@ -98,14 +98,14 @@ public class BlockCatalyticEngine extends BlockContainerBase implements
 
 	@Override
 	public boolean rotateBlock(World worldObj, int x, int y, int z,
-			ForgeDirection axis) {
+			EnumFacing axis) {
 		// Dumb hacks ahoy. Should really find a better (but still non-verbose)
 		// way to do this.
 		return RotationHelper.rotateVanillaBlock(Blocks.furnace, worldObj,
 				x, y, z, axis);
 	}
 	@Override
-	public ForgeDirection[] getValidRotations(World worldObj, int x, int y,
+	public EnumFacing[] getValidRotations(World worldObj, int x, int y,
 			int z) {
 		// Dumb hacks ahoy. Should really find a better (but still non-verbose)
 		// way to do this.

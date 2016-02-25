@@ -1,16 +1,17 @@
 package ws.zettabyte.zettalib.network;
 
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import ws.zettabyte.zettalib.inventory.IDescriptiveInventory;
 import ws.zettabyte.zettalib.inventory.IInvComponent;
 import ws.zettabyte.zettalib.inventory.IInvComponentInt;
 import io.netty.buffer.ByteBuf;
-import cpw.mods.fml.common.network.ByteBufUtils;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
 
 /**
  * Primarily intended for sending messages from client to server, to notify the server that
@@ -27,7 +28,7 @@ public class MessageTileIntComponent implements IMessage {
 	public MessageTileIntComponent() {
 	}
 	public MessageTileIntComponent(IInvComponentInt cmp, TileEntity te) {
-		x = te.xCoord; y = te.yCoord; z = te.zCoord;
+		x = te.getPos().getX(); y = te.getPos().getY(); z = te.getPos().getZ();
 		val = cmp.getComponentVal();
 		componentName = cmp.getComponentName();
 	}
@@ -57,7 +58,7 @@ public class MessageTileIntComponent implements IMessage {
 			if(ctx.getServerHandler().playerEntity == null) return null;
 			if(ctx.getServerHandler().playerEntity.worldObj == null) return null;
 			World w = ctx.getServerHandler().playerEntity.worldObj;
-			TileEntity te = w.getTileEntity(message.x, message.y, message.z);
+			TileEntity te = w.getTileEntity(new BlockPos(message.x, message.y, message.z));
 			if(te instanceof IDescriptiveInventory) {
 				IDescriptiveInventory te2 = (IDescriptiveInventory)te;
 				if(!(te2.canInteractWith(ctx.getServerHandler().playerEntity))) return null;

@@ -1,6 +1,6 @@
 package ws.zettabyte.zettalib.thermal;
 
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 /**
  * This is for entities / Tile Entities, etc that can do heat behavior.
@@ -12,7 +12,7 @@ public interface IHeatLogic {
 	 * @return Heat of this object in mC (thousandths of a degree celsius).
 	 */
 	int getHeat();
-	default int getHeat(ForgeDirection side) { return this.getHeat(); }
+	default int getHeat(EnumFacing side) { return this.getHeat(); }
 
 	/**
 	 * Adds some amount to our temperature - if it is negative, our temperature is
@@ -24,14 +24,14 @@ public interface IHeatLogic {
 	 * @return How much we were actually able to modify the temperature by. 
 	 */
 	int modifyHeat(int value);
-	default int modifyHeat(int value, ForgeDirection side) { return this.modifyHeat(value); }
+	default int modifyHeat(int value, EnumFacing side) { return this.modifyHeat(value); }
 	
 	/**
 	 * @return How many thousandths of a degree celsius can we transfer into or out of this object
 	 * per second?
 	 */
 	int getHeatTransferRate();
-	default int getHeatRate(ForgeDirection side) { return this.getHeatTransferRate(); }
+	default int getHeatRate(EnumFacing side) { return this.getHeatTransferRate(); }
 	
 	/**
 	 * @return How hot it is in our biome.

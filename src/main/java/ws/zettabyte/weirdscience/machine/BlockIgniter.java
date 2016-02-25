@@ -1,7 +1,7 @@
 package ws.zettabyte.weirdscience.machine;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -11,7 +11,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.util.RotationHelper;
 import ws.zettabyte.zettalib.block.BlockGeneric;
 import ws.zettabyte.zettalib.block.CubeIconSet;
@@ -33,14 +33,14 @@ public class BlockIgniter extends BlockGeneric {
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(int side, int meta) {
         //Porting danger spot
-        ForgeDirection facing = ForgeDirection.VALID_DIRECTIONS[meta & ~8];
-        ForgeDirection sideDir = ForgeDirection.VALID_DIRECTIONS[side];
+        EnumFacing facing = EnumFacing.VALID_DIRECTIONS[meta & ~8];
+        EnumFacing sideDir = EnumFacing.VALID_DIRECTIONS[side];
 
         return icons.getIconPistonStyle(sideDir, facing);
     }
     @Override
     public boolean rotateBlock(World worldObj, int x, int y, int z,
-                               ForgeDirection axis) {
+                               EnumFacing axis) {
         // Dumb hacks ahoy. Should really find a better (but still non-verbose)
         // way to do this.
         return RotationHelper.rotateVanillaBlock(Blocks.dispenser, worldObj,
@@ -58,12 +58,12 @@ public class BlockIgniter extends BlockGeneric {
     @Override
     public void registerBlockIcons(IIconRegister iconRegister) {
         icons.setAllSidesName("weirdscience:genericmachine");
-        icons.setTextureName("weirdscience:igniterface", ForgeDirection.SOUTH);
+        icons.setTextureName("weirdscience:igniterface", EnumFacing.SOUTH);
         icons.registerBlockIcons(iconRegister);
     }
 
-    public ForgeDirection getFacing(World world, int x, int y, int z) {
-        return ForgeDirection.VALID_DIRECTIONS[world.getBlockMetadata(x,y,z) & ~8];
+    public EnumFacing getFacing(World world, int x, int y, int z) {
+        return EnumFacing.VALID_DIRECTIONS[world.getBlockMetadata(x,y,z) & ~8];
     }
     //Possibly "get icon for item render"?
     @SideOnly(Side.CLIENT)
@@ -95,7 +95,7 @@ public class BlockIgniter extends BlockGeneric {
         if(this.isRedstoneActive(world,x,y,z)) {
             if( ! isOnCooldown(world,x,y,z, this)){
                 //First, check to see if the block in front of ours is air.
-                ForgeDirection dir = this.getFacing(world, x, y, z);
+                EnumFacing dir = this.getFacing(world, x, y, z);
                 System.out.println("Dir: " + dir.name());
                 int xShift = x + dir.offsetX;
                 int yShift = y + dir.offsetY;

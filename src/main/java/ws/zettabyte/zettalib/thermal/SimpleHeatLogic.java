@@ -1,5 +1,6 @@
 package ws.zettabyte.zettalib.thermal;
 
+import net.minecraft.util.BlockPos;
 import ws.zettabyte.zettalib.ZettaLib;
 import ws.zettabyte.zettalib.inventory.IInvComponentInt;
 import ws.zettabyte.zettalib.network.MessageTileIntComponent;
@@ -32,12 +33,12 @@ public class SimpleHeatLogic implements IHeatLogic, IInvComponentInt {
 
 	public SimpleHeatLogic() {}
 
-	public SimpleHeatLogic(World world, int x, int y, int z) {
-		setupAmbientHeat(world, x, y, z);
+	public SimpleHeatLogic(World world, BlockPos p) {
+		setupAmbientHeat(world, p);
 	}
 	
-	public void setupAmbientHeat(World world, int x, int y, int z) {
-		ambTemperature = HeatRegistry.celsiusFromBiome(world.getBiomeGenForCoords(x, z).temperature) * 1000;
+	public void setupAmbientHeat(World world, BlockPos p) {
+		ambTemperature = HeatRegistry.celsiusFromBiome(world.getBiomeGenForCoords(p).temperature) * 1000;
 		temperature = ambTemperature;
 		initialized = true;
 	}
@@ -90,7 +91,7 @@ public class SimpleHeatLogic implements IHeatLogic, IInvComponentInt {
         }
         else {
         	if(te != null) {
-        		this.setupAmbientHeat(te.getWorldObj(), te.xCoord, te.yCoord, te.zCoord);
+        		this.setupAmbientHeat(te.getWorld(), te.getPos());
         	} else {
         		this.ambTemperature = 0;
         	}
@@ -114,7 +115,7 @@ public class SimpleHeatLogic implements IHeatLogic, IInvComponentInt {
     
     protected void GUISet() {
 		if(this.te != null) {
-			if(this.te.getWorldObj().isRemote) {
+			if(this.te.getWorld().isRemote) {
 				sendValClientToServer();
 			}
 			else {

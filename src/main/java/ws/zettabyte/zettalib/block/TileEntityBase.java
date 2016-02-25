@@ -4,7 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import ws.zettabyte.zettalib.inventory.IComponentContainer;
 
 public abstract class TileEntityBase extends TileEntity implements ICachedTileEntity, IComponentContainer {
@@ -13,7 +13,7 @@ public abstract class TileEntityBase extends TileEntity implements ICachedTileEn
 	}
 	
 	//TODO: Cached version
-	protected TileEntity getAdjacent(ForgeDirection d) {
+	protected TileEntity getAdjacent(EnumFacing d) {
 		int x = xCoord; int y = yCoord; int z = zCoord;
 		x += d.offsetX; y += d.offsetY; z += d.offsetZ;
 		return worldObj.getTileEntity(x, y, z);
@@ -26,7 +26,7 @@ public abstract class TileEntityBase extends TileEntity implements ICachedTileEn
 	}
 
 	@Override
-	public void updateAdjacency(TileEntity te, ForgeDirection side) {
+	public void updateAdjacency(TileEntity te, EnumFacing side) {
 		// TODO Auto-generated method stub
 		
 	}

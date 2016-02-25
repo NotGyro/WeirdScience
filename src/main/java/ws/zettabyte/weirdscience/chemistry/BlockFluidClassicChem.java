@@ -9,7 +9,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fluids.BlockFluidClassic;
 import net.minecraftforge.fluids.Fluid;
 
@@ -51,7 +51,7 @@ public class BlockFluidClassicChem extends BlockFluidClassic {
 	public void updateReaction(World world, int x, int y, int z) {
 		if(isReactive ) {
 			Block adjBlock;
-			for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+			for(EnumFacing dir : EnumFacing.VALID_DIRECTIONS) {
 				adjBlock = world.getBlock(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
 				if(adjBlock != null) {
 					tryReaction(world, x, y, z, x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ, adjBlock);

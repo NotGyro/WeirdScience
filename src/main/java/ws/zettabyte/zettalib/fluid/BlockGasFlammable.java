@@ -1,7 +1,9 @@
 package ws.zettabyte.zettalib.fluid;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
@@ -16,6 +18,7 @@ public class BlockGasFlammable extends BlockGas {
 		super(fluid); //Just like liquid hydrogen!
 		isReactive = true;
 	}
+	/*
     public float getExplosionStrength() {
 		return explosionStrength;
 	}
@@ -35,14 +38,14 @@ public class BlockGasFlammable extends BlockGas {
 		this.explosionThreshhold = explosionThreshhold;
 	}
 	@Override
-    public void onBlockDestroyedByExplosion(World world, int x, int y, int z, Explosion explosion) {
-    	if(canExplode(world, x, y, z)) {
-            world.createExplosion(null, x, y, z, explosionStrength, true);
-            world.setBlockToAir(x, y, z);
+    public void onBlockDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
+    	if(canExplode(world, pos)) {
+            world.createExplosion(null, pos, explosionStrength, true);
+            world.setBlockToAir(pos);
     	}
-    }
-    public boolean canExplode(World world, int x, int y, int z) {
-    	if(explosionsEnabled & (getConcentration(world, x, y, z) > explosionThreshhold)) {
+    }*/
+    public boolean canExplode(World world, BlockPos pos) {
+    	if(explosionsEnabled & (getConcentration(world, pos) > explosionThreshhold)) {
     		return true;
     	}
     	else {
@@ -52,11 +55,11 @@ public class BlockGasFlammable extends BlockGas {
     
     //Check to see if the new neighbor is a block that should cause us to explode.
     @Override
-	public void tryReaction(World world, int x, int y, int z, int xO, int yO, int zO, Block b) {
+	public void tryReaction(World world, BlockPos pos, BlockPos posOther, IBlockState b) {
     	if(((b == Blocks.fire || b == Blocks.torch) || b == Blocks.lava)){
-        	if(canExplode(world, x, y, z)) {
-                world.createExplosion(null, x, y, z, explosionStrength, true);
-                world.setBlockToAir(x, y, z);
+        	if(canExplode(world, pos)) {
+                world.createExplosion(null, pos.getX(), pos.getY(), pos.getZ(), explosionStrength, true);
+                world.setBlockToAir(pos);
         	}
     	}
     }

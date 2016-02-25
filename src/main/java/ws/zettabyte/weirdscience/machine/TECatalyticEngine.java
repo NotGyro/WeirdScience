@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -21,7 +21,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import ws.zettabyte.zettalib.block.IMetaActive;
@@ -212,8 +212,8 @@ public class TECatalyticEngine extends TileEntityInventoryBase implements
 		            Block fBlock = fluidTank.getFluid().getFluid().getBlock();
 		            if (fBlock instanceof BlockGas) {
 		            	BlockGas ourWaste = (BlockGas)fBlock;
-		                for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-		                    if (dir != ForgeDirection.UP) {
+		                for (EnumFacing dir : EnumFacing.VALID_DIRECTIONS) {
+		                    if (dir != EnumFacing.UP) {
 		                        if (fluidTank.getFluid().amount < rateExhaustOut) {
 		                            break;
 		                        }
@@ -293,8 +293,8 @@ public class TECatalyticEngine extends TileEntityInventoryBase implements
                 Block fBlock = exhaustStack.getFluid().getBlock();
                 if (fBlock instanceof BlockGas) {
                 	BlockGas ourWaste = (BlockGas)fBlock;
-                    for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-                        if (dir != ForgeDirection.UP) {
+                    for (EnumFacing dir : EnumFacing.VALID_DIRECTIONS) {
+                        if (dir != EnumFacing.UP) {
                         	exhaustStack.amount = ourWaste.pushIntoBlock(worldObj, xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ, exhaustStack.amount);
                             if (exhaustStack.amount <= 0) {
                                 break;

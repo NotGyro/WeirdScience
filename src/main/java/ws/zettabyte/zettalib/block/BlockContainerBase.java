@@ -6,7 +6,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 /**
  * A BlockContainer (that is, block which has an associated Tile Entity) with all of the 
  * extra functionality required to make use of ZettaLib's bells and whistles.
@@ -33,9 +33,9 @@ public abstract class BlockContainerBase extends BlockContainer implements IInfo
             TileEntity te2 = world.getTileEntity(tileX, tileY, tileZ);
             //Check directionality
             for (int i = 0; i < 6; i++) {
-                if ((((tileX - x) == ForgeDirection.VALID_DIRECTIONS[i].offsetX) && ((tileY - y) == ForgeDirection.VALID_DIRECTIONS[i].offsetY))
-                        && ((tileZ - z) == ForgeDirection.VALID_DIRECTIONS[i].offsetZ))
-                    b.updateAdjacency(te2, ForgeDirection.VALID_DIRECTIONS[i]);
+                if ((((tileX - x) == EnumFacing.VALID_DIRECTIONS[i].offsetX) && ((tileY - y) == EnumFacing.VALID_DIRECTIONS[i].offsetY))
+                        && ((tileZ - z) == EnumFacing.VALID_DIRECTIONS[i].offsetZ))
+                    b.updateAdjacency(te2, EnumFacing.VALID_DIRECTIONS[i]);
             }
         }
     }

@@ -3,8 +3,9 @@ package ws.zettabyte.zettalib;
 import java.util.HashMap;
 import java.util.Map;
 
-import cpw.mods.fml.common.eventhandler.Event.Result;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.block.state.IBlockState;
+import net.minecraftforge.fml.common.eventhandler.Event.Result;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.block.Block;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -19,13 +20,13 @@ import net.minecraftforge.event.entity.player.FillBucketEvent;
  *
  */
 public class BucketEventManager {
-	protected Map<Block, ItemStack> fluidToBucket;
+	protected Map<IBlockState, ItemStack> fluidToBucket;
 	
 	public BucketEventManager() {
-		fluidToBucket = new HashMap<Block, ItemStack>();
+		fluidToBucket = new HashMap<IBlockState, ItemStack>();
 	};
 	
-	public boolean addRecipe(Block b, ItemStack bucket) {
+	public boolean addRecipe(IBlockState b, ItemStack bucket) {
 		if((b == null) || (fluidToBucket.containsKey(b))) {
 			return false;
 		}
@@ -42,13 +43,14 @@ public class BucketEventManager {
 			//Have we clicked a tile with an empty bucket?
 			if (event.current.getItem() == Items.bucket && event.target.typeOfHit == MovingObjectType.BLOCK) {
 				//Is there an entry for this block's ID?
-				if(fluidToBucket.get(event.world.getBlock(target.blockX, target.blockY, target.blockZ)) != null) {
+				IBlockState b = event.world.getBlockState(target.getBlockPos());
+				if(fluidToBucket.get(b) != null) {
 					//Set our event's item to our fluid.
-					event.result = fluidToBucket.get(event.world.getBlock(target.blockX, target.blockY, target.blockZ)).copy();
+					event.result = fluidToBucket.get(b).copy();
 					//Allow this to happen.
 					event.setResult(Result.ALLOW);
 					//Set the block to 0 so we don't just have infinite liquid.
-					event.world.setBlockToAir(target.blockX, target.blockY, target.blockZ);
+					event.world.setBlockToAir(target.getBlockPos());
 				}
 				else {
 					//Nothing we recognize.

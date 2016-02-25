@@ -1,9 +1,11 @@
 package ws.zettabyte.zettalib.thermal.registryentries;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import ws.zettabyte.zettalib.initutils.Configgable;
 import ws.zettabyte.zettalib.thermal.HeatRegistry;
@@ -20,22 +22,23 @@ public class FurnaceHeatBridge extends BlockHeatBehavior {
     public static int ratio = 4*HeatRegistry.burnSpeedMult; //ratio heat units to one furnace burn tick
 
     @Override
-    public boolean canPerform(World world, int x, int y, int z) {
-        Block b = world.getBlock(x,y,z);
+    public boolean canPerform(World world, BlockPos pos) {
+        IBlockState b = world.getBlockState(pos);
         if(b == null) return false;
         if((b != Blocks.furnace) && (b != Blocks.lit_furnace)) return false;
         return true;
     }
 
     @Override
-    public boolean doBehavior(World world, int x, int y, int z, IHeatLogic heatSource) {
-        if(!canPerform(world,x,y,z)) return false;
+    public boolean doBehavior(World world, BlockPos pos, IHeatLogic heatSource) {
+        if(!canPerform(world,pos)) return false;
 
-        TileEntity te = world.getTileEntity(x,y,z);
+        TileEntity te = world.getTileEntity(pos);
         if(te == null) return false;
         if(!(te instanceof TileEntityFurnace)) return false;
         TileEntityFurnace furnace = (TileEntityFurnace) te;
-
+        /* Why would you suddenly and for no reason make this private..?
+        //TODO: reflection code to get this working again
         if(furnace.furnaceBurnTime > this.maxFurnaceBurnTime) return false; //Do not go over max.
 
         if(heatSource == null) return false;
@@ -57,6 +60,7 @@ public class FurnaceHeatBridge extends BlockHeatBehavior {
         }
         else {
             return false;
-        }
+        }*/
+        return false;
     }
 }

@@ -3,7 +3,7 @@ package ws.zettabyte.weirdscience.machine;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntityFurnace;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import ws.zettabyte.zettalib.initutils.Conf;
 import ws.zettabyte.zettalib.initutils.Configgable;
 import ws.zettabyte.zettalib.inventory.ItemSlot;
@@ -202,7 +202,7 @@ public class TEBurnerSolid extends TEBurnerBase {
     @Override
     public boolean canExtractItem(int s, ItemStack stack, int fromDirection) {
         //Only allow extracting from bottom.
-        if(ForgeDirection.VALID_DIRECTIONS[fromDirection] != ForgeDirection.DOWN) {
+        if(EnumFacing.VALID_DIRECTIONS[fromDirection] != EnumFacing.DOWN) {
             return false;
         }
         else {

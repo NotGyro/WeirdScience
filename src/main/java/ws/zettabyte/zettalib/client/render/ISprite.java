@@ -1,7 +1,7 @@
 package ws.zettabyte.zettalib.client.render;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * An ISprite represents any 2D object that can be drawn at a specified X and Y position

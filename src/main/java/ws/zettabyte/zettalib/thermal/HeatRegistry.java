@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import ws.zettabyte.zettalib.thermal.registryentries.BlockHeatBehavior;
 
@@ -44,15 +46,15 @@ public class HeatRegistry
      * (p.s. Java now has the distinction of being more temperamental than C++,
      * in which vector<BlockHeatBehavior>* blockBehavior = new vector<BlockHeatBehavior>[4096]; would totally work.
      */
-    private HashMap<Block, ArrayList<BlockHeatBehavior>> blockBehavior = new HashMap<Block, ArrayList<BlockHeatBehavior>>();
+    private HashMap<IBlockState, ArrayList<BlockHeatBehavior>> blockBehavior = new HashMap<IBlockState, ArrayList<BlockHeatBehavior>>();
 
     //Maps blocks to amount of passive heat, e.g. steam -> 100 C. Is an offset from biome ambient temp.
-    private HashMap<Block, Integer> blockHeats = new HashMap<Block, Integer>();
+    private HashMap<IBlockState, Integer> blockHeats = new HashMap<IBlockState, Integer>();
 
-    public void registerBlockHeat(Block b, int i) {
+    public void registerBlockHeat(IBlockState b, int i) {
         blockHeats.put(b, i);
     }
-    public int getBlockHeat(Block b) {
+    public int getBlockHeat(IBlockState b) {
         if(blockHeats.containsKey(b)) {
             return blockHeats.get(b);
         }
@@ -70,17 +72,16 @@ public class HeatRegistry
      */
 
     //Temperature is in thousandths of a degrees celsius.
-    public void TryBlockBehaviorAt (World world, int x, int y, int z, IHeatLogic heatSource) {
-        ArrayList<BlockHeatBehavior> listbhb = blockBehavior.get(world.getBlock(x, y, z));
+    public void TryBlockBehaviorAt (World world, BlockPos pos, IHeatLogic heatSource) {
+        ArrayList<BlockHeatBehavior> listbhb = blockBehavior.get(world.getBlockState(pos));
         if (listbhb != null) {
             for (BlockHeatBehavior bhb : listbhb) {
-                bhb.doBehavior(world, x, y, z, heatSource);
+                bhb.doBehavior(world, pos, heatSource);
             }
         }
     }
 
-    //More Block ID dependent code.
-    public void AddBlockBehavior (Block block, BlockHeatBehavior bhb)
+    public void AddBlockBehavior (IBlockState block, BlockHeatBehavior bhb)
     {
         if (blockBehavior.get(block) == null)
         {

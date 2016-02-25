@@ -8,7 +8,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import ws.zettabyte.zettalib.block.TileEntityInventoryBase;
 import ws.zettabyte.zettalib.initutils.Conf;
 import ws.zettabyte.zettalib.initutils.Configgable;
@@ -124,7 +124,7 @@ public abstract class TEBurnerBase extends TileEntityInventoryBase implements
                 heat.process();
 
                 ArrayList<IHeatLogic> testAgainst = new ArrayList<IHeatLogic>(3);
-                for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+                for (EnumFacing dir : EnumFacing.VALID_DIRECTIONS) {
                     TileEntity t = worldObj.getTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
                     if (t != null) {
                         if (t instanceof IHeatLogic) {

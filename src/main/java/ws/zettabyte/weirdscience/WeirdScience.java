@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
@@ -34,15 +34,15 @@ import ws.zettabyte.zettalib.initutils.Conf;
 import ws.zettabyte.zettalib.initutils.ConfAnnotationParser;
 import ws.zettabyte.zettalib.initutils.Configgable;
 import ws.zettabyte.zettalib.initutils.InitUtils;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.registry.LanguageRegistry;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.registry.LanguageRegistry;
 import ws.zettabyte.zettalib.thermal.HeatRegistry;
 import ws.zettabyte.zettalib.thermal.registryentries.BlockPhaseChange;
 
@@ -138,9 +138,10 @@ public class WeirdScience {
         if(FluidRegistry.isFluidRegistered("steam")) {
             fluidSteam = FluidRegistry.getFluid("steam");
         } else {
+            /*
             fluidSteam = (Fluid) new Fluid("steam");
             fluidSteam.setUnlocalizedName("steam");
-            FluidRegistry.registerFluid(fluidSteam);
+            FluidRegistry.registerFluid(fluidSteam);*/
         }
 
     	fluidSmog = (FluidSmog) new FluidSmog("smog");
@@ -170,7 +171,7 @@ public class WeirdScience {
 	    blockAcid = new BlockAcid(fluidAcid);
     	blockAcid.entitiesInteract = true;
     	blockAcid.isReactive = true;
-        iu.initBlockConfig(blockAcid, "Acid").setBlockTextureName("weirdscience:placeholderacid");
+        iu.initBlockConfig(blockAcid, "Acid");//.setBlockTextureName("weirdscience:placeholderacid");
         
     	fluidAcid.setBlock(blockAcid);
 
@@ -202,7 +203,7 @@ public class WeirdScience {
         iu.initItemConfig(itemAshes, "Ashes");
 
         Item itemRust = new Item();
-        iu.initItemConfig(itemRust, "Rust").setTextureName("weirdscience:rustPile");
+        iu.initItemConfig(itemRust, "Rust");//.setTextureName("weirdscience:rustPile");
 
         blockRust.setItemDropped(new ItemStack(itemRust, 6, 0));
         blockRust.setDroppedRandomBonus(3);
@@ -242,8 +243,8 @@ public class WeirdScience {
         itemAcidBucket.setCreativeTab(tabWeirdScience);
         bucketMan.addRecipe(blockAcid, new ItemStack(itemAcidBucket));
 
-        fluidSteam.setIcons(blockSteam.getIcon(0, 0));
-        fluidSmog.setIcons(blockSmog.getIcon(0, 0));
-        fluidAcid.setIcons(blockAcid.getIcon(0, 0));
+        //fluidSteam.setIcons(blockSteam.getIcon(0, 0));
+        //fluidSmog.setIcons(blockSmog.getIcon(0, 0));
+        //fluidAcid.setIcons(blockAcid.getIcon(0, 0));
     }
 }

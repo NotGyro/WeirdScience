@@ -21,11 +21,6 @@ public class MaterialGas extends Material {
 	}
 
 	@Override
-	public boolean getCanBlockGrass() {
-		return super.getCanBlockGrass();
-	}
-
-	@Override
 	public boolean blocksMovement() {
 		return false;
 	}

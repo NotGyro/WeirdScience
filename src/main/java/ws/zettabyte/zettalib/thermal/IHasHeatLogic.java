@@ -1,6 +1,6 @@
 package ws.zettabyte.zettalib.thermal;
 
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 /**
  * For convenience while doing composition things instead of inheritance things.

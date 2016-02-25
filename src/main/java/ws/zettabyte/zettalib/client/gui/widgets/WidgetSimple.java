@@ -5,8 +5,8 @@ import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import ws.zettabyte.zettalib.client.gui.GUIContext;
 import ws.zettabyte.zettalib.client.gui.IGUIWidget;
 import ws.zettabyte.zettalib.client.render.ISprite;

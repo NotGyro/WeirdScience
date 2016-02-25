@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 import ws.zettabyte.weirdscience.CreativeTabWeirdScience;
 import ws.zettabyte.zettalib.block.IInfoTileEntity;
-import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 /**
  * A number of convenience functions to do common bits of Minecraft object initialization.
@@ -75,8 +75,8 @@ public final class InitUtils {
 	 */
 	public Block initBlock(Block block, String name) {
 		//A default unlocalized name.
-		block.setBlockName("block" + deSpaceName(name));
-		block.setBlockTextureName(modid + ":" + processName(name));
+		block.setUnlocalizedName("block" + deSpaceName(name));
+		//block.setBlockTextureName(modid + ":" + processName(name));
 	    GameRegistry.registerBlock(block, "block" + deSpaceName(name));
 	    if(tab != null) {
 	    	if(block instanceof ICreativeTabInfo) {
@@ -144,7 +144,7 @@ public final class InitUtils {
 	public Item initItem(Item item, String name) {
 		//A default unlocalized name.
 		item.setUnlocalizedName("item" + deSpaceName(name));
-		item.setTextureName(modid + ":" + processName(name));
+		//item.setTextureName(modid + ":" + processName(name));
 	    GameRegistry.registerItem(item, "item" + deSpaceName(name));
 	    if(tab != null) {
 	    	if(item instanceof ICreativeTabInfo) {

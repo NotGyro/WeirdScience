@@ -1,7 +1,7 @@
 package ws.zettabyte.zettalib.block;
 
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 /**
  * An interface for TileEntities which can cache the locations in memory
@@ -22,6 +22,6 @@ public interface ICachedTileEntity {
 	 * @param te Adjacent TileEntity. Null is a valid value for te, and it drops the Tile Entity on side from this Tile Entity's cache.
 	 * @param side Side of our block on which te lies.
 	 */
-	void updateAdjacency(TileEntity te, ForgeDirection side);
+	void updateAdjacency(TileEntity te, EnumFacing side);
 
 }

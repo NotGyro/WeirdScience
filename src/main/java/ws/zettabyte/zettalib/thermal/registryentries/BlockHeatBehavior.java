@@ -1,5 +1,6 @@
 package ws.zettabyte.zettalib.thermal.registryentries;
 
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import ws.zettabyte.zettalib.thermal.IHeatLogic;
 
@@ -9,8 +10,8 @@ import ws.zettabyte.zettalib.thermal.IHeatLogic;
 public class BlockHeatBehavior {
 
     //Returns whether or not we could actually do anything here
-    public boolean doBehavior(World world, int x, int y, int z, IHeatLogic heatSource) {
+    public boolean doBehavior(World world, BlockPos pos, IHeatLogic heatSource) {
         return false;
     }
-    public boolean canPerform (World world, int x, int y, int z) {return false;}
+    public boolean canPerform (World world, BlockPos pos) {return false;}
 }

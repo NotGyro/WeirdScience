@@ -3,11 +3,11 @@ package ws.zettabyte.zettalib.block;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 /**
  * A container of six icons associated with each side of a cube. 
@@ -30,11 +30,11 @@ public class CubeIconSet {
 	}
 	public CubeIconSet(String defTex, String topBottomTex) {
 		this(defTex);
-		textures[RotationTools.ForgeDirectionToIndex(ForgeDirection.UP)] = topBottomTex;
-		textures[RotationTools.ForgeDirectionToIndex(ForgeDirection.DOWN)] = topBottomTex;
+		textures[RotationTools.EnumFacingToIndex(EnumFacing.UP)] = topBottomTex;
+		textures[RotationTools.EnumFacingToIndex(EnumFacing.DOWN)] = topBottomTex;
 	}
-	public void setTextureName(String name, ForgeDirection side) { 
-		textures[RotationTools.ForgeDirectionToIndex(side)] = name;
+	public void setTextureName(String name, EnumFacing side) {
+		textures[RotationTools.EnumFacingToIndex(side)] = name;
 	}
 	public void setAllSidesName(String name) { 
 		for(int i = 0; i < 6; ++i) {
@@ -54,17 +54,17 @@ public class CubeIconSet {
 		}
 	}
 
-	public IIcon getIconFurnaceStyle(ForgeDirection side, ForgeDirection facing) {
-		return icons[RotationTools.ForgeDirectionToIndex(
+	public IIcon getIconFurnaceStyle(EnumFacing side, EnumFacing facing) {
+		return icons[RotationTools.EnumFacingToIndex(
 				RotationTools.getTranslatedSideFStyle(side, facing))];
 	}
-	public IIcon getIconPistonStyle(ForgeDirection side, ForgeDirection facing) {
-		return icons[RotationTools.ForgeDirectionToIndex(
+	public IIcon getIconPistonStyle(EnumFacing side, EnumFacing facing) {
+		return icons[RotationTools.EnumFacingToIndex(
 				RotationTools.getTranslatedSidePStyle(side, facing))];
 	}
     
-    public String getTexture(ForgeDirection side) {
-    	return textures[RotationTools.ForgeDirectionToIndex(side)];
+    public String getTexture(EnumFacing side) {
+    	return textures[RotationTools.EnumFacingToIndex(side)];
     }
 
     /**
@@ -72,7 +72,7 @@ public class CubeIconSet {
      */
 	public void makeCopy(CubeIconSet cpy) {
 		for(int i = 0; i < 6; ++i) {
-			textures[i] = cpy.getTexture(ForgeDirection.VALID_DIRECTIONS[i]);
+			textures[i] = cpy.getTexture(EnumFacing.VALID_DIRECTIONS[i]);
 		}
 	}
 

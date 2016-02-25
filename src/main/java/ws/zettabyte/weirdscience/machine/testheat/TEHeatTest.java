@@ -10,7 +10,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import ws.zettabyte.zettalib.block.TileEntityBase;
 import ws.zettabyte.zettalib.inventory.IComponentContainer;
 import ws.zettabyte.zettalib.inventory.IDescriptiveInventory;
@@ -87,7 +87,7 @@ public class TEHeatTest extends TileEntityBase implements IHasHeatLogic,
     	
     	tempLogic.process();
     	ArrayList<IHeatLogic> testAgainst = new ArrayList<IHeatLogic>(3);
-    	for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+    	for(EnumFacing dir : EnumFacing.VALID_DIRECTIONS) {
     		TileEntity t = worldObj.getTileEntity(xCoord + dir.offsetX, yCoord + dir.offsetY, zCoord + dir.offsetZ);
     		if(t != null) {
     			if(t instanceof IHeatLogic) {
@@ -103,9 +103,9 @@ public class TEHeatTest extends TileEntityBase implements IHasHeatLogic,
     		this.tempLogic.doPassiveLoss();
     	}
 		//Try in-world heat stuff
-		ForgeDirection check;
+		EnumFacing check;
 		for(int i = 0; i < 6; ++i) {
-			check = ForgeDirection.VALID_DIRECTIONS[i];
+			check = EnumFacing.VALID_DIRECTIONS[i];
 			//Block b = worldObj.getBlock(xCoord + check.offsetX,
 			//        yCoord + check.offsetY,
 			//        zCoord + check.offsetZ);

@@ -3,6 +3,8 @@ package ws.zettabyte.zettalib.fluid;
 import java.util.List;
 import java.util.Random;
 
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.BlockPos;
 import ws.zettabyte.weirdscience.chemistry.IBioactive;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -12,7 +14,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidBlock;
@@ -36,27 +38,12 @@ public class BlockFiniteFluid extends Block implements IFiniteFluidBlock {
 	}
 
 	@Override
-	public float getFilledPercentage(World world, int x, int y,
-			int z) {
-		return ((float)getBlockMB(world, x, y, z) / (float)getMaxMB()) * 100.0F;
+	public float getFilledPercentage(World world, BlockPos pos) {
+		return ((float)getBlockMB(world, pos) / (float)getMaxMB()) * 100.0F;
 	}
 
 	public int getMaxMB() {
 		return getMaxConcentration() * mbPerConcentration;
-	}
-
-	@Override
-	public boolean shouldSideBeRendered(IBlockAccess world, int x, int y,
-			int z, int side) {
-				//Do not render gas<->gas faces
-			    if (this.equivalent(world.getBlock(x,y,z))) return false;
-			    return !world.getBlock(x, y, z).isOpaqueCube();
-				//return true;
-			}
-
-	@Override
-	public int getRenderBlockPass() {
-	    return 1;
 	}
 
 	/**
@@ -69,44 +56,28 @@ public class BlockFiniteFluid extends Block implements IFiniteFluidBlock {
 	}
 
 	@Override
-	public void addCollisionBoxesToList(World p_149743_1_, int p_149743_2_,
-			int p_149743_3_, int p_149743_4_, AxisAlignedBB p_149743_5_, List p_149743_6_, Entity p_149743_7_) { }
-
-	@Override
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World p_149668_1_, int p_149668_2_,
-			int p_149668_3_, int p_149668_4_) {
-		return null;
-	}
-
-	@Override
 	public int quantityDropped(Random par1Random) {
 	    return 0;
 	}
 
 	@Override
-	public FluidStack drain(World world, int x, int y, int z,
+	public FluidStack drain(World world, BlockPos pos,
 			boolean doDrain) {
 				// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public boolean canDrain(World world, int x, int y, int z) {
+	public boolean canDrain(World world, BlockPos pos) {
 		//We're all source blocks here. You must be a source block too, or else you wouldn't have come here.
 		return true;
 	}
 
-	public int getQuantaValue(IBlockAccess world, int x, int y,
-			int z) {
+	public int getQuantaValue(IBlockAccess world, BlockPos pos) {
 		return mbPerConcentration;
 	}
 
-	@Override
-	public boolean canCollideCheck(int meta, boolean fullHit) {
-		return false;
-	}
-
-	public boolean equivalent(Block b) {
+	public boolean equivalent(IBlockState b) {
 		return (b == this);
 	}
 
@@ -122,22 +93,21 @@ public class BlockFiniteFluid extends Block implements IFiniteFluidBlock {
 		return 1;
 	}
 
-	protected int getConcentrationUnsafe(World world, int x,
-			int y, int z) {
-		return world.getBlockMetadata(x, y, z) + 1;
+	protected int getConcentrationUnsafe(World world, BlockPos pos) {
+		//return world.getBlockStateMetadata(pos) + 1;
+		return 0;
 	}
 
-	public int getConcentration(World world, int x, int y,
-			int z) {
-		Block b = world.getBlock(x,y,z);
+	public int getConcentration(World world, BlockPos pos) {
+		IBlockState b = world.getBlockState(pos);
 		if(b == null) return 0;
 		if(b == this) {
-			return getConcentrationUnsafe(world, x, y, z);
+			return getConcentrationUnsafe(world, pos);
 		}
 		else if(this.equivalent(b)) {
-			return ((BlockGas)b).getConcentration(world,x,y,z);
+			return ((BlockGas)b).getConcentration(world,pos);
 		}
-		else if(b.isAir(world, x, y, z)) {
+		else if(b.getBlock().isAir(world, pos)) {
 			return 0;
 		}
 		else {
@@ -145,8 +115,8 @@ public class BlockFiniteFluid extends Block implements IFiniteFluidBlock {
 		}
 	}
 
-	public int getBlockMB(World world, int x, int y, int z) {
-		return this.getConcentration(world, x, y, z) * this.mbPerConcentration;
+	public int getBlockMB(World world, BlockPos pos) {
+		return this.getConcentration(world, pos) * this.mbPerConcentration;
 	}
 
 	public int getConcentrationFromMB(int amount) {
@@ -164,45 +134,44 @@ public class BlockFiniteFluid extends Block implements IFiniteFluidBlock {
 		return this;
 	}
 
-	public void setConcentration(World world, int x, int y,
-			int z, int concen) {
+	public void setConcentration(World world, BlockPos pos, int concen) {
 				if (concen < getMinConcentration()) {
-					world.setBlock(x, y, z, Blocks.air, 0, 1|2);
+					world.setBlockToAir(pos);
 				}
 				else {
-					if(world.getBlock(x, y, z).isAir(world, x, y, z)) {
-						world.setBlock(x, y, z, this);
+					/*
+					TODO: Port this
+					if(world.getBlockState(pos).isAir(world, pos)) {
+						world.setBlock(pos, this);
 					}
 					//if(concen >= getMaxConcentration()) {
-					//	world.setBlockMetadataWithNotify(x, y, z, 15, 1|2);
+					//	world.setBlockMetadataWithNotify(pos, 15, 1|2);
 						//Todo: spillover code
 					//}
 					//else {
 					if(doesConcentrationMatter) {
-						world.setBlockMetadataWithNotify(x, y, z, concen-1, 1|4);
+						world.setBlockMetadataWithNotify(pos, concen-1, 1|4);
 					}
 					else {
-						world.setBlockMetadataWithNotify(x, y, z, concen-1, 4);
+						world.setBlockMetadataWithNotify(pos, concen-1, 4);
 					}
 					//}
+					 */
 				}
 				
 			}
 
-	public void addConcentration(World world, int x, int y,
-			int z, int concen) {
-				this.setConcentration(world, x, y, z, (this.getConcentration(world, x, y, z) + concen));
+	public void addConcentration(World world, BlockPos pos, int concen) {
+				this.setConcentration(world, pos, (this.getConcentration(world, pos) + concen));
 				
 			}
 
-	public void setConcentrationByMB(World world, int x, int y,
-			int z, int mbuckets) {
-				this.setConcentration(world, x, y, z, this.getConcentrationFromMB(mbuckets));		
+	public void setConcentrationByMB(World world, BlockPos pos, int mbuckets) {
+				this.setConcentration(world, pos, this.getConcentrationFromMB(mbuckets));
 			}
 
 	@Override
-	public void onEntityCollidedWithBlock(World world, int x,
-			int y, int z, Entity entity) {
+	public void onEntityCollidedWithBlock(World world, BlockPos pos, Entity entity) {
 				if(fluid == null) return;
 			    if(entitiesInteract & (fluid instanceof IBioactive)) {
 			    	IBioactive bioFluid = (IBioactive)fluid;
@@ -214,34 +183,29 @@ public class BlockFiniteFluid extends Block implements IFiniteFluidBlock {
 			}
 
 	@Override
-	public void onNeighborBlockChange(World world, int x, int y,
-			int z, Block other) {
-				// TODO Auto-generated method stub
-				super.onNeighborBlockChange(world, x, y, z, other);
-				updateReaction(world, x, y, z);
+	public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block other) {
+				super.onNeighborBlockChange(world, pos, state, other);
+				updateReaction(world, pos);
 			}
 
-	public void updateReaction(World world, int x, int y,
-			int z) {
+	public void updateReaction(World world, BlockPos pos) {
 				if(isReactive ) {
-					Block adjBlock;
-					for(ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-						adjBlock = world.getBlock(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ);
+					IBlockState adjBlock;
+					for(EnumFacing dir : EnumFacing.values()) {
+						BlockPos moved = pos.offset(dir);
+						adjBlock = world.getBlockState(moved);
 						if(adjBlock != null) {
-							tryReaction(world, x, y, z, x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ, adjBlock);
+							tryReaction(world, pos, moved, adjBlock);
 						}
 					}
 				}
 			}
 
-	public void tryReaction(World world, int x, int y,
-			int z, int xO, int yO, int zO, Block b) { }
+	public void tryReaction(World world, BlockPos pos, BlockPos neighorPos, IBlockState b) { }
 
 
-	public FluidStack wouldDrain(World world, int x, int y,
-			int z, int amount) {
-				// TODO Auto-generated method stub
-				int mb = this.getBlockMB(world, x, y, z);
+	public FluidStack wouldDrain(World world, BlockPos pos, int amount) {
+				int mb = this.getBlockMB(world, pos);
 				if(amount > mb) {
 					amount = mb;
 				}
@@ -255,13 +219,12 @@ public class BlockFiniteFluid extends Block implements IFiniteFluidBlock {
 	}
 
 	@Override
-	public int pushIntoBlock(World world, int x, int y,
-			int z, int amount) {
+	public int pushIntoBlock(World world, BlockPos pos, int amount) {
 				if(getConcentrationFromMB(amount) >= 1) {
-					Block block = world.getBlock(x, y, z);
-					if(block == null || block.isAir(world, x , y, z)) {
+					IBlockState block = world.getBlockState(pos);
+					if(block == null || block.getBlock().isAir(world, pos)) {
 						//Is this air?
-						setConcentration(world, x, y, z, getConcentrationFromMB(amount));
+						setConcentration(world, pos, getConcentrationFromMB(amount));
 						
 						if(amount > getMaxMB()) {
 							return amount - getMaxMB();
@@ -269,13 +232,13 @@ public class BlockFiniteFluid extends Block implements IFiniteFluidBlock {
 						return 0;
 					}
 					else if(equivalent(block)) {
-						int blockGas = getBlockMB(world, x, y, z);
+						int blockGas = getBlockMB(world, pos);
 						if((blockGas + amount) > getMaxMB()) {
-							setConcentrationByMB(world, x, y, z, getMaxConcentration()); //Set it to max.
+							setConcentrationByMB(world, pos, getMaxConcentration()); //Set it to max.
 							return (blockGas + amount) - getMaxMB(); //Return leftovers.
 						}
 						else {
-							setConcentrationByMB(world, x, y, z, blockGas + amount); //Add amount to block.
+							setConcentrationByMB(world, pos, blockGas + amount); //Add amount to block.
 							return 0;
 						}
 					}
@@ -292,14 +255,13 @@ public class BlockFiniteFluid extends Block implements IFiniteFluidBlock {
 			}
 
 	@Override
-	public FluidStack partialDrain(World world, int x, int y,
-			int z, int amount) {
-				FluidStack f = this.wouldDrain(world, x, y, z, amount);
-				if(f.amount >= this.getBlockMB(world, x, y, z)) {
+	public FluidStack partialDrain(World world, BlockPos pos, int amount) {
+				FluidStack f = this.wouldDrain(world, pos, amount);
+				if(f.amount >= this.getBlockMB(world, pos)) {
 					//Remove our block.
 				}
 				else {
-					this.addConcentration(world,x,y,z, -f.amount);
+					this.addConcentration(world,pos, -f.amount);
 				}
 				return f;
 			}

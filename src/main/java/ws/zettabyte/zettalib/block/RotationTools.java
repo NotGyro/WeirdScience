@@ -4,7 +4,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 public final class RotationTools {
 
@@ -28,7 +28,7 @@ public final class RotationTools {
 		//quadrant %= 4;
 
 		/*
-		 * public static final ForgeDirection[] VALID_DIRECTIONS = {DOWN, UP,
+		 * public static final EnumFacing[] VALID_DIRECTIONS = {DOWN, UP,
 		 * NORTH, SOUTH, WEST, EAST}; 0 1 2 3 4 5
 		 */
 		// Facing south
@@ -54,48 +54,48 @@ public final class RotationTools {
 		System.out.println("Meta: " + world.getBlockMetadata(x,y,z));
 	}
 
-	public static int ForgeDirectionToIndex(ForgeDirection in) {
+	public static int EnumFacingToIndex(EnumFacing in) {
 		//UP, NORTH, SOUTH, WEST, EAST
-		if(in == ForgeDirection.DOWN) return 0;
-		else if(in == ForgeDirection.UP) return 1;
-		else if(in == ForgeDirection.NORTH) return 2;
-		else if(in == ForgeDirection.SOUTH) return 3;
-		else if(in == ForgeDirection.WEST) return 4;
-		else if(in == ForgeDirection.EAST) return 5;
+		if(in == EnumFacing.DOWN) return 0;
+		else if(in == EnumFacing.UP) return 1;
+		else if(in == EnumFacing.NORTH) return 2;
+		else if(in == EnumFacing.SOUTH) return 3;
+		else if(in == EnumFacing.WEST) return 4;
+		else if(in == EnumFacing.EAST) return 5;
 		else return -1;
 	}
-	protected static int __FDtoUseable2DMath(ForgeDirection in) {
+	protected static int __FDtoUseable2DMath(EnumFacing in) {
 		//UP, NORTH, SOUTH, WEST, EAST
 		//Up-down is invalid for this function - however, they should have identity through this, so eh
-		if(in == ForgeDirection.DOWN) return 4;
-		else if(in == ForgeDirection.UP) return 5;
+		if(in == EnumFacing.DOWN) return 4;
+		else if(in == EnumFacing.UP) return 5;
 		
 		//Counter-clockwise rotation from origin.
-		else if(in == ForgeDirection.SOUTH) return 0;
-		if(in == ForgeDirection.EAST) return 1;
-		else if(in == ForgeDirection.NORTH) return 2;
-		else if(in == ForgeDirection.WEST) return 3;
+		else if(in == EnumFacing.SOUTH) return 0;
+		if(in == EnumFacing.EAST) return 1;
+		else if(in == EnumFacing.NORTH) return 2;
+		else if(in == EnumFacing.WEST) return 3;
 		
 		return -1;
 	}
-	protected static ForgeDirection __FDfromUseable2DMath(int in) {
-		if(in == 4) return ForgeDirection.DOWN;
-		else if(in == 5) return ForgeDirection.UP;
+	protected static EnumFacing __FDfromUseable2DMath(int in) {
+		if(in == 4) return EnumFacing.DOWN;
+		else if(in == 5) return EnumFacing.UP;
 		
 		//Counter-clockwise rotation from origin.
-		else if(in == 0) return ForgeDirection.SOUTH;
-		if(in == 1) return ForgeDirection.EAST;
-		else if(in == 2) return ForgeDirection.NORTH;
-		else if(in == 3) return ForgeDirection.WEST;
+		else if(in == 0) return EnumFacing.SOUTH;
+		if(in == 1) return EnumFacing.EAST;
+		else if(in == 2) return EnumFacing.NORTH;
+		else if(in == 3) return EnumFacing.WEST;
 		
-		return ForgeDirection.UNKNOWN; //1.8 port problem spot
+		return EnumFacing.UNKNOWN; //1.8 port problem spot
 	}
 	
-	public static ForgeDirection getTranslatedSideFStyle(ForgeDirection side, ForgeDirection facing) {
+	public static EnumFacing getTranslatedSideFStyle(EnumFacing side, EnumFacing facing) {
 		//Facing is presumed to be the "front" of a block. Metadata of 2 is presumed North.
 		//DOWN, UP, NORTH, SOUTH, WEST, EAST
-		if(side == ForgeDirection.DOWN) return ForgeDirection.DOWN;
-		else if(side == ForgeDirection.UP) return ForgeDirection.UP;
+		if(side == EnumFacing.DOWN) return EnumFacing.DOWN;
+		else if(side == EnumFacing.UP) return EnumFacing.UP;
 
 		int f = __FDtoUseable2DMath(facing);
 		int s = __FDtoUseable2DMath(side);
@@ -122,28 +122,28 @@ public final class RotationTools {
 			}
 		}
 	}
-	public static ForgeDirection getTranslatedSidePStyle(ForgeDirection side, ForgeDirection facing) {
+	public static EnumFacing getTranslatedSidePStyle(EnumFacing side, EnumFacing facing) {
 		//Facing is presumed to be the direction faced by the "front" of a block, and the "front" dir in the block's space
 		//is South.
 		//UP, NORTH, SOUTH, WEST, EAST
 		//I'm just gonna use a table here because I have no idea how to do axis-aligned 3D rotation, sorry senpai
-		if(facing == ForgeDirection.UP) {
-			if(side == ForgeDirection.UP) return ForgeDirection.SOUTH;
-			if(side == ForgeDirection.DOWN) return ForgeDirection.NORTH;
-			if(side == ForgeDirection.EAST) return ForgeDirection.EAST;
-			if(side == ForgeDirection.WEST) return ForgeDirection.WEST;
-			if(side == ForgeDirection.NORTH) return ForgeDirection.DOWN;
-			if(side == ForgeDirection.SOUTH) return ForgeDirection.UP;
-			return ForgeDirection.SOUTH;
+		if(facing == EnumFacing.UP) {
+			if(side == EnumFacing.UP) return EnumFacing.SOUTH;
+			if(side == EnumFacing.DOWN) return EnumFacing.NORTH;
+			if(side == EnumFacing.EAST) return EnumFacing.EAST;
+			if(side == EnumFacing.WEST) return EnumFacing.WEST;
+			if(side == EnumFacing.NORTH) return EnumFacing.DOWN;
+			if(side == EnumFacing.SOUTH) return EnumFacing.UP;
+			return EnumFacing.SOUTH;
 		}
-		else if(facing == ForgeDirection.DOWN) {
-			if(side == ForgeDirection.UP) return ForgeDirection.NORTH;
-			if(side == ForgeDirection.DOWN) return ForgeDirection.SOUTH;
-			if(side == ForgeDirection.EAST) return ForgeDirection.EAST;
-			if(side == ForgeDirection.WEST) return ForgeDirection.WEST;
-			if(side == ForgeDirection.NORTH) return ForgeDirection.UP;
-			if(side == ForgeDirection.SOUTH) return ForgeDirection.DOWN;
-			return ForgeDirection.SOUTH;
+		else if(facing == EnumFacing.DOWN) {
+			if(side == EnumFacing.UP) return EnumFacing.NORTH;
+			if(side == EnumFacing.DOWN) return EnumFacing.SOUTH;
+			if(side == EnumFacing.EAST) return EnumFacing.EAST;
+			if(side == EnumFacing.WEST) return EnumFacing.WEST;
+			if(side == EnumFacing.NORTH) return EnumFacing.UP;
+			if(side == EnumFacing.SOUTH) return EnumFacing.DOWN;
+			return EnumFacing.SOUTH;
 		}
 		else {
 			return getTranslatedSideFStyle(side, facing);
